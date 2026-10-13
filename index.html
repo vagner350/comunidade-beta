@@ -138,13 +138,13 @@
 
 <dialog id="dlg-login">
   <h3>Entrar na comunidade</h3>
-  <p class="m">Digite seu e-mail. Enviaremos um link de acesso, sem senha.</p>
+  <p class="m">Digite seu e-mail para entrar.</p>
   <form id="form-login">
     <label for="email">Seu e-mail</label>
     <input id="email" type="email" required autocomplete="email" placeholder="voce@email.com">
     <div class="row">
       <button class="btn ghost" type="button" data-close>Cancelar</button>
-      <button class="btn" type="submit" id="btn-enviar">Enviar link</button>
+      <button class="btn" type="submit" id="btn-enviar">Entrar</button>
     </div>
     <div class="msg" id="msg-login" role="status"></div>
   </form>
@@ -152,19 +152,11 @@
 
 <dialog id="dlg-conta">
   <h3>Minha conta</h3>
-  <p class="m"><span id="c-email"></span> <span class="badge" id="c-status"></span></p>
-  <form id="form-conta">
-    <label for="c-nome">Nome</label>
-    <input id="c-nome" type="text" autocomplete="name" maxlength="120">
-    <label for="c-whats">WhatsApp</label>
-    <input id="c-whats" type="tel" autocomplete="tel" maxlength="30" placeholder="(48) 99999-9999">
-    <div class="row">
-      <button class="btn ghost" type="button" id="btn-sair">Sair</button>
-      <button class="btn" type="submit">Salvar</button>
-    </div>
-    <div class="msg" id="msg-conta" role="status"></div>
-  </form>
-  <div class="row"><button class="btn ghost" type="button" data-close>Fechar</button></div>
+  <p class="m">Você entrou como <strong id="c-email"></strong>.</p>
+  <div class="row">
+    <button class="btn ghost" type="button" id="btn-sair">Sair</button>
+    <button class="btn" type="button" data-close>Fechar</button>
+  </div>
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -193,85 +185,55 @@
     c.appendChild(p); c.appendChild(w); d.appendChild(c);
   });
 
-  // ===== LOGIN DE AFILIADOS (Supabase, link por e-mail) =====
+  // ===== LOGIN DE AFILIADOS (só e-mail, sem confirmação) =====
   var SUPABASE_URL = "https://mgvpzmklmjvsozlsawzi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_K4Pa5UTavA5RJX8S367qYA_b7twGzzu"; // chave pública, segura no navegador
-  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
 
   var $ = function (id) { return document.getElementById(id); };
-  var dlgLogin = $("dlg-login"), dlgConta = $("dlg-conta");
-  var btnConta = $("btn-conta");
-  var sessao = null;
+  var dlgLogin = $("dlg-login"), dlgConta = $("dlg-conta"), btnConta = $("btn-conta");
+  var CHAVE = "amazole_afiliado_email";
+
+  function lerEmail() { try { return localStorage.getItem(CHAVE) || ""; } catch (e) { return ""; } }
+  function gravarEmail(v) { try { v ? localStorage.setItem(CHAVE, v) : localStorage.removeItem(CHAVE); } catch (e) {} }
+  var email = lerEmail();
 
   function msg(el, texto, tipo) { el.textContent = texto || ""; el.className = "msg" + (tipo ? " " + tipo : ""); }
+  function atualizarBotao() { btnConta.textContent = email ? "Minha conta" : "Entrar"; }
 
-  document.querySelectorAll("[data-open]").forEach(function (b) {
-    b.addEventListener("click", abrir);
-  });
+  function abrir() {
+    if (email) { $("c-email").textContent = email; dlgConta.showModal(); }
+    else { msg($("msg-login"), ""); dlgLogin.showModal(); }
+  }
+  document.querySelectorAll("[data-open]").forEach(function (b) { b.addEventListener("click", abrir); });
   document.querySelectorAll("[data-close]").forEach(function (b) {
     b.addEventListener("click", function () { b.closest("dialog").close(); });
   });
   btnConta.addEventListener("click", abrir);
 
-  function abrir() {
-    if (sessao) { carregarConta(); dlgConta.showModal(); }
-    else { msg($("msg-login"), ""); dlgLogin.showModal(); }
-  }
-
-  function atualizarBotao() {
-    btnConta.textContent = sessao ? "Minha conta" : "Entrar";
-  }
-
   $("form-login").addEventListener("submit", async function (e) {
     e.preventDefault();
-    var email = $("email").value.trim();
+    var valor = $("email").value.trim().toLowerCase();
     var btn = $("btn-enviar");
-    btn.disabled = true; msg($("msg-login"), "Enviando...");
-    var r = await sb.auth.signInWithOtp({
-      email: email,
-      options: { emailRedirectTo: location.origin + location.pathname }
-    });
+    btn.disabled = true; msg($("msg-login"), "Entrando...");
+    var r = await sb.rpc("entrar_afiliado", { p_email: valor });
     btn.disabled = false;
     if (r.error) {
-      msg($("msg-login"), "Não foi possível enviar agora. Tente de novo em alguns minutos.", "err");
-    } else {
-      msg($("msg-login"), "Pronto! Abra seu e-mail e clique no link para entrar.", "ok");
+      msg($("msg-login"), "Confira o e-mail e tente de novo.", "err");
+      return;
     }
+    email = valor; gravarEmail(email); atualizarBotao();
+    dlgLogin.close();
+    abrir();
   });
 
-  async function carregarConta() {
-    msg($("msg-conta"), "");
-    $("c-email").textContent = sessao.user.email;
-    var r = await sb.from("affiliates")
-      .select("nome,whatsapp,status").eq("id", sessao.user.id).maybeSingle();
-    var a = r.data || {};
-    $("c-nome").value = a.nome || "";
-    $("c-whats").value = a.whatsapp || "";
-    $("c-status").textContent = a.status || "pendente";
-  }
-
-  $("form-conta").addEventListener("submit", async function (e) {
-    e.preventDefault();
-    var r = await sb.from("affiliates")
-      .update({ nome: $("c-nome").value.trim(), whatsapp: $("c-whats").value.trim() })
-      .eq("id", sessao.user.id);
-    if (r.error) msg($("msg-conta"), "Não foi possível salvar.", "err");
-    else msg($("msg-conta"), "Dados salvos.", "ok");
+  $("btn-sair").addEventListener("click", function () {
+    email = ""; gravarEmail(""); atualizarBotao(); dlgConta.close();
   });
 
-  $("btn-sair").addEventListener("click", async function () {
-    await sb.auth.signOut();
-    dlgConta.close();
-  });
-
-  sb.auth.onAuthStateChange(function (evento, ses) {
-    sessao = ses;
-    atualizarBotao();
-    if (evento === "SIGNED_IN" && location.hash.indexOf("access_token") !== -1) {
-      history.replaceState(null, "", location.pathname);
-    }
-  });
-  sb.auth.getSession().then(function (r) { sessao = r.data.session; atualizarBotao(); });
+  atualizarBotao();
 </script>
 </body>
 </html>
