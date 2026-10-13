@@ -44,6 +44,19 @@
   .final{text-align:center}
   .final .box{background:linear-gradient(135deg,#3b0f78,#14042b);border:1px solid var(--line);border-radius:26px;padding:56px 24px}
   .final p{color:var(--muted);margin:10px auto 26px;max-width:480px}
+  button.btn{border:0;font:inherit;font-weight:700;cursor:pointer}
+  dialog{margin:auto;border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);padding:30px;width:min(420px,92vw)}
+  dialog::backdrop{background:rgba(5,0,15,.75)}
+  dialog h3{font-size:1.3rem;margin-bottom:6px}
+  dialog p.m{color:var(--muted);font-size:.92rem;margin-bottom:18px}
+  dialog label{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 6px}
+  dialog input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+  dialog input:focus{outline:2px solid var(--accent);border-color:transparent}
+  dialog .row{display:flex;gap:10px;margin-top:20px}
+  dialog .row .btn{flex:1;text-align:center;padding:12px}
+  .msg{margin-top:14px;font-size:.9rem;min-height:1.2em}
+  .msg.ok{color:#4ade80}.msg.err{color:#f87171}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.78rem;background:var(--bg);border:1px solid var(--line);color:var(--accent2)}
   .proof{padding-top:48px}
   .video{max-width:820px;margin:0 auto 32px;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:0 20px 60px rgba(168,85,247,.25)}
   .video iframe{width:100%;height:100%;border:0;display:block}
@@ -57,7 +70,7 @@
 <header>
   <div class="wrap nav">
     <a class="brand" href="#">Amazol<span>é</span></a>
-    <a class="btn" href="#entrar">Quero ser afiliado</a>
+    <button class="btn" id="btn-conta" type="button">Entrar</button>
   </div>
 </header>
 
@@ -68,7 +81,7 @@
       <h1>Venda produtos físicos e ganhe <em>comissão por venda</em></h1>
       <p>Plataforma de afiliados com estoque nacional. Você divulga e a gente cuida do resto.</p>
       <div class="cta">
-        <a class="btn" href="#entrar">Entrar na comunidade</a>
+        <button class="btn" type="button" data-open>Entrar na comunidade</button>
         <a class="btn ghost" href="#como-funciona">Como funciona</a>
       </div>
     </div>
@@ -113,7 +126,7 @@
       <div class="box">
         <h2>Pronto para começar?</h2>
         <p>Junte-se aos afiliados da Amazolé e comece a vender e ganhar comissão.</p>
-        <a class="btn" href="#">Quero entrar agora</a>
+        <button class="btn" type="button" data-open>Quero entrar agora</button>
       </div>
     </div>
   </section>
@@ -123,6 +136,38 @@
   <div class="wrap">© 2026 Amazolé · Comunidade de Afiliados</div>
 </footer>
 
+<dialog id="dlg-login">
+  <h3>Entrar na comunidade</h3>
+  <p class="m">Digite seu e-mail. Enviaremos um link de acesso, sem senha.</p>
+  <form id="form-login">
+    <label for="email">Seu e-mail</label>
+    <input id="email" type="email" required autocomplete="email" placeholder="voce@email.com">
+    <div class="row">
+      <button class="btn ghost" type="button" data-close>Cancelar</button>
+      <button class="btn" type="submit" id="btn-enviar">Enviar link</button>
+    </div>
+    <div class="msg" id="msg-login" role="status"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-conta">
+  <h3>Minha conta</h3>
+  <p class="m"><span id="c-email"></span> <span class="badge" id="c-status"></span></p>
+  <form id="form-conta">
+    <label for="c-nome">Nome</label>
+    <input id="c-nome" type="text" autocomplete="name" maxlength="120">
+    <label for="c-whats">WhatsApp</label>
+    <input id="c-whats" type="tel" autocomplete="tel" maxlength="30" placeholder="(48) 99999-9999">
+    <div class="row">
+      <button class="btn ghost" type="button" id="btn-sair">Sair</button>
+      <button class="btn" type="submit">Salvar</button>
+    </div>
+    <div class="msg" id="msg-conta" role="status"></div>
+  </form>
+  <div class="row"><button class="btn ghost" type="button" data-close>Fechar</button></div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ===== CONFIGURE AQUI =====
   // ID do vídeo do YouTube (ex.: em youtube.com/watch?v=ABC123xyz o ID é ABC123xyz)
@@ -147,6 +192,86 @@
     var w = document.createElement("div"); w.className = "who"; w.textContent = x.autor;
     c.appendChild(p); c.appendChild(w); d.appendChild(c);
   });
+
+  // ===== LOGIN DE AFILIADOS (Supabase, link por e-mail) =====
+  var SUPABASE_URL = "https://mgvpzmklmjvsozlsawzi.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_K4Pa5UTavA5RJX8S367qYA_b7twGzzu"; // chave pública, segura no navegador
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  var $ = function (id) { return document.getElementById(id); };
+  var dlgLogin = $("dlg-login"), dlgConta = $("dlg-conta");
+  var btnConta = $("btn-conta");
+  var sessao = null;
+
+  function msg(el, texto, tipo) { el.textContent = texto || ""; el.className = "msg" + (tipo ? " " + tipo : ""); }
+
+  document.querySelectorAll("[data-open]").forEach(function (b) {
+    b.addEventListener("click", abrir);
+  });
+  document.querySelectorAll("[data-close]").forEach(function (b) {
+    b.addEventListener("click", function () { b.closest("dialog").close(); });
+  });
+  btnConta.addEventListener("click", abrir);
+
+  function abrir() {
+    if (sessao) { carregarConta(); dlgConta.showModal(); }
+    else { msg($("msg-login"), ""); dlgLogin.showModal(); }
+  }
+
+  function atualizarBotao() {
+    btnConta.textContent = sessao ? "Minha conta" : "Entrar";
+  }
+
+  $("form-login").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var email = $("email").value.trim();
+    var btn = $("btn-enviar");
+    btn.disabled = true; msg($("msg-login"), "Enviando...");
+    var r = await sb.auth.signInWithOtp({
+      email: email,
+      options: { emailRedirectTo: location.origin + location.pathname }
+    });
+    btn.disabled = false;
+    if (r.error) {
+      msg($("msg-login"), "Não foi possível enviar agora. Tente de novo em alguns minutos.", "err");
+    } else {
+      msg($("msg-login"), "Pronto! Abra seu e-mail e clique no link para entrar.", "ok");
+    }
+  });
+
+  async function carregarConta() {
+    msg($("msg-conta"), "");
+    $("c-email").textContent = sessao.user.email;
+    var r = await sb.from("affiliates")
+      .select("nome,whatsapp,status").eq("id", sessao.user.id).maybeSingle();
+    var a = r.data || {};
+    $("c-nome").value = a.nome || "";
+    $("c-whats").value = a.whatsapp || "";
+    $("c-status").textContent = a.status || "pendente";
+  }
+
+  $("form-conta").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var r = await sb.from("affiliates")
+      .update({ nome: $("c-nome").value.trim(), whatsapp: $("c-whats").value.trim() })
+      .eq("id", sessao.user.id);
+    if (r.error) msg($("msg-conta"), "Não foi possível salvar.", "err");
+    else msg($("msg-conta"), "Dados salvos.", "ok");
+  });
+
+  $("btn-sair").addEventListener("click", async function () {
+    await sb.auth.signOut();
+    dlgConta.close();
+  });
+
+  sb.auth.onAuthStateChange(function (evento, ses) {
+    sessao = ses;
+    atualizarBotao();
+    if (evento === "SIGNED_IN" && location.hash.indexOf("access_token") !== -1) {
+      history.replaceState(null, "", location.pathname);
+    }
+  });
+  sb.auth.getSession().then(function (r) { sessao = r.data.session; atualizarBotao(); });
 </script>
 </body>
 </html>
