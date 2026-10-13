@@ -115,6 +115,8 @@
   .adm-tab .st-bloqueado{border-color:#fca5a5;background:#fef2f2}
   .adm-tab .lnk{border:0;background:transparent;color:#3b6cf6;font:inherit;font-weight:600;cursor:pointer;padding:4px 6px}
   .adm-tab .lnk.del{color:#dc2626}
+  .cta-note{color:var(--muted);font-size:.9rem;margin-top:14px;min-height:1.2em}
+  .linkbtn{border:0;background:transparent;color:var(--accent2);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline}
   .proof{padding-top:48px}
   .video{max-width:820px;margin:0 auto 32px;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:0 20px 60px rgba(168,85,247,.25)}
   .video iframe{width:100%;height:100%;border:0;display:block}
@@ -140,9 +142,10 @@
       <h1>Venda produtos físicos e ganhe <em>comissão por venda</em></h1>
       <p>Plataforma de afiliados com estoque nacional. Você divulga e a gente cuida do resto.</p>
       <div class="cta">
-        <button class="btn" type="button" data-open>Entrar na comunidade</button>
-        <a class="btn ghost" href="#como-funciona">Como funciona</a>
+        <a class="btn" href="#" data-checkout>Entrar na comunidade · R$ 57,00</a>
+        <button class="btn ghost" type="button" data-open>Já sou afiliado? Entrar</button>
       </div>
+      <p class="cta-note" role="status"></p>
     </div>
   </div>
 
@@ -185,7 +188,9 @@
       <div class="box">
         <h2>Pronto para começar?</h2>
         <p>Junte-se aos afiliados da Amazolé e comece a vender e ganhar comissão.</p>
-        <button class="btn" type="button" data-open>Quero entrar agora</button>
+        <a class="btn" href="#" data-checkout>Quero entrar agora · R$ 57,00</a>
+        <p class="cta-note" role="status"></p>
+        <p><button class="linkbtn" type="button" data-open>Já sou afiliado? Entrar</button></p>
       </div>
     </div>
   </section>
@@ -278,6 +283,24 @@
     var p = document.createElement("p"); p.textContent = "“" + x.texto + "”";
     var w = document.createElement("div"); w.className = "who"; w.textContent = x.autor;
     c.appendChild(p); c.appendChild(w); d.appendChild(c);
+  });
+
+  // ===== CHECKOUT =====
+  // Cole aqui o link completo do checkout (pagamento de R$ 57,00).
+  // Exemplo: var CHECKOUT_URL = "https://pay.exemplo.com/abc123";
+  var CHECKOUT_URL = "";
+
+  document.querySelectorAll("[data-checkout]").forEach(function (a) {
+    if (/^https:\/\//i.test(CHECKOUT_URL)) {
+      a.href = CHECKOUT_URL; a.rel = "noopener";
+    } else {
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.querySelectorAll(".cta-note").forEach(function (n) {
+          n.textContent = "O link de pagamento estará disponível em breve.";
+        });
+      });
+    }
   });
 
   // ===== LOGIN DE AFILIADOS =====
