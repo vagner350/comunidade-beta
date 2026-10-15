@@ -42,7 +42,7 @@
     var dlg = el("dialog", "dlg-adm");
     dlg.appendChild(el("h3", "", cfg.titulo));
     var form = el("form");
-    var campos = {};
+    var campos = {}, rotulos = {}, dicas = {};
     cfg.campos.forEach(function (c) {
       var id = "f-" + c.id;
       if (c.tipo === "checkbox") {
@@ -52,6 +52,7 @@
         form.appendChild(lb); campos[c.id] = cb; return;
       }
       var l = el("label", "", c.label); l.htmlFor = id;
+      rotulos[c.id] = l;
       form.appendChild(l);
       var f;
       if (c.tipo === "textarea") { f = el("textarea"); f.rows = c.linhas || 4; }
@@ -65,6 +66,7 @@
       if (c.obrig) f.required = true;
       f.value = c.valor != null ? c.valor : "";
       form.appendChild(f); campos[c.id] = f;
+      if (c.dica) { var dk = el("small", "dica", c.dica); form.appendChild(dk); dicas[c.id] = dk; }
     });
     var linha = el("div", "row");
     var cancelar = el("button", "btn ghost", "Cancelar"); cancelar.type = "button";
@@ -87,6 +89,7 @@
       if (r && r.ok) { fechar(); if (cfg.depois) cfg.depois(); }
       else msg(aviso, (r && r.erro) || "Não foi possível salvar.", "err");
     });
+    if (cfg.aoMontar) cfg.aoMontar({ campos: campos, rotulos: rotulos, dicas: dicas, titulo: dlg.querySelector("h3") });
     dlg.showModal();
   }
 
@@ -178,7 +181,9 @@
     cont.corpo = corpo; cont.t = corpo.dataset.t;
     corpo.textContent = "";
     var secs = menuCompleto().filter(function (s) { return s.id !== "cursos"; });
-    if (!cont.secao || !secs.some(function (s) { return s.id === cont.secao; })) cont.secao = secs.length ? secs[0].id : "";
+    if (!cont.secao || !secs.some(function (s) { return s.id === cont.secao; })) {
+      cont.secao = secs.some(function (s) { return s.id === "criativos"; }) ? "criativos" : (secs.length ? secs[0].id : "");
+    }
 
     var barra = el("div", "adm-bar");
     var sel = el("select");
@@ -204,6 +209,14 @@
     cont.itens = r.data.itens || [];
     desenhar();
   }
+
+  // Em Criativos e Produtos cada item é um produto com a pasta do Google Drive
+  function modo(secao) {
+    if (secao === "criativos") return { item: "Produto", titulo: "Produto", link: "Link da pasta do Google Drive", ph: "https://drive.google.com/drive/folders/...", texto: "Descrição (opcional)", dica: "No Drive: botão direito na pasta → Compartilhar → “Qualquer pessoa com o link” → Leitor. Senão o afiliado não consegue abrir." };
+    if (secao === "produtos") return { item: "Produto", titulo: "Nome do produto", link: "Link (página do produto ou Drive)", ph: "https://...", texto: "Descrição", dica: "" };
+    return { item: "Item", titulo: "Título", link: "Link do botão “Abrir” (https, opcional)", ph: "https://...", texto: "Texto", dica: "" };
+  }
+  function ehDrive(u) { return /^https:\/\/(drive|docs)\.google\.com\//i.test(u || ""); }
 
   function itensDaSecao() { return cont.itens.filter(function (i) { return i.secao === cont.secao; }); }
 
@@ -237,11 +250,12 @@
       } else th.classList.add("sem-capa");
       h.appendChild(th);
       var info = el("div", "ad-info");
-      info.appendChild(el("strong", "", it.titulo));
+      info.appendChild(el("strong", "", "#" + it.ordem + "  " + it.titulo));
       if (it.texto) info.appendChild(el("div", "ad-trecho", it.texto.length > 120 ? it.texto.slice(0, 120) + "…" : it.texto));
       var meta = el("div", "ad-meta");
       meta.appendChild(el("span", "ad-selo " + (it.publicado ? "ok" : "rasc"), it.publicado ? "Publicado" : "Rascunho"));
-      if (it.link) meta.appendChild(el("span", "ad-selo dest", "Com link"));
+      if (it.link) meta.appendChild(el("span", "ad-selo dest", ehDrive(it.link) ? "Google Drive" : "Com link"));
+      else meta.appendChild(el("span", "ad-selo rasc", "Sem link"));
       info.appendChild(meta);
       h.appendChild(info);
       var ac = el("div", "ad-acoes");
@@ -264,17 +278,31 @@
 
   function form(it) {
     var secs = menuCompleto().filter(function (s) { return s.id !== "cursos"; });
+    var m0 = modo(it ? it.secao : cont.secao);
     formulario({
-      titulo: it ? "Editar item" : "Novo item",
+      titulo: it ? "Editar " + m0.item.toLowerCase() : "Novo " + m0.item.toLowerCase(),
       campos: [
         { id: "secao", label: "Seção", tipo: "select", opcoes: secs.map(function (s) { return [s.id, s.icone + " " + s.nome]; }), valor: it ? it.secao : cont.secao },
-        { id: "titulo", label: "Título", max: 200, obrig: true, valor: it ? it.titulo : "" },
-        { id: "texto", label: "Texto", tipo: "textarea", linhas: 5, max: 5000, valor: it ? it.texto : "" },
-        { id: "link", label: "Link do botão “Abrir” (https, opcional)", tipo: "url", max: 500, placeholder: "https://...", valor: it ? it.link : "" },
-        { id: "imagem_url", label: "Imagem (link https, opcional)", tipo: "url", max: 500, placeholder: "https://...", valor: it ? it.imagem_url : "" },
+        { id: "titulo", label: m0.titulo, max: 200, obrig: true, valor: it ? it.titulo : "" },
         { id: "ordem", label: "Ordem (1 aparece primeiro)", tipo: "number", valor: it ? it.ordem : itensDaSecao().length + 1 },
+        { id: "link", label: m0.link, tipo: "url", max: 500, placeholder: m0.ph, valor: it ? it.link : "", dica: m0.dica },
+        { id: "texto", label: m0.texto, tipo: "textarea", linhas: 3, max: 5000, valor: it ? it.texto : "" },
+        { id: "imagem_url", label: "Imagem de capa (link https, opcional)", tipo: "url", max: 500, placeholder: "https://...", valor: it ? it.imagem_url : "" },
         { id: "publicado", label: "Publicado (visível para afiliados)", tipo: "checkbox", valor: it ? it.publicado : true }
       ],
+      aoMontar: function (f) {
+        function aplicar() {
+          var m = modo(f.campos.secao.value);
+          f.rotulos.titulo.textContent = m.titulo;
+          f.rotulos.link.textContent = m.link;
+          f.campos.link.placeholder = m.ph;
+          f.rotulos.texto.textContent = m.texto;
+          f.dicas.link.textContent = m.dica;
+          f.dicas.link.hidden = !m.dica;
+        }
+        f.campos.secao.addEventListener("change", aplicar);
+        aplicar();
+      },
       salvar: async function (v) {
         var d = { secao: v.secao, titulo: v.titulo, texto: v.texto, link: v.link, imagem_url: v.imagem_url, ordem: parseInt(v.ordem, 10) || 0, publicado: v.publicado };
         if (it) d.id = it.id;
@@ -284,7 +312,7 @@
       },
       depois: async function () {
         await atualizarApp();
-        msg(cont.aviso, "Item salvo.", "ok");
+        msg(cont.aviso, "Salvo.", "ok");
         conteudo(cont.corpo);
       }
     });

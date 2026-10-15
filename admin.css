@@ -49,3 +49,5 @@
 dialog.dlg-adm{width:min(520px,94vw)}
 dialog.dlg-adm .chk{display:flex;align-items:center;gap:8px;color:var(--text);margin-top:14px}
 dialog.dlg-adm input[type=checkbox]{width:auto}
+dialog.dlg-adm small.dica{display:block;color:var(--muted);font-size:.8rem;margin-top:6px}
+dialog.dlg-adm small.dica[hidden]{display:none}

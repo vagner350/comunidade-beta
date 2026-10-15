@@ -814,6 +814,12 @@
     if (txt != null) e.textContent = txt;
     return e;
   }
+  function rotuloLink(u) {
+    if (/^https:\/\/(drive|docs)\.google\.com\//i.test(u)) return "📁 Abrir no Google Drive";
+    if (/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(u)) return "▶ Assistir";
+    if (/^https:\/\/(chat\.whatsapp\.com|wa\.me)\//i.test(u)) return "📱 Abrir no WhatsApp";
+    return "Abrir";
+  }
   function linkSeguro(u) { return /^https?:\/\//i.test(u || ""); }
   var ADMIN_CURSOS = { id: "admin_cursos", nome: "Gerenciar Cursos", icone: "🎬", sub: "Cadastre cursos, aulas, capas e a sequência" };
   var ADMIN_ITENS = [
@@ -945,7 +951,7 @@
       c.appendChild(criar("h3", "", it.titulo || ""));
       if (it.texto) c.appendChild(criar("p", "", it.texto));
       if (linkSeguro(it.link)) {
-        var a = criar("a", "go", "Abrir");
+        var a = criar("a", "go", rotuloLink(it.link));
         a.href = it.link; a.target = "_blank"; a.rel = "noopener noreferrer";
         c.appendChild(a);
       }
