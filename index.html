@@ -306,6 +306,16 @@
     .hero .cta,.hero .trust{justify-content:flex-start}
     .hero .prova12{align-items:flex-start;text-align:left}
   }
+
+  /* ===== MENU / PENDENTE / CONTEÚDO ===== */
+  #app .main{padding:0}
+  .nav-sep{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6e78a8;padding:12px 14px 2px}
+  .item-img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;margin-bottom:12px;background:#e4e6f3}
+  .pendente-box{grid-column:1/-1;background:#fff;border:1px solid #e4e6f3;border-radius:18px;padding:28px;color:#1c2038;max-width:640px}
+  .pendente-box h3{font-size:1.3rem;margin-bottom:8px}
+  .pendente-box p{color:#5c6385;margin-bottom:18px}
+  .pend-acoes{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  @media(max-width:760px){.nav-sep{display:none}.pendente-box{padding:20px}.pend-acoes .btn{width:100%;text-align:center}}
 </style>
 <link rel="stylesheet" href="cursos.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="cursos.css"></noscript>
@@ -651,22 +661,26 @@
   var DEPOIMENTOS = [];
   // ==========================
 
-  var v = document.getElementById("video");
-  if (VIDEO_ID) {
-    v.innerHTML = '<iframe src="https://www.youtube.com/embed/' + encodeURIComponent(VIDEO_ID) +
-      '?rel=0" title="Vídeo Amazolé" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
-  } else {
-    v.innerHTML = '<div class="soon">Vídeo em breve</div>';
+  function montarProva() {
+    var v = document.getElementById("video"), d = document.getElementById("depoimentos");
+    var sec = document.getElementById("prova-social");
+    var temVideo = /^[\w-]{11}$/.test(VIDEO_ID), temDep = DEPOIMENTOS.length > 0;
+    if (sec) sec.hidden = !(temVideo || temDep);
+    v.textContent = ""; d.textContent = "";
+    v.hidden = !temVideo;
+    if (temVideo) {
+      v.innerHTML = '<iframe src="https://www.youtube.com/embed/' + encodeURIComponent(VIDEO_ID) +
+        '?rel=0" title="Vídeo Amazolé" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    }
+    DEPOIMENTOS.forEach(function (x) {
+      var c = document.createElement("div");
+      c.className = "card quote";
+      var p = document.createElement("p"); p.textContent = "“" + x.texto + "”";
+      var w = document.createElement("div"); w.className = "who"; w.textContent = x.autor || "";
+      c.appendChild(p); c.appendChild(w); d.appendChild(c);
+    });
   }
-
-  var d = document.getElementById("depoimentos");
-  DEPOIMENTOS.forEach(function (x) {
-    var c = document.createElement("div");
-    c.className = "card quote";
-    var p = document.createElement("p"); p.textContent = "“" + x.texto + "”";
-    var w = document.createElement("div"); w.className = "who"; w.textContent = x.autor;
-    c.appendChild(p); c.appendChild(w); d.appendChild(c);
-  });
+  montarProva();
 
   // ===== CARROSSEL DE PRODUTOS: duplica os itens para o loop contínuo =====
   (function () {
@@ -716,20 +730,23 @@
   // Exemplo: var CHECKOUT_URL = "https://pay.exemplo.com/abc123";
   var CHECKOUT_URL = "https://dignopay.com.br/checkout/202m449h5f";
 
-  document.querySelectorAll("[data-checkout]").forEach(function (a) {
-    if (/^https:\/\//i.test(CHECKOUT_URL)) {
-      a.href = CHECKOUT_URL; a.rel = "noopener";
-    } else {
-      a.addEventListener("click", function (e) {
-        e.preventDefault();
-        document.querySelectorAll(".cta-note").forEach(function (n) {
-          n.textContent = "O link de pagamento estará disponível em breve.";
-        });
-        var of = document.getElementById("oferta");
-        if (of) of.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-    }
-  });
+  function aplicarCheckout() {
+    var ok = /^https:\/\//i.test(CHECKOUT_URL);
+    document.querySelectorAll("[data-checkout]").forEach(function (a) {
+      if (ok) { a.href = CHECKOUT_URL; a.rel = "noopener"; a.onclick = null; }
+      else {
+        a.onclick = function (e) {
+          e.preventDefault();
+          document.querySelectorAll(".cta-note").forEach(function (n) {
+            n.textContent = "O link de pagamento estará disponível em breve.";
+          });
+          var of = document.getElementById("oferta");
+          if (of) of.scrollIntoView({ behavior: "smooth", block: "center" });
+        };
+      }
+    });
+  }
+  aplicarCheckout();
 
   // ===== LOGIN DE AFILIADOS =====
   // Afiliados entram só com e-mail. O administrador entra com link de confirmação no e-mail.
@@ -789,7 +806,7 @@
     { id: "automacao", nome: "Automação Whatsapp", icone: "🤖", sub: "Atendimento automático para o seu WhatsApp" },
     { id: "grupo", nome: "Grupo Whatsapp", icone: "📱", sub: "Entre no grupo da comunidade" }
   ];
-  var ADMIN_SECAO = { id: "admin", nome: "Painel Admin", icone: "🛠️", sub: "Gerencie os afiliados da comunidade" };
+  var ADMIN_SECAO = { id: "admin", nome: "Afiliados", icone: "👥", sub: "Aprove, cadastre e edite os afiliados da comunidade" };
 
   function criar(tag, cls, txt) {
     var e = document.createElement(tag);
@@ -799,8 +816,63 @@
   }
   function linkSeguro(u) { return /^https?:\/\//i.test(u || ""); }
   var ADMIN_CURSOS = { id: "admin_cursos", nome: "Gerenciar Cursos", icone: "🎬", sub: "Cadastre cursos, aulas, capas e a sequência" };
+  var ADMIN_ITENS = [
+    { id: "admin_resumo", nome: "Resumo", icone: "📊", sub: "Os números da comunidade" },
+    ADMIN_SECAO,
+    ADMIN_CURSOS,
+    { id: "admin_conteudo", nome: "Gerenciar Conteúdo", icone: "🗂️", sub: "Posts, criativos, produtos e links de cada seção" },
+    { id: "admin_menu", nome: "Editar Menu", icone: "🧭", sub: "Nome, ícone, ordem e visibilidade das seções" },
+    { id: "admin_config", nome: "Configurações", icone: "⚙️", sub: "Link de pagamento, vídeo, depoimentos e aprovação automática" }
+  ];
   var navCont = 0;
-  function secoes() { return ehAdmin ? [ADMIN_SECAO, ADMIN_CURSOS].concat(SECOES) : SECOES; }
+  var menuSalvo = null, liberado = true;
+
+  // Junta o menu padrão com o que o admin salvou (ordem, nomes, ocultas e seções novas)
+  function menuCompleto() {
+    var padrao = SECOES.map(function (x) { return { id: x.id, nome: x.nome, icone: x.icone, sub: x.sub, posts: !!x.posts, visivel: true }; });
+    if (!menuSalvo) return padrao;
+    var porId = {}; padrao.forEach(function (x) { porId[x.id] = x; });
+    var out = [], usados = {};
+    menuSalvo.forEach(function (m) {
+      if (!m || usados[m.id]) return;
+      usados[m.id] = 1;
+      var base = porId[m.id];
+      out.push({
+        id: m.id, nome: m.nome || (base && base.nome) || m.id, icone: m.icone || (base && base.icone) || "•",
+        sub: m.sub != null ? m.sub : (base ? base.sub : ""), posts: m.tipo ? m.tipo === "posts" : !!(base && base.posts),
+        visivel: m.visivel !== false, custom: !base
+      });
+    });
+    padrao.forEach(function (x) { if (!usados[x.id]) out.push(x); });
+    return out;
+  }
+  function secoes() {
+    var base = menuCompleto().filter(function (x) { return x.visivel !== false; });
+    return ehAdmin ? ADMIN_ITENS.concat(base) : base;
+  }
+
+  async function carregarApp() {
+    var r = await api("app_ler", { email: ehAdmin ? "" : email });
+    if (r.ok) {
+      menuSalvo = r.data.menu || null; CONTEUDO = r.data.conteudo || {}; liberado = true;
+    } else {
+      menuSalvo = null; CONTEUDO = {}; liberado = r.status === 0 || r.status >= 500;
+    }
+  }
+  async function recarregarApp(abrir) {
+    await carregarApp();
+    montarMenu();
+    abrirSecao(abrir || "forum");
+  }
+
+  function carregarAdminJs() {
+    return new Promise(function (res) {
+      if (window.Admin) return res();
+      var sc = document.createElement("script");
+      sc.src = "admin.js"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      document.head.appendChild(sc);
+    });
+  }
 
   function abrirSecao(id) {
     var todas = secoes();
@@ -826,6 +898,35 @@
       renderAdmin(corpo);
       return;
     }
+    var rotaAdmin = { admin_resumo: "resumo", admin_conteudo: "conteudo", admin_menu: "menu", admin_config: "config" }[sec.id];
+    if (rotaAdmin) {
+      corpo.className = "main-body admin";
+      corpo.appendChild(criar("div", "vazio", "Carregando..."));
+      var tk = corpo.dataset.t;
+      carregarAdminJs().then(function () {
+        if (corpo.dataset.t !== tk) return;
+        corpo.textContent = "";
+        if (!window.Admin) { corpo.appendChild(criar("div", "vazio", "Não foi possível carregar o painel. Recarregue a página.")); return; }
+        window.Admin[rotaAdmin](corpo);
+      });
+      return;
+    }
+    if (!liberado && !ehAdmin) {
+      corpo.className = "main-body";
+      var box = criar("div", "pendente-box");
+      box.appendChild(criar("h3", "", "Seu acesso está pendente"));
+      box.appendChild(criar("p", "", "O acesso é liberado automaticamente assim que o pagamento é confirmado. Se você já pagou, aguarde alguns minutos e toque em “Já paguei, verificar de novo”."));
+      var go = criar("a", "btn lg", "Quero entrar · R$ 57,00");
+      go.href = "#"; go.setAttribute("data-checkout", "");
+      var ja = criar("button", "linkbtn", "Já paguei, verificar de novo");
+      ja.type = "button";
+      ja.addEventListener("click", function () { recarregarApp(sec.id); });
+      var ac = criar("div", "pend-acoes"); ac.appendChild(go); ac.appendChild(ja);
+      box.appendChild(ac);
+      corpo.appendChild(box);
+      aplicarCheckout();
+      return;
+    }
     corpo.className = "main-body" + (sec.posts ? "" : " cards");
     var itens = CONTEUDO[sec.id] || [];
     if (!itens.length) {
@@ -835,6 +936,12 @@
     itens.forEach(function (it) {
       var c = criar("div", sec.posts ? "post" : "item");
       if (it.data) c.appendChild(criar("div", "d", it.data));
+      if (/^https:\/\//i.test(it.imagem_url || "")) {
+        var im = criar("img", "item-img");
+        im.src = it.imagem_url; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+        im.addEventListener("error", function () { im.remove(); });
+        c.appendChild(im);
+      }
       c.appendChild(criar("h3", "", it.titulo || ""));
       if (it.texto) c.appendChild(criar("p", "", it.texto));
       if (linkSeguro(it.link)) {
@@ -849,7 +956,11 @@
   function montarMenu() {
     var nav = $("side-nav");
     nav.textContent = "";
-    secoes().forEach(function (sec) {
+    var primeiraArea = true;
+    secoes().forEach(function (sec, i) {
+      var admin = /^admin/.test(sec.id);
+      if (ehAdmin && i === 0) nav.appendChild(criar("div", "nav-sep", "Administração"));
+      if (ehAdmin && !admin && primeiraArea) { primeiraArea = false; nav.appendChild(criar("div", "nav-sep", "Área do afiliado")); }
       var b = criar("button");
       b.type = "button"; b.dataset.id = sec.id;
       b.appendChild(criar("span", "ic", sec.icone));
@@ -859,12 +970,15 @@
     });
   }
 
-  function mostrarApp(inicial) {
+  async function mostrarApp(inicial) {
     $("app-email").textContent = ehAdmin ? emailAdmin + " (admin)" : email;
-    montarMenu();
-    abrirSecao(inicial || "forum");
     document.body.classList.add("logado");
+    $("sec-titulo").textContent = "Carregando...";
+    $("sec-sub").textContent = "";
     window.scrollTo(0, 0);
+    await carregarApp();
+    montarMenu();
+    abrirSecao(inicial || (ehAdmin ? "admin_resumo" : "forum"));
   }
 
   // ===== PAINEL ADMIN =====
@@ -1006,7 +1120,7 @@
 
   // ===== ENTRAR / SAIR =====
   function abrir() {
-    if (ehAdmin) mostrarApp("admin");
+    if (ehAdmin) mostrarApp("admin_resumo");
     else if (email) mostrarApp();
     else { msg($("msg-login"), ""); dlgLogin.showModal(); }
   }
@@ -1065,7 +1179,7 @@
     var r = await api("admin_eu");
     if (r.ok && r.data && r.data.admin) {
       ehAdmin = true; emailAdmin = r.data.email || "";
-      mostrarApp("admin");
+      mostrarApp("admin_resumo");
       return;
     }
     if (email) mostrarApp();
@@ -1123,12 +1237,16 @@
     else window.addEventListener("load", function () { setTimeout(iniciar, 50); });
   })();
 
-  // sem vídeo do YouTube nem depoimentos, esconde a seção vazia
-  (function () {
-    if (!VIDEO_ID && !DEPOIMENTOS.length) {
-      var sec = document.getElementById("prova-social");
-      if (sec) sec.hidden = true;
-    }
+  // Link de pagamento, vídeo e depoimentos podem ser editados no painel admin
+  (async function () {
+    var r = await api("site_publico");
+    if (!r.ok) return;
+    var d = r.data || {};
+    if (/^https:\/\//i.test(d.checkout_url || "")) CHECKOUT_URL = d.checkout_url;
+    if (/^[\w-]{11}$/.test(d.video_id || "")) VIDEO_ID = d.video_id;
+    if (Array.isArray(d.depoimentos) && d.depoimentos.length) DEPOIMENTOS = d.depoimentos;
+    aplicarCheckout();
+    montarProva();
   })();
   iniciar();
 </script>

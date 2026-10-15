@@ -34,6 +34,7 @@ function db(): PDO {
             ]
         );
         $pdo->exec("SET time_zone = '+00:00'");
+        try { garantirEsquema($pdo); } catch (Throwable $e) { error_log('[comunidade-api] esquema: ' . $e->getMessage()); }
     }
     return $pdo;
 }
@@ -172,6 +173,169 @@ function status_ok($v): string {
 function id_ok($v): string {
     if (!is_string($v) || !preg_match('/^[a-f0-9-]{36}$/', $v)) resp(400, ['erro' => 'id_invalido']);
     return $v;
+}
+
+
+// ===== Tabelas novas (criadas sozinhas na primeira chamada depois da atualização) =====
+function garantirEsquema(PDO $pdo): void {
+    static $feito = false;
+    if ($feito) return;
+    $feito = true;
+    $n = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ('config','conteudo','webhook_log')")->fetchColumn();
+    if ($n === 3) return;
+    $sqls = [
+        "CREATE TABLE IF NOT EXISTS config (
+            chave VARCHAR(60) NOT NULL PRIMARY KEY,
+            valor MEDIUMTEXT NOT NULL,
+            atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "CREATE TABLE IF NOT EXISTS conteudo (
+            id CHAR(36) NOT NULL PRIMARY KEY,
+            secao VARCHAR(40) NOT NULL,
+            titulo VARCHAR(200) NOT NULL,
+            texto TEXT NULL,
+            link VARCHAR(500) NULL,
+            imagem_url VARCHAR(500) NULL,
+            ordem INT NOT NULL DEFAULT 0,
+            publicado TINYINT(1) NOT NULL DEFAULT 1,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            KEY idx_secao (secao, ordem)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "CREATE TABLE IF NOT EXISTS webhook_log (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            recebido_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            email VARCHAR(254) NULL,
+            status_pagto VARCHAR(80) NULL,
+            acao VARCHAR(30) NOT NULL,
+            corpo TEXT NULL,
+            KEY idx_data (recebido_em)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+    ];
+    foreach ($sqls as $sql) $pdo->exec($sql);
+    $pdo->prepare('INSERT IGNORE INTO config (chave, valor) VALUES (?, ?)')->execute(['webhook_secret', bin2hex(random_bytes(24))]);
+}
+
+function cfg_get(string $k, ?string $def = null): ?string {
+    $r = q('SELECT valor FROM config WHERE chave = ?', [$k])->fetch();
+    return $r ? $r['valor'] : $def;
+}
+
+function cfg_set(string $k, string $v): void {
+    q('INSERT INTO config (chave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)', [$k, $v]);
+}
+
+// Só deixa passar quem é admin ou afiliado aprovado (mesma regra dos cursos)
+function exigirAfiliado(array $j): void {
+    if (adminAtual() !== null) return;
+    limitar('area:' . ip(), 200, 600);
+    $email = email_ok($j['email'] ?? null);
+    $ok = $email !== null && q("SELECT 1 FROM afiliados WHERE email = ? AND status = 'aprovado'", [$email])->fetch();
+    if (!$ok) resp(403, ['erro' => 'sem_acesso']);
+}
+
+function secao_ok($v): string {
+    if (!is_string($v) || !preg_match('/^[a-z][a-z0-9_]{0,39}$/', $v)) resp(400, ['erro' => 'secao_invalida']);
+    return $v;
+}
+
+function conteudo_linha(array $c): array {
+    return [
+        'id' => $c['id'], 'secao' => $c['secao'], 'titulo' => $c['titulo'], 'texto' => $c['texto'],
+        'link' => $c['link'], 'imagem_url' => $c['imagem_url'], 'ordem' => (int) $c['ordem'],
+        'publicado' => (bool) $c['publicado'],
+    ];
+}
+
+function video_id_ok($v): ?string {
+    $v = texto($v, 200);
+    if ($v === null) return null;
+    if (preg_match('/^[\w-]{11}$/', $v)) return $v;
+    if (preg_match('#^https://(?:www\.|m\.)?youtube\.com/watch\?(?:[^\#]*&)?v=([\w-]{11})#i', $v, $m)) return $m[1];
+    if (preg_match('#^https://youtu\.be/([\w-]{11})#i', $v, $m)) return $m[1];
+    if (preg_match('#^https://(?:www\.)?youtube\.com/(?:embed|shorts|live)/([\w-]{11})#i', $v, $m)) return $m[1];
+    resp(400, ['erro' => 'video_invalido']);
+}
+
+function depoimentos_ok($v): array {
+    if (!is_array($v) || count($v) > 12) resp(400, ['erro' => 'depoimentos_invalidos']);
+    $out = [];
+    foreach ($v as $d) {
+        if (!is_array($d)) continue;
+        $t = texto($d['texto'] ?? null, 400);
+        if ($t === null) continue;
+        $out[] = ['texto' => $t, 'autor' => texto($d['autor'] ?? null, 80) ?? ''];
+    }
+    return $out;
+}
+
+function menu_ok($m): array {
+    if (!is_array($m) || count($m) > 40) resp(400, ['erro' => 'menu_invalido']);
+    $out = []; $ids = [];
+    foreach ($m as $it) {
+        if (!is_array($it)) resp(400, ['erro' => 'menu_invalido']);
+        $id = secao_ok($it['id'] ?? null);
+        if (strpos($id, 'admin') === 0 || isset($ids[$id])) resp(400, ['erro' => 'menu_invalido']);
+        $ids[$id] = 1;
+        $nome = texto($it['nome'] ?? null, 40);
+        if ($nome === null) resp(400, ['erro' => 'nome_obrigatorio']);
+        $tipo = ($it['tipo'] ?? 'cards') === 'posts' ? 'posts' : 'cards';
+        $out[] = [
+            'id' => $id, 'nome' => $nome, 'icone' => texto($it['icone'] ?? null, 8) ?? '•',
+            'sub' => texto($it['sub'] ?? null, 150) ?? '', 'visivel' => !array_key_exists('visivel', $it) || !empty($it['visivel']),
+            'tipo' => $tipo,
+        ];
+    }
+    return $out;
+}
+
+// ===== Aprovação automática por pagamento (webhook) =====
+function sem_acento(string $s): string {
+    return strtr(mb_strtolower($s), ['á'=>'a','à'=>'a','â'=>'a','ã'=>'a','é'=>'e','ê'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ú'=>'u','ç'=>'c']);
+}
+
+function coletar($d, string $caminho, array &$out, int $prof = 0): void {
+    if ($prof > 6) return;
+    if (is_array($d)) {
+        foreach ($d as $k => $v) coletar($v, $caminho . '/' . sem_acento((string) $k), $out, $prof + 1);
+    } elseif (is_string($d) || is_numeric($d)) {
+        $out[] = [$caminho, (string) $d];
+    }
+}
+
+function webhook_analisar(array $dados): array {
+    $pares = [];
+    coletar($dados, '', $pares);
+    $email = null; $emailPref = null; $nome = null; $status = [];
+    foreach ($pares as [$cam, $val]) {
+        $chave = substr($cam, (int) strrpos($cam, '/') + 1);
+        if (preg_match('/mail/', $chave)) {
+            $e = email_ok($val);
+            if ($e !== null) {
+                if ($emailPref === null && preg_match('#customer|buyer|cliente|comprador|payer|lead|client|subscriber#', $cam)) $emailPref = $e;
+                if ($email === null) $email = $e;
+            }
+        }
+        if ($nome === null && preg_match('/^(name|nome|full_name|customer_name|buyer_name|nome_completo)$/', $chave) && mb_strlen($val) >= 2 && mb_strlen($val) <= 120) $nome = $val;
+        if (preg_match('/^(status|situacao|event|evento|type|tipo|payment_status|transaction_status|order_status|payment_state|webhook_event_type)$/', $chave)) $status[] = sem_acento($val);
+    }
+    return ['email' => $emailPref ?? $email, 'nome' => $nome, 'status' => $status];
+}
+
+function webhook_decidir(array $status): string {
+    $pagos = ['paid','approved','aprovado','aprovada','pago','paga','completed','complete','concluido','concluida','confirmed','confirmado','confirmada','authorized','autorizado','succeeded','success','sucesso','captured','capturado'];
+    $reemb = ['refunded','refund','reembolsado','reembolsada','reembolso','estornado','estornada','estorno','chargeback','canceled','cancelled','cancelado','cancelada'];
+    $neg = ['pending','waiting','pendente','aguardando','unpaid','not','nao','failed','falhou','recusado','recusada','refused','denied','declined','expired','expirado','abandoned','abandonado'];
+    $tp = $tr = $tn = false;
+    foreach ($status as $st) {
+        foreach (preg_split('/[^a-z]+/', $st, -1, PREG_SPLIT_NO_EMPTY) as $t) {
+            if (in_array($t, $reemb, true)) $tr = true;
+            elseif (in_array($t, $neg, true)) $tn = true;
+            elseif (in_array($t, $pagos, true)) $tp = true;
+        }
+    }
+    if ($tr) return 'revogar';
+    if ($tp && !$tn) return 'aprovar';
+    return 'ignorar';
 }
 
 try {
@@ -371,6 +535,182 @@ try {
             exigirAdmin();
             q('DELETE FROM aulas WHERE id = ?', [id_ok($j['id'] ?? null)]);
             resp(200, ['ok' => true]);
+        }
+
+        // ===== Dados públicos da página inicial (link de pagamento, vídeo, depoimentos) =====
+        case 'site_publico': {
+            header('Cache-Control: public, max-age=60');
+            $dep = json_decode(cfg_get('depoimentos', '[]') ?? '[]', true);
+            resp(200, [
+                'checkout_url' => cfg_get('checkout_url', '') ?? '',
+                'video_id' => cfg_get('video_id', '') ?? '',
+                'depoimentos' => is_array($dep) ? $dep : [],
+            ]);
+        }
+
+        // ===== Área do afiliado: menu e conteúdo das seções =====
+        case 'app_ler': {
+            exigirPost();
+            $j = entrada();
+            exigirAfiliado($j);
+            $menu = json_decode(cfg_get('menu', 'null') ?? 'null', true);
+            $itens = [];
+            foreach (q('SELECT * FROM conteudo WHERE publicado = 1 ORDER BY secao, ordem, created_at')->fetchAll() as $c) {
+                $itens[$c['secao']][] = conteudo_linha($c);
+            }
+            resp(200, ['menu' => is_array($menu) ? $menu : null, 'conteudo' => (object) $itens]);
+        }
+
+        // ===== Admin: conteúdo das seções =====
+        case 'conteudo_admin': {
+            exigirAdmin();
+            $rows = q('SELECT * FROM conteudo ORDER BY secao, ordem, created_at')->fetchAll();
+            resp(200, ['itens' => array_map('conteudo_linha', $rows)]);
+        }
+
+        case 'conteudo_salvar': {
+            exigirPost();
+            $j = entrada();
+            exigirAdmin();
+            $titulo = texto($j['titulo'] ?? null, 200);
+            if ($titulo === null) resp(400, ['erro' => 'titulo_obrigatorio']);
+            $d = [
+                secao_ok($j['secao'] ?? null), $titulo, texto($j['texto'] ?? null, 5000),
+                url_https($j['link'] ?? null), url_https($j['imagem_url'] ?? null),
+                (int) ($j['ordem'] ?? 0), array_key_exists('publicado', $j) && !$j['publicado'] ? 0 : 1,
+            ];
+            if (!empty($j['id'])) {
+                $id = id_ok($j['id']);
+                q('UPDATE conteudo SET secao = ?, titulo = ?, texto = ?, link = ?, imagem_url = ?, ordem = ?, publicado = ? WHERE id = ?', array_merge($d, [$id]));
+            } else {
+                $id = uuid();
+                q('INSERT INTO conteudo (secao, titulo, texto, link, imagem_url, ordem, publicado, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array_merge($d, [$id]));
+            }
+            resp(200, ['ok' => true, 'id' => $id]);
+        }
+
+        case 'conteudo_remover': {
+            exigirPost();
+            $j = entrada();
+            exigirAdmin();
+            q('DELETE FROM conteudo WHERE id = ?', [id_ok($j['id'] ?? null)]);
+            resp(200, ['ok' => true]);
+        }
+
+        // ===== Admin: menu =====
+        case 'menu_ler': {
+            exigirAdmin();
+            $menu = json_decode(cfg_get('menu', 'null') ?? 'null', true);
+            resp(200, ['menu' => is_array($menu) ? $menu : null]);
+        }
+
+        case 'menu_salvar': {
+            exigirPost();
+            $j = entrada();
+            exigirAdmin();
+            if (array_key_exists('menu', $j) && $j['menu'] === null) {
+                q("DELETE FROM config WHERE chave = 'menu'");
+                resp(200, ['ok' => true]);
+            }
+            cfg_set('menu', json_encode(menu_ok($j['menu'] ?? null), JSON_UNESCAPED_UNICODE));
+            resp(200, ['ok' => true]);
+        }
+
+        // ===== Admin: configurações do site =====
+        case 'config_ler': {
+            exigirAdmin();
+            $dep = json_decode(cfg_get('depoimentos', '[]') ?? '[]', true);
+            $segredo = cfg_get('webhook_secret', '') ?? '';
+            $ev = q('SELECT id, recebido_em, email, status_pagto, acao, corpo FROM webhook_log ORDER BY id DESC LIMIT 20')->fetchAll();
+            foreach ($ev as &$e) { $e['recebido_em'] = iso($e['recebido_em']); $e['corpo'] = mb_substr((string) $e['corpo'], 0, 1500); }
+            resp(200, [
+                'checkout_url' => cfg_get('checkout_url', '') ?? '',
+                'video_id' => cfg_get('video_id', '') ?? '',
+                'depoimentos' => is_array($dep) ? $dep : [],
+                'webhook_url' => rtrim($CFG['site'], '/') . '/api/?a=webhook&k=' . $segredo,
+                'eventos' => $ev,
+            ]);
+        }
+
+        case 'config_salvar': {
+            exigirPost();
+            $j = entrada();
+            exigirAdmin();
+            cfg_set('checkout_url', url_https($j['checkout_url'] ?? null) ?? '');
+            cfg_set('video_id', video_id_ok($j['video_id'] ?? null) ?? '');
+            cfg_set('depoimentos', json_encode(depoimentos_ok($j['depoimentos'] ?? []), JSON_UNESCAPED_UNICODE));
+            resp(200, ['ok' => true]);
+        }
+
+        case 'webhook_regenerar': {
+            exigirPost();
+            entrada();
+            exigirAdmin();
+            cfg_set('webhook_secret', bin2hex(random_bytes(24)));
+            resp(200, ['ok' => true]);
+        }
+
+        // ===== Admin: números =====
+        case 'stats': {
+            exigirAdmin();
+            $tot = ['pendente' => 0, 'aprovado' => 0, 'bloqueado' => 0];
+            foreach (q('SELECT status, COUNT(*) c FROM afiliados GROUP BY status')->fetchAll() as $r) $tot[$r['status']] = (int) $r['c'];
+            $dias = [];
+            for ($i = 29; $i >= 0; $i--) $dias[gmdate('Y-m-d', time() - $i * 86400)] = 0;
+            foreach (q('SELECT DATE(created_at) d, COUNT(*) c FROM afiliados WHERE created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY) GROUP BY DATE(created_at)')->fetchAll() as $r) {
+                if (isset($dias[$r['d']])) $dias[$r['d']] = (int) $r['c'];
+            }
+            $por_dia = [];
+            foreach ($dias as $d => $c) $por_dia[] = ['dia' => $d, 'novos' => $c];
+            resp(200, [
+                'total' => array_sum($tot), 'status' => $tot, 'por_dia' => $por_dia,
+                'novos_hoje' => (int) q('SELECT COUNT(*) c FROM afiliados WHERE created_at >= UTC_DATE()')->fetch()['c'],
+                'ativos_7d' => (int) q('SELECT COUNT(*) c FROM afiliados WHERE last_login_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)')->fetch()['c'],
+                'aprovados_por_pagamento_30d' => (int) q("SELECT COUNT(*) c FROM webhook_log WHERE acao = 'aprovado' AND recebido_em >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)")->fetch()['c'],
+                'conteudos' => (int) q('SELECT COUNT(*) c FROM conteudo')->fetch()['c'],
+                'cursos' => (int) q('SELECT COUNT(*) c FROM cursos')->fetch()['c'],
+            ]);
+        }
+
+        // ===== Webhook do gateway de pagamento (aprova o afiliado quando o pagamento é confirmado) =====
+        case 'webhook': {
+            $k = $_GET['k'] ?? '';
+            $segredo = cfg_get('webhook_secret', '') ?? '';
+            if (!is_string($k) || $segredo === '' || !hash_equals($segredo, $k)) {
+                limitar('whk-falha:' . ip(), 20, 600);
+                resp(403, ['erro' => 'nao_autorizado']);
+            }
+            limitar('whk:' . ip(), 300, 600);
+            $raw = (string) file_get_contents('php://input', false, null, 0, 65537);
+            if (strlen($raw) > 65536) resp(413, ['erro' => 'muito_grande']);
+            $dados = json_decode($raw, true);
+            if (!is_array($dados)) { $dados = []; if ($raw !== '') parse_str($raw, $dados); }
+            if (!$dados && !empty($_POST)) $dados = $_POST;
+            $an = webhook_analisar(is_array($dados) ? $dados : []);
+            $email = $an['email'];
+            $decisao = webhook_decidir($an['status']);
+            if ($email === null) {
+                $acao_log = 'sem_email';
+            } elseif ($decisao === 'aprovar') {
+                $antes = q('SELECT status FROM afiliados WHERE email = ?', [$email])->fetch();
+                if ($antes && $antes['status'] === 'bloqueado') {
+                    $acao_log = 'bloqueado_mantido';
+                } else {
+                    q("INSERT INTO afiliados (email, nome, status, observacao) VALUES (?, ?, 'aprovado', 'Aprovado automaticamente pelo pagamento')
+                       ON DUPLICATE KEY UPDATE status = 'aprovado', nome = COALESCE(nome, VALUES(nome))", [$email, $an['nome']]);
+                    $acao_log = 'aprovado';
+                }
+            } elseif ($decisao === 'revogar') {
+                $st = q("UPDATE afiliados SET status = 'pendente', observacao = 'Pagamento reembolsado ou cancelado' WHERE email = ? AND status = 'aprovado'", [$email]);
+                $acao_log = $st->rowCount() ? 'revogado' : 'ignorado';
+            } else {
+                $acao_log = 'ignorado';
+            }
+            q('INSERT INTO webhook_log (email, status_pagto, acao, corpo) VALUES (?, ?, ?, ?)', [
+                $email, mb_substr(implode(',', array_unique($an['status'])), 0, 80), $acao_log, mb_substr($raw !== '' ? $raw : json_encode($dados), 0, 3000),
+            ]);
+            if (random_int(1, 40) === 1) q('DELETE FROM webhook_log WHERE recebido_em < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 60 DAY)');
+            resp(200, ['ok' => true, 'acao' => $acao_log]);
         }
 
         default:

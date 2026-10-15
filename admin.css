@@ -1,0 +1,51 @@
+/* Painel admin: resumo, conteúdo, menu e configurações */
+.abtn.ghost{background:#fff;color:#1c2038;border:1px solid #cfd4ea}
+.abtn:disabled,.lnk:disabled{opacity:.4;cursor:default}
+
+/* números */
+.ad-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:8px 0 18px}
+.ad-tile{background:#fff;border:1px solid #e4e6f3;border-radius:16px;padding:16px 18px;color:#1c2038}
+.ad-tile .n{font-size:2rem;font-weight:800;line-height:1.1}
+.ad-tile .l{color:#6b7194;font-size:.85rem;margin-top:4px}
+.ad-tile.ok .n{color:#15803d}
+.ad-tile.pend .n{color:#b45309}
+.ad-tile.bloq .n{color:#b91c1c}
+.ad-graf{background:#fff;border:1px solid #e4e6f3;border-radius:16px;padding:18px;color:#1c2038}
+.ad-graf h3{font-size:1rem;margin-bottom:12px}
+.ad-barras{display:flex;align-items:flex-end;gap:3px;height:140px}
+.ad-bar-col{flex:1;height:100%;display:flex;align-items:flex-end;min-width:0}
+.ad-bar-i{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#ec4899,#2563eb)}
+.ad-bar-i.zero{background:#e4e6f3}
+.ad-eixo{display:flex;justify-content:space-between;color:#6b7194;font-size:.75rem;margin-top:6px}
+
+/* listas */
+.ad-trecho{color:#5c6385;font-size:.88rem;margin-top:2px}
+.ad-info strong{display:block}
+
+/* menu */
+.mn-row{display:grid;grid-template-columns:64px minmax(140px,1fr) minmax(160px,2fr) auto;gap:10px;align-items:center;background:#fff;border:1px solid #e4e6f3;border-radius:14px;padding:10px 12px}
+.mn-row.oculta{opacity:.6}
+.mn-row input,.mn-row select{padding:9px 10px;border-radius:10px;border:1px solid #d5d8ec;background:#fff;color:#1c2038;font:inherit;min-width:0;width:100%}
+.mn-row .mn-ic{text-align:center;font-size:1.2rem}
+.mn-row .ad-acoes select{width:auto}
+@media(max-width:900px){.mn-row{grid-template-columns:56px 1fr}.mn-row .mn-sub{grid-column:1/-1}.mn-row .ad-acoes{grid-column:1/-1}}
+
+/* configurações */
+.cf-box{background:#fff;border:1px solid #e4e6f3;border-radius:16px;padding:20px;margin-bottom:16px;color:#1c2038}
+.cf-box h3{font-size:1.1rem;margin-bottom:12px}
+.cf-box h4{font-size:.95rem;margin:18px 0 8px}
+.cf-box label{display:block;font-size:.85rem;color:#4b5173;font-weight:600;margin-bottom:12px}
+.cf-box input,.cf-box textarea{display:block;width:100%;margin-top:6px;padding:11px 12px;border-radius:10px;border:1px solid #d5d8ec;background:#fff;color:#1c2038;font:inherit;font-weight:400}
+.cf-box small{display:block;font-weight:400;color:#6b7194;margin-top:4px}
+.cf-dep{display:grid;grid-template-columns:1fr 200px auto;gap:8px;align-items:start;margin-bottom:10px}
+.cf-dep textarea,.cf-dep input{margin-top:0}
+.cf-dep .lnk{border:0;background:transparent;color:#dc2626;font:inherit;font-weight:600;cursor:pointer;padding:10px 6px}
+@media(max-width:700px){.cf-dep{grid-template-columns:1fr}}
+.cf-url{flex:1;min-width:220px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem}
+.cf-alerta{color:#b45309!important}
+.cf-pre{max-width:420px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-all;font-size:.75rem;background:#f3f4fb;border-radius:8px;padding:8px;margin-top:6px}
+
+/* janelas do admin */
+dialog.dlg-adm{width:min(520px,94vw)}
+dialog.dlg-adm .chk{display:flex;align-items:center;gap:8px;color:var(--text);margin-top:14px}
+dialog.dlg-adm input[type=checkbox]{width:auto}
