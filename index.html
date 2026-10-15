@@ -316,6 +316,37 @@
   .pendente-box p{color:#5c6385;margin-bottom:18px}
   .pend-acoes{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
   @media(max-width:760px){.nav-sep{display:none}.pendente-box{padding:20px}.pend-acoes .btn{width:100%;text-align:center}}
+
+  /* ===== IMPLEMENTAÇÃO AMAZOLÉ ===== */
+  .main-body.impl{display:block;max-width:980px}
+  .impl-hero{background:linear-gradient(135deg,#1e40af,#9d174d);color:#fff;border-radius:22px;padding:34px;margin-bottom:18px}
+  .impl-tag{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.16);border-radius:999px;padding:6px 14px;margin-bottom:16px}
+  .impl-hero h2{font-size:clamp(1.4rem,3.4vw,2rem);line-height:1.2;text-align:left;margin-bottom:14px;color:#fff}
+  .impl-hero p{color:#e8edff;max-width:760px;margin-bottom:22px}
+  .impl-acoes{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .impl-selo{font-size:.9rem;font-weight:700;color:#fde68a}
+  .impl-preco{background:#fff;border:1px solid #e4e6f3;border-radius:22px;padding:28px;margin-bottom:18px;text-align:center;color:#1c2038}
+  .impl-preco h3{font-size:1.15rem;margin-bottom:16px}
+  .impl-vals{display:flex;flex-wrap:wrap;gap:18px 28px;justify-content:center;align-items:center;margin-bottom:22px}
+  .impl-val{display:flex;flex-direction:column;gap:2px}
+  .impl-val small{color:#6b7194;font-size:.85rem}
+  .impl-val strong{font-size:clamp(1.6rem,4.5vw,2.2rem);line-height:1.1;color:#1e40af}
+  .impl-ou{color:#6b7194;font-weight:700}
+  .impl-bloco{margin:28px 0}
+  .impl-bloco h3,.impl-fim h3{font-size:1.3rem;margin-bottom:6px;color:#1c2038}
+  .impl-sub{color:#5c6385;margin-bottom:16px}
+  .impl-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+  .impl-card{background:#fff;border:1px solid #e4e6f3;border-radius:18px;padding:20px;color:#1c2038}
+  .impl-ic{font-size:1.8rem;margin-bottom:8px}
+  .impl-card h4{font-size:1.02rem;margin-bottom:6px}
+  .impl-card p{color:#5c6385;font-size:.92rem}
+  .impl-lista{list-style:none;display:grid;gap:10px;margin:0;padding:0}
+  .impl-lista li{background:#fff;border:1px solid #e4e6f3;border-radius:14px;padding:14px 16px 14px 44px;position:relative;color:#1c2038;font-weight:600}
+  .impl-lista li::before{content:"✔";position:absolute;left:16px;color:#15803d;font-weight:800}
+  .impl-fim{background:#eef3ff;border:1px solid #d6e2f6;border-radius:22px;padding:28px;text-align:center;color:#1c2038;margin-top:8px}
+  .impl-fim p{color:#5c6385;max-width:620px;margin:0 auto 18px}
+  .impl-hero .btn,.impl-preco .btn,.impl-fim .btn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;font-weight:800;box-shadow:0 8px 28px rgba(34,197,94,.35)}
+  @media(max-width:760px){.impl-hero{padding:22px}.impl-preco,.impl-fim{padding:22px 16px}.impl-hero .btn,.impl-preco .btn,.impl-fim .btn{width:100%;text-align:center}}
 </style>
 <link rel="stylesheet" href="cursos.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="cursos.css"></noscript>
@@ -796,7 +827,7 @@
   };
 
   var SECOES = [
-    { id: "implementacao", nome: "Implementação Amazolé", icone: "🚀", sub: "Passo a passo para colocar sua operação no ar" },
+    { id: "implementacao", nome: "Implementação Amazolé", icone: "🚀", sub: "Consultoria completa: nossa equipe executa a sua operação de vendas no WhatsApp de ponta a ponta" },
     { id: "forum", nome: "Fórum", icone: "💬", sub: "Troque ideias, tire dúvidas e compartilhe resultados", posts: true },
     { id: "cursos", nome: "Cursos", icone: "📚", sub: "Aprenda no seu ritmo" },
     { id: "criativos", nome: "Criativos", icone: "🎨", sub: "Imagens e vídeos prontos para divulgar" },
@@ -880,6 +911,84 @@
     });
   }
 
+
+  // ===== IMPLEMENTAÇÃO AMAZOLÉ (página da consultoria) =====
+  var WHATS_IMPL = "https://wa.me/5592985647581?text=Quero%20implementa%C3%A7%C3%A3o";
+  function renderImplementacao(corpo) {
+    function link(txt, cls) {
+      var a = criar("a", cls || "btn lg", txt);
+      a.href = WHATS_IMPL; a.target = "_blank"; a.rel = "noopener noreferrer";
+      return a;
+    }
+    var hero = criar("section", "impl-hero");
+    hero.appendChild(criar("span", "impl-tag", "Consultoria Amazolé — Feito por Você"));
+    hero.appendChild(criar("h2", "", "Nossa equipe executa a sua operação de vendas no WhatsApp — do anúncio ao fechamento."));
+    hero.appendChild(criar("p", "", "Na consultoria de Implementação Amazolé, colocamos toda a nossa experiência à disposição do seu negócio. O produto é nosso — validado e com estrutura pronta — e nós construímos toda a operação de vendas para você: anúncios, criativos, integração do WhatsApp com inteligência artificial e o funil completo de conversão. Você entra para vender; nós cuidamos de toda a máquina que gera pedidos."));
+    var linha = criar("div", "impl-acoes");
+    linha.appendChild(link("Falar com nossa equipe"));
+    linha.appendChild(criar("span", "impl-selo", "✔ Metodologia validada em operações reais"));
+    hero.appendChild(linha);
+    corpo.appendChild(hero);
+
+    var preco = criar("section", "impl-preco");
+    preco.appendChild(criar("h3", "", "Investimento na Consultoria"));
+    var vals = criar("div", "impl-vals");
+    var v1 = criar("div", "impl-val");
+    v1.appendChild(criar("small", "", "à vista"));
+    v1.appendChild(criar("strong", "", "R$ 1.497,00"));
+    var ou = criar("div", "impl-ou", "ou");
+    var v2 = criar("div", "impl-val");
+    v2.appendChild(criar("small", "", "parcelado"));
+    v2.appendChild(criar("strong", "", "10x de R$ 167,00"));
+    v2.appendChild(criar("small", "", "no cartão de crédito"));
+    vals.appendChild(v1); vals.appendChild(ou); vals.appendChild(v2);
+    preco.appendChild(vals);
+    preco.appendChild(link("Quero agendar minha consultoria"));
+    corpo.appendChild(preco);
+
+    var fazemos = criar("section", "impl-bloco");
+    fazemos.appendChild(criar("h3", "", "O que fazemos por você"));
+    fazemos.appendChild(criar("p", "impl-sub", "Uma implementação completa, executada por especialistas em Cash on Delivery e vendas no WhatsApp."));
+    var grade = criar("div", "impl-grade");
+    [
+      ["📣", "Gestão de Anúncios", "Estruturação, veiculação e otimização diária das campanhas em Meta Ads com foco em CPA e escala sustentável."],
+      ["🎬", "Produção de Criativos", "Criativos validados por nossa equipe, produzidos sob medida para o seu produto e público — vídeo e estático."],
+      ["💬", "Integração com WhatsApp", "Configuração completa do canal de atendimento no WhatsApp, com fluxo comercial pronto para converter."],
+      ["🤖", "Automação com Inteligência Artificial", "IA treinada com nossa metodologia para qualificar leads, responder objeções e conduzir o cliente até o fechamento."],
+      ["🧭", "Funil de Vendas", "Construção do funil completo — da captação ao pós-venda — orientado à conversão em Cash on Delivery."],
+      ["📊", "Acompanhamento de Resultados", "Monitoramento contínuo de métricas e ajustes finos para maximizar o retorno da sua operação."]
+    ].forEach(function (x) {
+      var c = criar("div", "impl-card");
+      c.appendChild(criar("div", "impl-ic", x[0]));
+      c.appendChild(criar("h4", "", x[1]));
+      c.appendChild(criar("p", "", x[2]));
+      grade.appendChild(c);
+    });
+    fazemos.appendChild(grade);
+    corpo.appendChild(fazemos);
+
+    var incluso = criar("section", "impl-bloco impl-incluso");
+    incluso.appendChild(criar("h3", "", "O que está incluso na consultoria"));
+    incluso.appendChild(criar("p", "impl-sub", "Entregas concretas para colocar sua operação em produção."));
+    var ul = criar("ul", "impl-lista");
+    [
+      "Diagnóstico completo da sua operação atual",
+      "Estruturação técnica de contas de anúncio e pixels",
+      "Criação de landing pages e materiais de venda",
+      "Configuração de WhatsApp Business + IA de atendimento",
+      "Playbook comercial e scripts de conversão",
+      "Suporte direto da nossa equipe durante toda a implementação"
+    ].forEach(function (t) { ul.appendChild(criar("li", "", t)); });
+    incluso.appendChild(ul);
+    corpo.appendChild(incluso);
+
+    var fim = criar("section", "impl-fim");
+    fim.appendChild(criar("h3", "", "Pronto para acelerar seus resultados?"));
+    fim.appendChild(criar("p", "", "Agende uma conversa com nosso time. Vamos entender o seu momento e desenhar o plano de implementação ideal para a sua operação."));
+    fim.appendChild(link("Falar com nossa equipe no WhatsApp"));
+    corpo.appendChild(fim);
+  }
+
   function abrirSecao(id) {
     var todas = secoes();
     var sec = todas.filter(function (x) { return x.id === id; })[0] || todas[0];
@@ -931,6 +1040,11 @@
       box.appendChild(ac);
       corpo.appendChild(box);
       aplicarCheckout();
+      return;
+    }
+    if (sec.id === "implementacao") {
+      corpo.className = "main-body impl";
+      renderImplementacao(corpo);
       return;
     }
     corpo.className = "main-body" + (sec.posts ? "" : " cards");
