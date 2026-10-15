@@ -338,6 +338,33 @@ function webhook_decidir(array $status): string {
     return 'ignorar';
 }
 
+
+// ===== Fotos enviadas pelo admin (pasta /uploads, sem execução de código) =====
+function pasta_uploads(): string { return dirname(__DIR__) . '/uploads'; }
+
+function url_upload(string $nome): string {
+    global $CFG;
+    return rtrim($CFG['site'], '/') . '/uploads/' . $nome;
+}
+
+function nome_upload_da_url(?string $url): ?string {
+    global $CFG;
+    if ($url === null) return null;
+    $pref = rtrim($CFG['site'], '/') . '/uploads/';
+    if (strpos($url, $pref) !== 0) return null;
+    $n = substr($url, strlen($pref));
+    return preg_match('/^[a-f0-9]{24}\.(webp|jpg|png)$/', $n) ? $n : null;
+}
+
+// Apaga a foto enviada quando nenhum item usa mais
+function limpar_upload(?string $url): void {
+    $n = nome_upload_da_url($url);
+    if ($n === null) return;
+    if (q('SELECT 1 FROM conteudo WHERE imagem_url = ? LIMIT 1', [$url])->fetch()) return;
+    $f = pasta_uploads() . '/' . $n;
+    if (is_file($f)) @unlink($f);
+}
+
 try {
     $acao = $_GET['a'] ?? '';
     if (!is_string($acao)) resp(400, ['erro' => 'acao_invalida']);
@@ -581,7 +608,9 @@ try {
             ];
             if (!empty($j['id'])) {
                 $id = id_ok($j['id']);
+                $antes = q('SELECT imagem_url FROM conteudo WHERE id = ?', [$id])->fetch();
                 q('UPDATE conteudo SET secao = ?, titulo = ?, texto = ?, link = ?, imagem_url = ?, ordem = ?, publicado = ? WHERE id = ?', array_merge($d, [$id]));
+                if ($antes && $antes['imagem_url'] !== $d[4]) limpar_upload($antes['imagem_url']);
             } else {
                 $id = uuid();
                 q('INSERT INTO conteudo (secao, titulo, texto, link, imagem_url, ordem, publicado, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array_merge($d, [$id]));
@@ -593,8 +622,65 @@ try {
             exigirPost();
             $j = entrada();
             exigirAdmin();
-            q('DELETE FROM conteudo WHERE id = ?', [id_ok($j['id'] ?? null)]);
+            $idc = id_ok($j['id'] ?? null);
+            $antes = q('SELECT imagem_url FROM conteudo WHERE id = ?', [$idc])->fetch();
+            q('DELETE FROM conteudo WHERE id = ?', [$idc]);
+            if ($antes) limpar_upload($antes['imagem_url']);
             resp(200, ['ok' => true]);
+        }
+
+        // ===== Admin: enviar foto (multipart). Reencoda a imagem para tirar qualquer conteúdo escondido =====
+        case 'imagem_upload': {
+            exigirPost();
+            if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== 'fetch') resp(400, ['erro' => 'requisicao_invalida']);
+            exigirAdmin();
+            limitar('upload:' . ip(), 60, 3600);
+            $f = $_FILES['arquivo'] ?? null;
+            if (!is_array($f) || ($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) resp(400, ['erro' => 'arquivo_invalido']);
+            if (($f['size'] ?? 0) > 4 * 1024 * 1024) resp(413, ['erro' => 'arquivo_grande']);
+            $info = @getimagesize($f['tmp_name']);
+            if (!$info || !in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) resp(400, ['erro' => 'formato_invalido']);
+            if ($info[0] < 1 || $info[1] < 1 || $info[0] > 8000 || $info[1] > 8000) resp(400, ['erro' => 'dimensao_invalida']);
+
+            $dir = pasta_uploads();
+            if (!is_dir($dir) && !@mkdir($dir, 0755, true)) resp(500, ['erro' => 'pasta_indisponivel']);
+            $base = bin2hex(random_bytes(12));
+            $dados = file_get_contents($f['tmp_name']);
+            $nome = null;
+            if (function_exists('imagecreatefromstring')) {
+                $im = @imagecreatefromstring($dados);
+                if ($im) {
+                    $w = imagesx($im); $h = imagesy($im);
+                    $max = 1000;
+                    if ($w > $max || $h > $max) {
+                        $k = $max / max($w, $h);
+                        $novo = imagecreatetruecolor((int) round($w * $k), (int) round($h * $k));
+                        imagealphablending($novo, false); imagesavealpha($novo, true);
+                        imagecopyresampled($novo, $im, 0, 0, 0, 0, imagesx($novo), imagesy($novo), $w, $h);
+                        imagedestroy($im); $im = $novo;
+                    }
+                    if (function_exists('imagewebp')) {
+                        imagealphablending($im, false); imagesavealpha($im, true);
+                        if (@imagewebp($im, "$dir/$base.webp", 84)) $nome = "$base.webp";
+                    }
+                    if ($nome === null) {
+                        $fundo = imagecreatetruecolor(imagesx($im), imagesy($im));
+                        imagefill($fundo, 0, 0, imagecolorallocate($fundo, 255, 255, 255));
+                        imagecopy($fundo, $im, 0, 0, 0, 0, imagesx($im), imagesy($im));
+                        if (@imagejpeg($fundo, "$dir/$base.jpg", 85)) $nome = "$base.jpg";
+                        imagedestroy($fundo);
+                    }
+                    imagedestroy($im);
+                }
+            }
+            if ($nome === null) {
+                // Sem biblioteca de imagem no servidor: guarda o arquivo já validado
+                $ext = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'][$info[2]];
+                if (!@move_uploaded_file($f['tmp_name'], "$dir/$base.$ext")) resp(500, ['erro' => 'falha_ao_salvar']);
+                $nome = "$base.$ext";
+            }
+            @chmod("$dir/$nome", 0644);
+            resp(200, ['ok' => true, 'url' => url_upload($nome)]);
         }
 
         // ===== Admin: menu =====

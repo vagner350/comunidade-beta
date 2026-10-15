@@ -210,6 +210,96 @@
     desenhar();
   }
 
+
+  // ----- foto do produto: enviar do aparelho ou escolher uma das fotos que já estão no site -----
+  var FOTOS_SITE = [
+    ["formula-avancada", "Fórmula Avançada"], ["serum-olhos", "Sérum para os Olhos"], ["pink-amazonico", "Pink Amazônico"],
+    ["escova-japonesinha", "Escova Japonesinha"], ["esfoliante-clareador", "Esfoliante Clareador"],
+    ["sabonete-clareador", "Sabonete Clareador"], ["mxd20", "MXD20 + Barbudom"]
+  ];
+
+  // Reduz a foto no próprio aparelho (máx. 1000 px) antes de enviar: rápido e leve
+  function reduzir(arquivo) {
+    return new Promise(function (ok, erro) {
+      var url = URL.createObjectURL(arquivo), img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var k = Math.min(1, 1000 / Math.max(img.width, img.height));
+        var c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+        var g = c.getContext("2d");
+        g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+        g.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function (b) { b ? ok(b) : erro(new Error("falha")); }, "image/jpeg", 0.86);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); erro(new Error("imagem")); };
+      img.src = url;
+    });
+  }
+
+  async function enviarFoto(blob) {
+    var fd = new FormData();
+    fd.append("arquivo", blob, "foto.jpg");
+    try {
+      var r = await fetch("/api/?a=imagem_upload", { method: "POST", credentials: "same-origin", headers: { "X-Requested-With": "fetch" }, body: fd });
+      var j = {}; try { j = await r.json(); } catch (e) {}
+      return { ok: r.ok, data: j };
+    } catch (e) { return { ok: false, data: {} }; }
+  }
+
+  function seletorFoto(campo) {
+    var caixa = el("div", "ft-box");
+    var previa = el("div", "ft-previa");
+    var linha = el("div", "ft-linha");
+    var arq = el("input"); arq.type = "file"; arq.accept = "image/jpeg,image/png,image/webp"; arq.hidden = true;
+    var enviar = btn("📷 Enviar foto do produto", "abtn peq", function () { arq.click(); });
+    var tirar = btn("Remover foto", "abtn peq ghost", function () { campo.value = ""; atualizar(); });
+    var estado = el("span", "ft-estado");
+    linha.appendChild(enviar); linha.appendChild(tirar); linha.appendChild(estado); linha.appendChild(arq);
+    var atalhos = el("div", "ft-atalhos");
+    atalhos.appendChild(el("div", "ft-rot", "Ou use uma foto que já está no site:"));
+    var fila = el("div", "ft-fila");
+    FOTOS_SITE.forEach(function (f) {
+      var u = location.origin + "/img/produtos/" + f[0] + ".webp";
+      var b = el("button", "ft-mini"); b.type = "button"; b.title = f[1];
+      var im = el("img"); im.src = u; im.alt = f[1]; im.loading = "lazy"; im.width = 52; im.height = 52;
+      b.appendChild(im);
+      b.addEventListener("click", function () { campo.value = u; atualizar(); });
+      fila.appendChild(b);
+    });
+    atalhos.appendChild(fila);
+    caixa.appendChild(previa); caixa.appendChild(linha); caixa.appendChild(atalhos);
+
+    function atualizar() {
+      previa.textContent = "";
+      var u = campo.value.trim();
+      tirar.hidden = !u;
+      if (/^https:\/\//i.test(u)) {
+        var im = el("img"); im.src = u; im.alt = "Prévia da foto"; im.referrerPolicy = "no-referrer";
+        im.addEventListener("error", function () { previa.textContent = ""; previa.appendChild(el("span", "ft-erro", "Não foi possível mostrar essa imagem.")); });
+        previa.appendChild(im);
+      } else previa.appendChild(el("span", "ft-vazio", "Sem foto"));
+    }
+    campo.addEventListener("input", atualizar);
+    arq.addEventListener("change", async function () {
+      var a = arq.files && arq.files[0];
+      arq.value = "";
+      if (!a) return;
+      estado.textContent = "Enviando...";
+      enviar.disabled = true;
+      try {
+        var blob = await reduzir(a);
+        var r = await enviarFoto(blob);
+        if (r.ok && r.data.url) { campo.value = r.data.url; estado.textContent = "Foto enviada."; }
+        else estado.textContent = r.data && r.data.erro === "formato_invalido" ? "Use JPG, PNG ou WEBP." : "Não foi possível enviar a foto.";
+      } catch (e) { estado.textContent = "Não foi possível ler essa imagem."; }
+      enviar.disabled = false;
+      atualizar();
+    });
+    atualizar();
+    return caixa;
+  }
+
   // Em Criativos e Produtos cada item é um produto com a pasta do Google Drive
   function modo(secao) {
     if (secao === "criativos") return { item: "Produto", titulo: "Produto", link: "Link da pasta do Google Drive", ph: "https://drive.google.com/drive/folders/...", texto: "Descrição (opcional)", dica: "No Drive: botão direito na pasta → Compartilhar → “Qualquer pessoa com o link” → Leitor. Senão o afiliado não consegue abrir." };
@@ -287,7 +377,7 @@
         { id: "ordem", label: "Ordem (1 aparece primeiro)", tipo: "number", valor: it ? it.ordem : itensDaSecao().length + 1 },
         { id: "link", label: m0.link, tipo: "url", max: 500, placeholder: m0.ph, valor: it ? it.link : "", dica: m0.dica },
         { id: "texto", label: m0.texto, tipo: "textarea", linhas: 3, max: 5000, valor: it ? it.texto : "" },
-        { id: "imagem_url", label: "Imagem de capa (link https, opcional)", tipo: "url", max: 500, placeholder: "https://...", valor: it ? it.imagem_url : "" },
+        { id: "imagem_url", label: "Foto do produto (aparece no cartão do afiliado)", tipo: "url", max: 500, placeholder: "Envie a foto abaixo ou cole um link https", valor: it ? it.imagem_url : "" },
         { id: "publicado", label: "Publicado (visível para afiliados)", tipo: "checkbox", valor: it ? it.publicado : true }
       ],
       aoMontar: function (f) {
@@ -302,6 +392,7 @@
         }
         f.campos.secao.addEventListener("change", aplicar);
         aplicar();
+        f.campos.imagem_url.after(seletorFoto(f.campos.imagem_url));
       },
       salvar: async function (v) {
         var d = { secao: v.secao, titulo: v.titulo, texto: v.texto, link: v.link, imagem_url: v.imagem_url, ordem: parseInt(v.ordem, 10) || 0, publicado: v.publicado };

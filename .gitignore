@@ -1,2 +1,6 @@
 .hostinger/
 api/config.php
+
+# fotos enviadas pelo painel (ficam só no servidor)
+uploads/*
+!uploads/.htaccess
