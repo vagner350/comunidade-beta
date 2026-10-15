@@ -1,0 +1,89 @@
+/* Cursos: visual estilo Netflix (afiliado) e cadastro (admin) */
+#app .main.dark{background:#141414}
+#app .main.dark .main-head{background:transparent}
+.nf-hero-img.sem-capa::before{display:none}
+#app .main.dark .main-head h1{color:#fff}
+#app .main.dark .main-head p{color:#b3b3b3}
+.main-body.netflix{display:block;padding:0 30px 60px}
+.nf-aviso{margin:24px 0;padding:28px;border-radius:14px;background:#1f1f1f;color:#d0d0d0;text-align:center}
+
+.nf-hero{position:relative;min-height:340px;border-radius:14px;overflow:hidden;background:#222;display:flex;align-items:flex-end;margin-bottom:28px}
+.nf-hero-img{position:absolute;inset:0}
+.nf-hero-img img{width:100%;height:100%;object-fit:cover;display:block}
+.nf-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,20,20,.92) 0%,rgba(20,20,20,.45) 55%,rgba(20,20,20,.1) 100%),linear-gradient(0deg,#141414 0%,transparent 45%)}
+.nf-hero-txt{position:relative;z-index:1;padding:28px;max-width:560px;color:#fff}
+.nf-tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.12em;color:#e50914;margin-bottom:8px}
+.nf-hero-txt h2{font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.1;margin-bottom:10px}
+.nf-hero-txt p{color:#d6d6d6;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+.nf-btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.nf-play,.nf-info,.nf-voltar{border:0;border-radius:6px;font:inherit;font-weight:700;padding:10px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+.nf-play{background:#fff;color:#111}
+.nf-play:hover{background:#e0e0e0}
+.nf-info{background:rgba(109,109,110,.7);color:#fff}
+.nf-info:hover{background:rgba(109,109,110,.5)}
+.nf-voltar{background:transparent;color:#d0d0d0;padding-left:0}
+.nf-voltar:hover{color:#fff}
+
+.nf-row{margin-bottom:26px}
+.nf-row h3{color:#e5e5e5;font-size:1.15rem;margin-bottom:10px}
+.nf-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 2px 14px;-webkit-overflow-scrolling:touch}
+.nf-card{flex:none;width:230px;scroll-snap-align:start;border:0;padding:0;background:#1f1f1f;color:#fff;border-radius:8px;overflow:hidden;cursor:pointer;text-align:left;font:inherit;transition:transform .2s}
+.nf-card:hover,.nf-card:focus-visible{transform:scale(1.05);outline:2px solid #fff}
+.nf-card-img{aspect-ratio:16/9;background:#2a2a2a}
+.nf-card-img img{width:100%;height:100%;object-fit:cover;display:block}
+.nf-card-t{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}
+.nf-card-t strong{font-size:.95rem}
+.nf-card-t span{font-size:.78rem;color:#9a9a9a}
+.nf-prog{height:3px;background:#444}
+.nf-prog span{display:block;height:100%;background:#e50914}
+.sem-capa{background:linear-gradient(135deg,#3b1d6e,#7c3aed 60%,#a855f7)!important;position:relative}
+.sem-capa::before{content:"▶";position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.7);font-size:2rem}
+
+.nf-curso{color:#fff}
+.nf-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
+.nf-curso-nome{color:#9a9a9a;font-size:.85rem;margin-bottom:8px}
+.nf-player{position:relative;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;display:grid;place-items:center}
+.nf-player iframe,.nf-player video{position:absolute;inset:0;width:100%;height:100%;border:0}
+.nf-sem-video{color:#9a9a9a}
+.nf-aula-t{font-size:1.4rem;margin:16px 0 4px}
+.nf-meta{color:#9a9a9a;font-size:.85rem}
+.nf-desc{color:#d0d0d0;margin-top:10px;white-space:pre-line}
+.nf-side{background:#1f1f1f;border-radius:10px;padding:16px;max-height:80vh;overflow-y:auto}
+.nf-side h3{margin-bottom:2px}
+.nf-aulas{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.nf-aula{display:flex;gap:12px;align-items:center;text-align:left;border:0;background:#2a2a2a;color:#fff;border-radius:8px;padding:10px 12px;cursor:pointer;font:inherit}
+.nf-aula:hover{background:#353535}
+.nf-aula.on{background:#3b1d6e;outline:1px solid #a855f7}
+.nf-n{flex:none;width:28px;height:28px;border-radius:50%;background:#444;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.nf-at{display:flex;flex-direction:column;min-width:0}
+.nf-at strong{font-size:.9rem}
+.nf-at small{color:#9a9a9a}
+@media(max-width:860px){.nf-grid{grid-template-columns:1fr}.nf-side{max-height:none}.nf-card{width:170px}.nf-hero{min-height:280px}}
+
+/* ===== admin ===== */
+.ad-lista{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.ad-curso{background:#fff;border:1px solid #e4e6f3;border-radius:16px;overflow:hidden}
+.ad-head{display:flex;gap:14px;align-items:center;padding:12px;flex-wrap:wrap}
+.ad-thumb{flex:none;width:128px;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#e4e6f3}
+.ad-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ad-info{flex:1;min-width:180px;color:#1c2038}
+.ad-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:#6b7194;font-size:.82rem;margin-top:4px}
+.ad-selo{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:#eef0f8;color:#4b5173}
+.ad-selo.ok{background:#dcfce7;color:#166534}
+.ad-selo.rasc{background:#fef3c7;color:#92400e}
+.ad-selo.dest{background:#ede9fe;color:#5b21b6}
+.ad-acoes{display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+.ad-acoes .lnk{border:0;background:transparent;color:#3b6cf6;font:inherit;font-weight:600;cursor:pointer;padding:6px 8px}
+.ad-acoes .lnk.del{color:#dc2626}
+.ad-acoes .lnk:disabled{opacity:.3;cursor:default}
+.ad-aulas{border-top:1px solid #eef0f8;background:#f8f9fd;padding:12px}
+.ad-aulas-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;color:#1c2038}
+.ad-aula{display:flex;gap:12px;align-items:center;padding:8px 6px;border-bottom:1px solid #eef0f8;flex-wrap:wrap}
+.ad-aula:last-child{border-bottom:0}
+.ad-num{flex:none;width:26px;height:26px;border-radius:50%;background:#e4e6f3;color:#1c2038;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.ad-at{flex:1;min-width:160px;color:#1c2038}
+.abtn.peq{padding:6px 12px;font-size:.85rem}
+dialog input[type=checkbox]{width:auto;margin-right:8px}
+dialog .chk{display:flex;align-items:center;color:var(--text);margin-top:14px;font-size:.92rem}
+.nf-curso h2,.nf-curso h3{text-align:left}

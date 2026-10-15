@@ -145,6 +145,7 @@
   .quote .who{color:var(--accent2);font-size:.9rem;font-weight:600}
   footer{padding:32px 0;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
 </style>
+<link rel="stylesheet" href="cursos.css">
 </head>
 <body>
 <div id="landing">
@@ -326,6 +327,56 @@
   </form>
 </dialog>
 
+<dialog id="dlg-curso">
+  <h3 id="cu-titulo-dlg">Novo curso</h3>
+  <form id="form-curso">
+    <input type="hidden" id="cu-id">
+    <label for="cu-titulo">Título</label>
+    <input id="cu-titulo" type="text" required maxlength="160">
+    <label for="cu-desc">Descrição</label>
+    <textarea id="cu-desc" rows="3" maxlength="1000"></textarea>
+    <label for="cu-capa">Capa (link https da imagem)</label>
+    <input id="cu-capa" type="url" maxlength="500" placeholder="https://...">
+    <label for="cu-cat">Categoria (linha da tela)</label>
+    <input id="cu-cat" type="text" maxlength="80" list="dl-cat">
+    <datalist id="dl-cat"></datalist>
+    <label for="cu-ordem">Ordem (1 aparece primeiro)</label>
+    <input id="cu-ordem" type="number" min="0" max="9999">
+    <label class="chk"><input id="cu-dest" type="checkbox"> Curso em destaque (banner do topo)</label>
+    <label class="chk"><input id="cu-pub" type="checkbox" checked> Publicado (visível para afiliados)</label>
+    <div class="row">
+      <button class="btn ghost" type="button" data-close>Cancelar</button>
+      <button class="btn" type="submit">Salvar</button>
+    </div>
+    <div class="msg" id="msg-cu" role="status"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-aula">
+  <h3 id="au-titulo-dlg">Nova aula</h3>
+  <form id="form-aula">
+    <input type="hidden" id="au-id">
+    <label for="au-titulo">Título da aula</label>
+    <input id="au-titulo" type="text" required maxlength="160">
+    <label for="au-desc">Descrição</label>
+    <textarea id="au-desc" rows="3" maxlength="1000"></textarea>
+    <label for="au-video">Vídeo (YouTube, Vimeo ou .mp4, link https)</label>
+    <input id="au-video" type="url" maxlength="500" placeholder="https://www.youtube.com/watch?v=...">
+    <label for="au-mat">Material de apoio (link https, opcional)</label>
+    <input id="au-mat" type="url" maxlength="500" placeholder="https://...">
+    <label for="au-dur">Duração (ex.: 12 min)</label>
+    <input id="au-dur" type="text" maxlength="20">
+    <label for="au-ordem">Ordem na sequência</label>
+    <input id="au-ordem" type="number" min="0" max="9999">
+    <label class="chk"><input id="au-pub" type="checkbox" checked> Publicada</label>
+    <div class="row">
+      <button class="btn ghost" type="button" data-close>Cancelar</button>
+      <button class="btn" type="submit">Salvar</button>
+    </div>
+    <div class="msg" id="msg-au" role="status"></div>
+  </form>
+</dialog>
+
 <script>
   // ===== CONFIGURE AQUI =====
   // ID do vídeo do YouTube (ex.: em youtube.com/watch?v=ABC123xyz o ID é ABC123xyz)
@@ -479,7 +530,9 @@
     return e;
   }
   function linkSeguro(u) { return /^https?:\/\//i.test(u || ""); }
-  function secoes() { return ehAdmin ? [ADMIN_SECAO].concat(SECOES) : SECOES; }
+  var ADMIN_CURSOS = { id: "admin_cursos", nome: "Gerenciar Cursos", icone: "🎬", sub: "Cadastre cursos, aulas, capas e a sequência" };
+  var navCont = 0;
+  function secoes() { return ehAdmin ? [ADMIN_SECAO, ADMIN_CURSOS].concat(SECOES) : SECOES; }
 
   function abrirSecao(id) {
     var todas = secoes();
@@ -491,6 +544,15 @@
     $("sec-sub").textContent = sec.sub;
     var corpo = $("sec-corpo");
     corpo.textContent = "";
+    corpo.dataset.t = String(++navCont);
+    document.querySelector("#app .main").classList.toggle("dark", sec.id === "cursos");
+    if (sec.id === "cursos" || sec.id === "admin_cursos") {
+      var ad = sec.id === "admin_cursos";
+      corpo.className = ad ? "main-body admin" : "main-body netflix";
+      if (!window.Cursos) { corpo.appendChild(criar("div", "vazio", "Não foi possível carregar os cursos.")); return; }
+      if (ad) window.Cursos.admin(corpo); else window.Cursos.afiliado(corpo);
+      return;
+    }
     if (sec.id === "admin") {
       corpo.className = "main-body admin";
       renderAdmin(corpo);
@@ -742,5 +804,6 @@
   }
   iniciar();
 </script>
+<script src="cursos.js"></script>
 </body>
 </html>
