@@ -138,6 +138,7 @@
   .clip video{display:block;width:240px;aspect-ratio:9/16;object-fit:cover;border-radius:18px;border:1px solid var(--line);background:var(--card);cursor:pointer}
   @media(max-width:600px){.clip,.clip video{width:200px}}
   .proof{padding-top:48px}
+  [hidden]{display:none!important}
   .video{max-width:820px;margin:0 auto 32px;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:0 20px 60px rgba(37,99,235,.25)}
   .video iframe{width:100%;height:100%;border:0;display:block}
   .video .soon{height:100%;display:grid;place-items:center;color:var(--muted)}
@@ -276,6 +277,34 @@
   .final .box .linkbtn{color:#fbcfe8}
   .final .preco strong{background:linear-gradient(90deg,#4ade80,#fde047);-webkit-background-clip:text;background-clip:text;color:transparent}
   footer{background:#fff}
+
+  /* ===== VÍDEO DO TOPO ===== */
+  .hero-grid{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-txt{width:100%}
+  .hero-video{width:100%;display:flex;justify-content:center;margin-top:8px}
+  .vframe{position:relative;width:min(340px,86vw);aspect-ratio:9/16;border-radius:26px;overflow:hidden;background:#0f1b3d;border:6px solid #fff;box-shadow:0 24px 70px rgba(37,99,235,.35),0 0 0 1px var(--line)}
+  .vframe video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .vsom{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:800;font-size:.9rem;cursor:pointer;background:#fff;color:#0f1b3d;box-shadow:0 8px 24px rgba(0,0,0,.35);white-space:nowrap;animation:pulsa 1.8s ease-in-out infinite}
+  .vframe.som .vsom{display:none}
+  @keyframes pulsa{50%{transform:translateX(-50%) scale(1.06)}}
+  @media (prefers-reduced-motion:reduce){.vsom{animation:none}}
+  @media(max-width:899px){
+    /* celular: título, selo, vídeo, e só depois oferta e botão */
+    .hero-txt{display:contents}
+    .hero-txt > :not(.hero-mid){order:1;max-width:100%}
+    .hero-txt > h1{width:100%}
+    .hero-video{order:2}
+    .hero-txt > .hero-mid{order:3;width:100%}
+  }
+  @media(min-width:900px){
+    .hero{padding:72px 0 64px;text-align:left}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;align-items:center}
+    .hero-video{margin:0}
+    .hero h1{text-align:left}
+    .hero .hero-txt p{margin-left:0;margin-right:0}
+    .hero .cta,.hero .trust{justify-content:flex-start}
+    .hero .prova12{align-items:flex-start;text-align:left}
+  }
 </style>
 <link rel="stylesheet" href="cursos.css">
 </head>
@@ -293,26 +322,36 @@
 
 <main>
   <div class="hero">
-    <div class="wrap">
-      <span class="tag">Comunidade de Afiliados Amazolé</span>
-      <h1>Faça parte do nosso <em>time de vendas</em> da marca Amazolé como afiliado</h1>
-      <div class="prova12">
+    <div class="wrap hero-grid">
+      <div class="hero-txt">
+        <span class="tag">Comunidade de Afiliados Amazolé</span>
+        <h1>Faça parte do nosso <em>time de vendas</em> da marca Amazolé como afiliado</h1>
+        <div class="prova12">
         <span class="n">+12 milhões</span>
         <span class="t">em vendas pelo WhatsApp: é a marca que você vai representar</span>
       </div>
-      <p class="oferta-linha">Venda clareador de manchas e fique com <strong>50% de comissão</strong> em cada venda.</p>
+        <div class="hero-mid">
+        <p class="oferta-linha">Venda clareador de manchas e fique com <strong>50% de comissão</strong> em cada venda.</p>
       <p>Entre para a comunidade e receba o passo a passo, os criativos prontos e os produtos com estoque nacional para divulgar. Você divulga, a Amazolé cuida do resto.</p>
       <div class="cta">
         <a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a>
         <a class="btn ghost lg" href="#como-funciona">Ver como funciona</a>
       </div>
       <p class="cta-note" role="status"></p>
-      <ul class="trust">
+        <ul class="trust">
         <li>✔ 50% de comissão por venda</li>
         <li>✔ Sem precisar de estoque</li>
         <li>✔ Produtos físicos enviados do Brasil</li>
         <li>✔ Funil de vendas validado</li>
       </ul>
+        </div>
+      </div>
+      <div class="hero-video">
+        <div class="vframe" id="vframe">
+          <video id="vtopo" src="media/topo/comunidade.mp4" poster="media/topo/comunidade.jpg" autoplay muted loop playsinline preload="auto" width="480" height="854" aria-label="Vídeo de apresentação da comunidade Amazolé"></video>
+          <button type="button" class="vsom" id="vsom" aria-label="Ativar o som do vídeo">🔊 Toque para ativar o som</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1038,6 +1077,36 @@
     new IntersectionObserver(function (es) {
       bar.classList.toggle("off", es[0].isIntersecting);
     }).observe(alvo);
+  })();
+
+  // ===== VÍDEO DO TOPO: começa sozinho (sem som) e o toque ativa o som =====
+  (function () {
+    var v = document.getElementById("vtopo"), f = document.getElementById("vframe"), b = document.getElementById("vsom");
+    if (!v || !f || !b) return;
+    var comSom = false, quisPausar = false;
+    function tentar() { var p = v.play(); if (p && p.catch) p.catch(function () { b.textContent = "▶ Toque para assistir"; }); }
+    b.addEventListener("click", function () {
+      comSom = true; v.muted = false; v.loop = false; v.controls = true;
+      try { v.currentTime = 0; } catch (e) {}
+      f.classList.add("som");
+      tentar();
+    });
+    v.addEventListener("pause", function () { quisPausar = comSom && !v.ended && v.dataset.auto !== "1"; });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) { if (!quisPausar) tentar(); }
+        else { v.dataset.auto = "1"; v.pause(); setTimeout(function () { delete v.dataset.auto; }, 50); }
+      }, { threshold: 0.25 }).observe(f);
+    }
+    tentar();
+  })();
+
+  // sem vídeo do YouTube nem depoimentos, esconde a seção vazia
+  (function () {
+    if (!VIDEO_ID && !DEPOIMENTOS.length) {
+      var sec = document.getElementById("prova-social");
+      if (sec) sec.hidden = true;
+    }
   })();
   iniciar();
 </script>
