@@ -1,0 +1,10 @@
+# Bloqueia leitura direta dos arquivos de configuração
+<FilesMatch "^(config\.php|.*\.sql|.*\.log)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

@@ -291,7 +291,6 @@
   </form>
 </dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ===== CONFIGURE AQUI =====
   // ID do vídeo do YouTube (ex.: em youtube.com/watch?v=ABC123xyz o ID é ABC123xyz)
@@ -349,11 +348,23 @@
 
   // ===== LOGIN DE AFILIADOS =====
   // Afiliados entram só com e-mail. O administrador entra com link de confirmação no e-mail.
-  var SUPABASE_URL = "https://mgvpzmklmjvsozlsawzi.supabase.co";
-  var SUPABASE_KEY = "sb_publishable_K4Pa5UTavA5RJX8S367qYA_b7twGzzu"; // chave pública, segura no navegador
-  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-  });
+  // A página conversa com a API em PHP (pasta /api) no mesmo endereço, que usa o MySQL da Hostinger.
+  async function api(acao, dados) {
+    var opts = { credentials: "same-origin" };
+    if (dados !== undefined) {
+      opts.method = "POST";
+      opts.headers = { "Content-Type": "application/json", "X-Requested-With": "fetch" };
+      opts.body = JSON.stringify(dados);
+    }
+    try {
+      var r = await fetch("/api/?a=" + encodeURIComponent(acao), opts);
+      var j = {};
+      try { j = await r.json(); } catch (e) {}
+      return { ok: r.ok, status: r.status, data: j };
+    } catch (e) {
+      return { ok: false, status: 0, data: {} };
+    }
+  }
 
   var $ = function (id) { return document.getElementById(id); };
   var dlgLogin = $("dlg-login"), dlgAfil = $("dlg-afiliado");
@@ -492,9 +503,9 @@
   }
 
   async function carregarAfiliados() {
-    var r = await sb.from("afiliados_email").select("*").order("created_at", { ascending: false });
-    if (r.error) { msg(admMsgEl, "Não foi possível carregar os afiliados.", "err"); return; }
-    lista = r.data || [];
+    var r = await api("afiliados_listar");
+    if (!r.ok) { msg(admMsgEl, "Não foi possível carregar os afiliados.", "err"); return; }
+    lista = r.data.afiliados || [];
     desenharTabela();
   }
 
@@ -533,8 +544,8 @@
       var s = criar("select", "st-" + a.status);
       opcoesStatus(s, a.status);
       s.addEventListener("change", async function () {
-        var r = await sb.from("afiliados_email").update({ status: s.value }).eq("email", a.email);
-        if (r.error) { msg(admMsgEl, "Não foi possível alterar o status.", "err"); s.value = a.status; return; }
+        var r = await api("afiliado_status", { email: a.email, status: s.value });
+        if (!r.ok) { msg(admMsgEl, "Não foi possível alterar o status.", "err"); s.value = a.status; return; }
         a.status = s.value; s.className = "st-" + a.status;
         msg(admMsgEl, "Status atualizado.", "ok");
       });
@@ -549,8 +560,8 @@
       var rm = criar("button", "lnk del", "Remover"); rm.type = "button";
       rm.addEventListener("click", async function () {
         if (!confirm("Remover " + a.email + "? Essa ação não pode ser desfeita.")) return;
-        var r = await sb.from("afiliados_email").delete().eq("email", a.email);
-        if (r.error) { msg(admMsgEl, "Não foi possível remover.", "err"); return; }
+        var r = await api("afiliado_remover", { email: a.email });
+        if (!r.ok) { msg(admMsgEl, "Não foi possível remover.", "err"); return; }
         msg(admMsgEl, "Afiliado removido.", "ok");
         carregarAfiliados();
       });
@@ -577,18 +588,17 @@
     e.preventDefault();
     var orig = $("af-orig").value;
     var dados = {
+      original: orig,
       email: $("af-email").value.trim().toLowerCase(),
       nome: $("af-nome").value.trim() || null,
       whatsapp: $("af-whats").value.trim() || null,
       status: $("af-status").value,
       observacao: $("af-obs").value.trim() || null
     };
-    var r = orig
-      ? await sb.from("afiliados_email").update(dados).eq("email", orig)
-      : await sb.from("afiliados_email").insert(dados);
-    if (r.error) {
-      var texto = r.error.code === "23505" ? "Esse e-mail já está cadastrado."
-        : r.error.code === "23514" ? "Confira o e-mail."
+    var r = await api("afiliado_salvar", dados);
+    if (!r.ok) {
+      var texto = r.status === 409 ? "Esse e-mail já está cadastrado."
+        : r.data && r.data.erro === "email_invalido" ? "Confira o e-mail."
         : "Não foi possível salvar.";
       msg($("msg-af"), texto, "err");
       return;
@@ -615,21 +625,19 @@
     var valor = $("email").value.trim().toLowerCase();
     var btn = $("btn-enviar");
     btn.disabled = true; msg($("msg-login"), "Entrando...");
-    var r = await sb.rpc("entrar_afiliado", { p_email: valor });
-    if (r.error) {
-      var m = r.error.message || "";
-      if (m.indexOf("admin_requer_link") !== -1) {
-        var o = await sb.auth.signInWithOtp({
-          email: valor,
-          options: { emailRedirectTo: location.origin + location.pathname }
-        });
-        if (o.error) msg($("msg-login"), "Não foi possível enviar o link agora. Tente de novo em alguns minutos.", "err");
-        else msg($("msg-login"), "Enviamos um link de confirmação para o seu e-mail. Clique nele para entrar.", "ok");
-      } else if (m.indexOf("acesso_bloqueado") !== -1) {
-        msg($("msg-login"), "Este acesso está bloqueado. Fale com o suporte.", "err");
-      } else {
-        msg($("msg-login"), "Confira o e-mail e tente de novo.", "err");
-      }
+    var r = await api("entrar", { email: valor });
+    if (!r.ok) {
+      var er = (r.data && r.data.erro) || "";
+      if (r.status === 429) msg($("msg-login"), "Muitas tentativas. Aguarde alguns minutos e tente de novo.", "err");
+      else if (r.status === 403 && er === "bloqueado") msg($("msg-login"), "Este acesso está bloqueado. Fale com o suporte.", "err");
+      else if (er === "envio_falhou") msg($("msg-login"), "Não foi possível enviar o link agora. Tente de novo em alguns minutos.", "err");
+      else if (er === "email_invalido") msg($("msg-login"), "Confira o e-mail e tente de novo.", "err");
+      else msg($("msg-login"), "Não foi possível entrar agora. Tente de novo.", "err");
+      btn.disabled = false;
+      return;
+    }
+    if (r.data && r.data.admin) {
+      msg($("msg-login"), "Enviamos um link de confirmação para o seu e-mail. Clique nele para entrar.", "ok");
       btn.disabled = false;
       return;
     }
@@ -641,24 +649,28 @@
 
   $("btn-sair").addEventListener("click", async function () {
     email = ""; gravarEmail("");
-    if (ehAdmin) { ehAdmin = false; emailAdmin = ""; await sb.auth.signOut(); }
+    if (ehAdmin) { ehAdmin = false; emailAdmin = ""; await api("admin_sair", {}); }
     document.body.classList.remove("logado");
     window.scrollTo(0, 0);
   });
 
   async function iniciar() {
-    var s = await sb.auth.getSession();
-    var ses = s.data && s.data.session;
-    if (ses) {
-      var r = await sb.rpc("is_admin");
-      if (!r.error && r.data === true) {
-        ehAdmin = true; emailAdmin = ses.user.email || "";
-        if (location.hash.indexOf("access_token") !== -1) {
-          history.replaceState(null, "", location.pathname + location.search);
-        }
-        mostrarApp("admin");
-        return;
+    // Volta do link do e-mail: confirma o token e remove da barra de endereço
+    var p = new URLSearchParams(location.search);
+    var tk = p.get("entrar");
+    if (tk) {
+      history.replaceState(null, "", location.pathname);
+      var v = await api("admin_verificar", { token: tk });
+      if (!v.ok) {
+        msg($("msg-login"), "Esse link expirou ou já foi usado. Peça um novo.", "err");
+        dlgLogin.showModal();
       }
+    }
+    var r = await api("admin_eu");
+    if (r.ok && r.data && r.data.admin) {
+      ehAdmin = true; emailAdmin = r.data.email || "";
+      mostrarApp("admin");
+      return;
     }
     if (email) mostrarApp();
   }
