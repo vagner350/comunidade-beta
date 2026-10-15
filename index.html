@@ -311,6 +311,8 @@
   #app .main{padding:0}
   .nav-sep{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6e78a8;padding:12px 14px 2px}
   .item-img{display:block;width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:12px;margin-bottom:12px;background:#fff;border:1px solid #eef0f8}
+  .item.com-capa{overflow:hidden}
+  .item-img.capa{width:calc(100% + 40px);max-width:none;margin:-20px -20px 14px;aspect-ratio:4/3;object-fit:cover;border:0;border-radius:0;border-bottom:1px solid #eef0f8}
   .pendente-box{grid-column:1/-1;background:#fff;border:1px solid #e4e6f3;border-radius:18px;padding:28px;color:#1c2038;max-width:640px}
   .pendente-box h3{font-size:1.3rem;margin-bottom:8px}
   .pendente-box p{color:#5c6385;margin-bottom:18px}
@@ -1059,7 +1061,8 @@
       var c = criar("div", sec.posts ? "post" : "item");
       if (it.data) c.appendChild(criar("div", "d", it.data));
       if (/^https:\/\//i.test(it.imagem_url || "")) {
-        var im = criar("img", "item-img");
+        var im = criar("img", sec.posts ? "item-img" : "item-img capa");
+        if (!sec.posts) c.classList.add("com-capa");
         im.src = it.imagem_url; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
         im.addEventListener("error", function () { im.remove(); });
         c.appendChild(im);
