@@ -6,6 +6,7 @@
 <title>Seja afiliado Amazolé — Time de vendas com 50% de comissão</title>
 <meta name="description" content="Faça parte do time de vendas da Amazolé, marca com mais de 12 milhões em vendas pelo WhatsApp. 50% de comissão e pagamento único de R$ 57,00.">
 <meta name="theme-color" content="#ffffff">
+<link rel="preload" as="image" href="media/topo/comunidade.webp" type="image/webp" fetchpriority="high">
 <style>
   :root{
     --bg:#0a0118; --bg2:#1e3a8a; --card:#1a0a35; --line:#2e1a55;
@@ -306,7 +307,8 @@
     .hero .prova12{align-items:flex-start;text-align:left}
   }
 </style>
-<link rel="stylesheet" href="cursos.css">
+<link rel="stylesheet" href="cursos.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="cursos.css"></noscript>
 </head>
 <body>
 <div id="landing">
@@ -348,7 +350,7 @@
       </div>
       <div class="hero-video">
         <div class="vframe" id="vframe">
-          <video id="vtopo" src="media/topo/comunidade.mp4" poster="media/topo/comunidade.jpg" autoplay muted loop playsinline preload="auto" width="480" height="854" aria-label="Vídeo de apresentação da comunidade Amazolé"></video>
+          <video id="vtopo" data-src="media/topo/comunidade.mp4" poster="media/topo/comunidade.webp" muted loop playsinline preload="none" width="360" height="640" aria-label="Vídeo de apresentação da comunidade Amazolé"></video>
           <button type="button" class="vsom" id="vsom" aria-label="Ativar o som do vídeo">🔊 Toque para ativar o som</button>
         </div>
       </div>
@@ -369,7 +371,7 @@
     <div class="wrap">
       <div class="hist-grid">
         <figure class="hist-foto">
-          <img src="img/vagner.jpg" alt="Vagner, fundador da Amazolé, segurando uma placa de premiação em um evento" width="800" height="841" loading="lazy">
+          <img src="img/vagner.webp" alt="Vagner, fundador da Amazolé, segurando uma placa de premiação em um evento" width="800" height="841" loading="lazy">
           <figcaption><strong>Vagner</strong><span>Fundador da Amazolé</span></figcaption>
         </figure>
         <div class="hist-txt">
@@ -437,13 +439,13 @@
     </div>
     <div class="marquee" aria-label="Produtos disponíveis para afiliados">
       <div class="track" id="track-produtos">
-        <figure class="prod"><img src="img/produtos/formula-avancada.jpg" alt="Fórmula Avançada, suplemento alimentar em cápsulas" width="260" height="260"><figcaption>Fórmula Avançada</figcaption></figure>
-        <figure class="prod"><img src="img/produtos/serum-olhos.jpg" alt="Sérum roll-on para os olhos" width="260" height="260"><figcaption>Sérum para os Olhos</figcaption></figure>
-        <figure class="prod"><img src="img/produtos/pink-amazonico.jpg" alt="Pink Amazônico, creme iluminador corporal" width="260" height="260"><figcaption>Pink Amazônico</figcaption></figure>
-        <figure class="prod"><img src="img/produtos/escova-japonesinha.jpg" alt="Escova Japonesinha, progressiva alisadora" width="260" height="260"><figcaption>Escova Japonesinha</figcaption></figure>
-        <figure class="prod"><img src="img/produtos/esfoliante-clareador.jpg" alt="Esfoliante clareador" width="260" height="260"><figcaption>Esfoliante Clareador</figcaption></figure>
-        <figure class="prod"><img src="img/produtos/sabonete-clareador.jpg" alt="Sabonete em pasta clareador" width="260" height="260"><figcaption>Sabonete Clareador</figcaption></figure>
-        <figure class="prod"><img src="img/produtos/mxd20.jpg" alt="MXD20 Power Hair em cápsulas e Barbudom tônico capilar" width="260" height="260"><figcaption>MXD20 + Barbudom</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/formula-avancada.webp" alt="Fórmula Avançada, suplemento alimentar em cápsulas" width="260" height="260"><figcaption>Fórmula Avançada</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/serum-olhos.webp" alt="Sérum roll-on para os olhos" width="260" height="260"><figcaption>Sérum para os Olhos</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/pink-amazonico.webp" alt="Pink Amazônico, creme iluminador corporal" width="260" height="260"><figcaption>Pink Amazônico</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/escova-japonesinha.webp" alt="Escova Japonesinha, progressiva alisadora" width="260" height="260"><figcaption>Escova Japonesinha</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/esfoliante-clareador.webp" alt="Esfoliante clareador" width="260" height="260"><figcaption>Esfoliante Clareador</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/sabonete-clareador.webp" alt="Sabonete em pasta clareador" width="260" height="260"><figcaption>Sabonete Clareador</figcaption></figure>
+        <figure class="prod"><img decoding="async" src="img/produtos/mxd20.webp" alt="MXD20 Power Hair em cápsulas e Barbudom tônico capilar" width="260" height="260"><figcaption>MXD20 + Barbudom</figcaption></figure>
       </div>
     </div>
   </section>
@@ -456,22 +458,22 @@
     <div class="wrap">
       <div class="clips" id="clips">
         <figure class="clip">
-          <video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="240" height="427"></video>
+          <video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="240" height="427"></video>
         </figure>
         <figure class="clip">
-          <video data-src="media/conteudo/v2.mp4" poster="media/conteudo/v2.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="240" height="427"></video>
+          <video data-src="media/conteudo/v2.mp4" poster="media/conteudo/v2.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="240" height="427"></video>
         </figure>
         <figure class="clip">
-          <video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 3" width="240" height="427"></video>
+          <video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 3" width="240" height="427"></video>
         </figure>
         <figure class="clip">
-          <video data-src="media/conteudo/v4.mp4" poster="media/conteudo/v4.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 4" width="240" height="427"></video>
+          <video data-src="media/conteudo/v4.mp4" poster="media/conteudo/v4.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 4" width="240" height="427"></video>
         </figure>
         <figure class="clip">
-          <video data-src="media/conteudo/v5.mp4" poster="media/conteudo/v5.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 5" width="240" height="427"></video>
+          <video data-src="media/conteudo/v5.mp4" poster="media/conteudo/v5.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 5" width="240" height="427"></video>
         </figure>
         <figure class="clip">
-          <video data-src="media/conteudo/v6.mp4" poster="media/conteudo/v6.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 6" width="240" height="427"></video>
+          <video data-src="media/conteudo/v6.mp4" poster="media/conteudo/v6.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 6" width="240" height="427"></video>
         </figure>
       </div>
     </div>
@@ -1080,13 +1082,28 @@
   })();
 
   // ===== VÍDEO DO TOPO: começa sozinho (sem som) e o toque ativa o som =====
+  // O arquivo só é baixado depois que a página terminou de carregar, e não é baixado
+  // em conexão lenta ou com economia de dados (aí o visitante toca para assistir).
   (function () {
     var v = document.getElementById("vtopo"), f = document.getElementById("vframe"), b = document.getElementById("vsom");
     if (!v || !f || !b) return;
-    var comSom = false, quisPausar = false;
-    function tentar() { var p = v.play(); if (p && p.catch) p.catch(function () { b.textContent = "▶ Toque para assistir"; }); }
+    var comSom = false, quisPausar = false, carregado = false, visivel = true;
+    var cn = navigator.connection || {};
+    var lenta = cn.saveData || /(^|-)2g$/.test(cn.effectiveType || "");
+    function carregar() {
+      if (carregado) return;
+      carregado = true;
+      v.src = v.getAttribute("data-src");
+      v.preload = "auto";
+    }
+    function tentar() {
+      carregar();
+      var p = v.play();
+      if (p && p.catch) p.catch(function () { b.textContent = "▶ Toque para assistir"; });
+    }
     b.addEventListener("click", function () {
       comSom = true; v.muted = false; v.loop = false; v.controls = true;
+      carregar();
       try { v.currentTime = 0; } catch (e) {}
       f.classList.add("som");
       tentar();
@@ -1094,11 +1111,16 @@
     v.addEventListener("pause", function () { quisPausar = comSom && !v.ended && v.dataset.auto !== "1"; });
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) { if (!quisPausar) tentar(); }
+        visivel = es[0].isIntersecting;
+        if (!carregado) return;
+        if (visivel) { if (!quisPausar) tentar(); }
         else { v.dataset.auto = "1"; v.pause(); setTimeout(function () { delete v.dataset.auto; }, 50); }
       }, { threshold: 0.25 }).observe(f);
     }
-    tentar();
+    if (lenta) { b.textContent = "▶ Toque para assistir"; return; }
+    function iniciar() { if (visivel) tentar(); else carregar(); }
+    if (document.readyState === "complete") setTimeout(iniciar, 50);
+    else window.addEventListener("load", function () { setTimeout(iniciar, 50); });
   })();
 
   // sem vídeo do YouTube nem depoimentos, esconde a seção vazia
@@ -1110,6 +1132,6 @@
   })();
   iniciar();
 </script>
-<script src="cursos.js"></script>
+<script src="cursos.js" defer></script>
 </body>
 </html>
