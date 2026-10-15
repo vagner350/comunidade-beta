@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Amazolé — Comunidade de Afiliados</title>
-<meta name="description" content="Comunidade de afiliados Amazolé: produtos físicos com estoque nacional e comissão por venda.">
+<title>Comunidade de Afiliados Amazolé — Venda skincare e ganhe comissão</title>
+<meta name="description" content="Entre na comunidade de afiliados Amazolé: cursos, criativos prontos e produtos de skincare com estoque nacional. Ganhe comissão por venda.">
 <meta name="theme-color" content="#0a0118">
 <style>
   :root{
@@ -144,6 +144,36 @@
   .quote p{color:var(--text);font-size:1rem;margin-bottom:14px}
   .quote .who{color:var(--accent2);font-size:.9rem;font-weight:600}
   footer{padding:32px 0;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+
+  /* ===== PÁGINA DE VENDAS ===== */
+  .nav-r{display:flex;align-items:center;gap:14px}
+  .nav-r .linkbtn{text-decoration:none;color:var(--muted);font-size:.9rem}
+  @media(max-width:420px){.nav-r .linkbtn{display:none}}
+  .btn.sm{padding:9px 18px;font-size:.9rem}
+  .btn.lg{padding:16px 32px;font-size:1.05rem}
+  .trust{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;margin-top:26px;color:var(--muted);font-size:.92rem}
+  .mid-cta{text-align:center;margin-top:34px}
+  .faq{max-width:760px}
+  .faq details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:0 20px}
+  .faq summary{cursor:pointer;font-weight:700;padding:16px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";color:var(--accent2);font-size:1.3rem;line-height:1}
+  .faq details[open] summary::after{content:"–"}
+  .faq details p{color:var(--muted);padding:0 0 16px}
+  .final .preco{margin:6px 0 18px}
+  .final .preco small{display:block;color:var(--muted)}
+  .final .preco strong{font-size:clamp(2.6rem,9vw,3.8rem);line-height:1;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .inclui{list-style:none;max-width:420px;margin:0 auto 26px;text-align:left;color:var(--text)}
+  .inclui li{padding:6px 0;border-bottom:1px solid var(--line)}
+  .final .seguro{font-size:.85rem;margin:14px auto 6px}
+  .sticky-cta{display:none}
+  @media(max-width:700px){
+    .hero{padding:64px 0 48px}
+    .btn.lg{width:100%;text-align:center}
+    .sticky-cta{display:block;position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 14px;background:rgba(10,1,24,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+    body:not(.logado){padding-bottom:78px}
+    body.logado .sticky-cta{display:none}
+  }
 </style>
 <link rel="stylesheet" href="cursos.css">
 </head>
@@ -152,30 +182,69 @@
 <header>
   <div class="wrap nav">
     <a class="brand" href="#">Amazol<span>é</span></a>
-    <button class="btn" id="btn-conta" type="button">Entrar</button>
+    <div class="nav-r">
+      <button class="linkbtn" id="btn-conta" type="button">Já sou afiliado</button>
+      <a class="btn sm" href="#" data-checkout>Quero entrar</a>
+    </div>
   </div>
 </header>
 
 <main>
   <div class="hero">
     <div class="wrap">
-      <span class="tag">Programa de Afiliados Amazolé</span>
-      <h1>Venda produtos físicos e ganhe <em>comissão por venda</em></h1>
-      <p>Plataforma de afiliados com estoque nacional. Você divulga e a gente cuida do resto.</p>
+      <span class="tag">Comunidade de Afiliados Amazolé</span>
+      <h1>Comece a vender produtos de skincare e <em>ganhe comissão por venda</em></h1>
+      <p>Entre para a comunidade e receba o passo a passo, os criativos prontos e os produtos com estoque nacional para divulgar. Você divulga, a Amazolé cuida do resto.</p>
       <div class="cta">
-        <a class="btn" href="#" data-checkout>Entrar na comunidade · R$ 57,00</a>
-        <button class="btn ghost" type="button" data-open>Já sou afiliado? Entrar</button>
+        <a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a>
+        <a class="btn ghost lg" href="#como-funciona">Ver como funciona</a>
       </div>
       <p class="cta-note" role="status"></p>
+      <ul class="trust">
+        <li>✔ Sem precisar de estoque</li>
+        <li>✔ Produtos físicos enviados do Brasil</li>
+        <li>✔ Criativos e treinamento prontos</li>
+      </ul>
     </div>
   </div>
 
   <section class="proof" id="prova-social">
     <div class="wrap">
-      <h2>Quem já vende com a Amazolé</h2>
-      <p class="sub">Assista e veja como funciona na prática.</p>
+      <h2>Veja como funciona na prática</h2>
+      <p class="sub">Assista ao vídeo e entenda como os afiliados da Amazolé vendem.</p>
       <div class="video" id="video"></div>
       <div class="grid" id="depoimentos"></div>
+      <p class="mid-cta"><a class="btn" href="#" data-checkout>Quero fazer parte · R$ 57,00</a></p>
+    </div>
+  </section>
+
+  <section class="dor alt">
+    <div class="wrap">
+      <h2>Para quem é a comunidade</h2>
+      <p class="sub">Se você se identifica com algum destes pontos, ela foi feita para você.</p>
+      <div class="grid">
+        <div class="card"><div class="ic">🌱</div><h3>Quer começar do zero</h3><p>Não precisa ter loja, estoque nem experiência: você começa com o passo a passo.</p></div>
+        <div class="card"><div class="ic">📱</div><h3>Já vende nas redes</h3><p>Use seu Instagram, WhatsApp ou anúncios para divulgar produtos que as pessoas procuram.</p></div>
+        <div class="card"><div class="ic">⏱️</div><h3>Quer economizar tempo</h3><p>Criativos, vídeos e páginas de venda prontos, sem criar tudo do zero.</p></div>
+        <div class="card"><div class="ic">💸</div><h3>Quer uma renda extra</h3><p>Ganhe comissão por venda gerada pela sua divulgação.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dentro">
+    <div class="wrap">
+      <h2>O que você recebe ao entrar</h2>
+      <p class="sub">Tudo o que você precisa para divulgar, em um único lugar.</p>
+      <div class="grid">
+        <div class="card"><div class="ic">🎬</div><h3>Cursos em vídeo</h3><p>Aulas em sequência, no seu ritmo, estilo plataforma de streaming.</p></div>
+        <div class="card"><div class="ic">🎨</div><h3>Criativos prontos</h3><p>Imagens e vídeos para postar e anunciar sem começar do zero.</p></div>
+        <div class="card"><div class="ic">🛍️</div><h3>Produtos para afiliar</h3><p>Cremes, esfoliantes, séruns, sabonetes e mais, com estoque nacional.</p></div>
+        <div class="card"><div class="ic">🌐</div><h3>Landing pages</h3><p>Páginas de venda prontas para usar na sua divulgação.</p></div>
+        <div class="card"><div class="ic">🎓</div><h3>Treinamentos</h3><p>Como anunciar e melhorar seus resultados.</p></div>
+        <div class="card"><div class="ic">🤖</div><h3>Automação de WhatsApp</h3><p>Atendimento automático para você atender mais clientes.</p></div>
+        <div class="card"><div class="ic">💬</div><h3>Fórum e grupo</h3><p>Tire dúvidas e troque experiência com outros afiliados.</p></div>
+        <div class="card"><div class="ic">🚀</div><h3>Implementação guiada</h3><p>Um caminho claro para fazer sua primeira venda.</p></div>
+      </div>
     </div>
   </section>
 
@@ -226,44 +295,54 @@
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <h2>Por que ser afiliado Amazolé</h2>
-      <p class="sub">Tudo pensado para você vender sem estoque e sem dor de cabeça.</p>
-      <div class="grid">
-        <div class="card"><div class="ic">📦</div><h3>Produtos físicos</h3><p>Cremes, esfoliantes, kits, sabonetes e séruns com demanda real.</p></div>
-        <div class="card"><div class="ic">💰</div><h3>Comissão por venda</h3><p>Você ganha uma comissão a cada venda feita pela sua divulgação.</p></div>
-        <div class="card"><div class="ic">🇧🇷</div><h3>Estoque nacional</h3><p>Produtos enviados de dentro do Brasil.</p></div>
-        <div class="card"><div class="ic">🤝</div><h3>Comunidade ativa</h3><p>Materiais, criativos e treinamento de anúncios em um só lugar.</p></div>
-      </div>
-    </div>
-  </section>
-
   <section class="alt" id="como-funciona">
     <div class="wrap">
       <h2>Como funciona</h2>
-      <p class="sub">Três passos para começar a vender.</p>
+      <p class="sub">Quatro passos simples para começar.</p>
       <div class="grid steps">
-        <div class="card"><h3>Cadastre-se</h3><p>Entre na comunidade e libere seu acesso de afiliado.</p></div>
-        <div class="card"><h3>Divulgue</h3><p>Use os criativos e vídeos prontos e rode seus anúncios.</p></div>
-        <div class="card"><h3>Receba comissão</h3><p>Cada venda feita pela sua divulgação gera a sua comissão.</p></div>
+        <div class="card"><h3>Entre na comunidade</h3><p>Faça o pagamento e receba o seu acesso de afiliado.</p></div>
+        <div class="card"><h3>Escolha o produto</h3><p>Veja os produtos disponíveis e escolha o que combina com seu público.</p></div>
+        <div class="card"><h3>Divulgue</h3><p>Use os criativos, vídeos e páginas prontas nas suas redes e anúncios.</p></div>
+        <div class="card"><h3>Receba comissão</h3><p>Cada venda gerada pela sua divulgação gera a sua comissão.</p></div>
       </div>
     </div>
   </section>
 
-  <section class="final" id="entrar">
+  <section class="final" id="oferta">
     <div class="wrap">
       <div class="box">
-        <h2>Pronto para começar?</h2>
-        <p>Junte-se aos afiliados da Amazolé e comece a vender e ganhar comissão.</p>
-        <a class="btn" href="#" data-checkout>Quero entrar agora · R$ 57,00</a>
+        <span class="tag">Acesso à comunidade</span>
+        <h2>Entre agora e comece a divulgar</h2>
+        <div class="preco"><small>por apenas</small><strong>R$ 57,00</strong></div>
+        <ul class="inclui">
+          <li>✔ Cursos e treinamentos em vídeo</li>
+          <li>✔ Criativos, vídeos e landing pages prontos</li>
+          <li>✔ Produtos com estoque nacional para afiliar</li>
+          <li>✔ Automação de WhatsApp e grupo da comunidade</li>
+        </ul>
+        <a class="btn lg" href="#" data-checkout>Quero entrar agora</a>
         <p class="cta-note" role="status"></p>
+        <p class="seguro">🔒 Pagamento em ambiente seguro</p>
         <p><button class="linkbtn" type="button" data-open>Já sou afiliado? Entrar</button></p>
       </div>
     </div>
   </section>
+
+  <section id="duvidas">
+    <div class="wrap faq">
+      <h2>Perguntas frequentes</h2>
+      <p class="sub">Tire suas dúvidas antes de entrar.</p>
+      <details><summary>Preciso ter estoque ou loja?</summary><p>Não. Os produtos têm estoque nacional e você só precisa divulgar.</p></details>
+      <details><summary>Preciso ter experiência?</summary><p>Não. A comunidade tem cursos, treinamentos e um caminho guiado para quem está começando.</p></details>
+      <details><summary>Como funciona a comissão?</summary><p>Você ganha uma comissão a cada venda feita pela sua divulgação. As condições ficam disponíveis dentro da comunidade.</p></details>
+      <details><summary>Como recebo o meu acesso?</summary><p>Depois da confirmação do pagamento, é só entrar com o seu e-mail na página inicial.</p></details>
+      <details><summary>Onde posso divulgar?</summary><p>Onde você tiver público: Instagram, WhatsApp, TikTok, anúncios e outros canais.</p></details>
+      <details><summary>Tenho dúvidas, com quem falo?</summary><p>Entre em contato pelo e-mail sac@amazole.me.</p></details>
+    </div>
+  </section>
 </main>
 
+<div class="sticky-cta" id="sticky-cta"><a class="btn lg" href="#" data-checkout>Entrar na comunidade · R$ 57,00</a></div>
 <footer>
   <div class="wrap">© 2026 Amazolé · Comunidade de Afiliados</div>
 </footer>
@@ -459,6 +538,8 @@
         document.querySelectorAll(".cta-note").forEach(function (n) {
           n.textContent = "O link de pagamento estará disponível em breve.";
         });
+        var of = document.getElementById("oferta");
+        if (of) of.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     }
   });
