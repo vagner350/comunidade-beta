@@ -819,6 +819,7 @@
     forum: [],
     cursos: [],
     criativos: [],
+    funil: [],
     produtos: [],
     landing: [],
     treinamentos: [],
@@ -831,6 +832,7 @@
     { id: "forum", nome: "Fórum", icone: "💬", sub: "Troque ideias, tire dúvidas e compartilhe resultados", posts: true },
     { id: "cursos", nome: "Cursos", icone: "📚", sub: "Aprenda no seu ritmo" },
     { id: "criativos", nome: "Criativos", icone: "🎨", sub: "Imagens e vídeos prontos para divulgar" },
+    { id: "funil", nome: "Funil", icone: "🎯", sub: "Funis de venda prontos, por produto" },
     { id: "produtos", nome: "Produtos", icone: "🛍️", sub: "Produtos disponíveis para você vender" },
     { id: "landing", nome: "Landing Page", icone: "🌐", sub: "Páginas de venda prontas para usar" },
     { id: "treinamentos", nome: "Treinamentos", icone: "🎓", sub: "Treinamentos para melhorar seus resultados" },
@@ -1065,7 +1067,7 @@
       c.appendChild(criar("h3", "", it.titulo || ""));
       if (it.texto) c.appendChild(criar("p", "", it.texto));
       if (linkSeguro(it.link)) {
-        var a = criar("a", "go", rotuloLink(it.link));
+        var a = criar("a", "go", sec.id === "funil" ? "🎯 Acessar funil" : rotuloLink(it.link));
         a.href = it.link; a.target = "_blank"; a.rel = "noopener noreferrer";
         c.appendChild(a);
       }
