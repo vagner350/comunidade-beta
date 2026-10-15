@@ -131,6 +131,12 @@
     .track{animation:none}
   }
   @media(max-width:600px){.prod,.prod img{width:210px}.prod img{height:210px}}
+  /* ===== CONTEÚDO REAL (vídeos curtos em loop) ===== */
+  .conteudo{padding-top:36px}
+  .clips{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 18px;-webkit-overflow-scrolling:touch}
+  .clip{flex:none;width:240px;margin:0;scroll-snap-align:start}
+  .clip video{display:block;width:240px;aspect-ratio:9/16;object-fit:cover;border-radius:18px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+  @media(max-width:600px){.clip,.clip video{width:200px}}
   .proof{padding-top:48px}
   .video{max-width:820px;margin:0 auto 32px;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:0 20px 60px rgba(168,85,247,.25)}
   .video iframe{width:100%;height:100%;border:0;display:block}
@@ -186,6 +192,35 @@
         <figure class="prod"><img src="img/produtos/esfoliante-clareador.jpg" alt="Esfoliante clareador" width="260" height="260"><figcaption>Esfoliante Clareador</figcaption></figure>
         <figure class="prod"><img src="img/produtos/sabonete-clareador.jpg" alt="Sabonete em pasta clareador" width="260" height="260"><figcaption>Sabonete Clareador</figcaption></figure>
         <figure class="prod"><img src="img/produtos/mxd20.jpg" alt="MXD20 Power Hair em cápsulas e Barbudom tônico capilar" width="260" height="260"><figcaption>MXD20 + Barbudom</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="conteudo" id="conteudo-real">
+    <div class="wrap">
+      <h2>Conteúdo Real para você vender mais</h2>
+      <p class="sub">Exemplos de vídeos para você se inspirar e divulgar os produtos.</p>
+    </div>
+    <div class="wrap">
+      <div class="clips" id="clips">
+        <figure class="clip">
+          <video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="240" height="427"></video>
+        </figure>
+        <figure class="clip">
+          <video data-src="media/conteudo/v2.mp4" poster="media/conteudo/v2.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="240" height="427"></video>
+        </figure>
+        <figure class="clip">
+          <video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 3" width="240" height="427"></video>
+        </figure>
+        <figure class="clip">
+          <video data-src="media/conteudo/v4.mp4" poster="media/conteudo/v4.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 4" width="240" height="427"></video>
+        </figure>
+        <figure class="clip">
+          <video data-src="media/conteudo/v5.mp4" poster="media/conteudo/v5.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 5" width="240" height="427"></video>
+        </figure>
+        <figure class="clip">
+          <video data-src="media/conteudo/v6.mp4" poster="media/conteudo/v6.jpg" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 6" width="240" height="427"></video>
+        </figure>
       </div>
     </div>
   </section>
@@ -326,6 +361,37 @@
       var im = c.querySelector("img"); if (im) im.alt = "";
       t.appendChild(c);
     });
+  })();
+
+  // ===== CONTEÚDO REAL: carrega e toca cada vídeo só quando aparece na tela =====
+  (function () {
+    var videos = document.querySelectorAll("#clips video");
+    if (!videos.length) return;
+    var reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function carregar(v) {
+      if (!v.getAttribute("src")) v.setAttribute("src", v.dataset.src);
+    }
+    videos.forEach(function (v) {
+      v.addEventListener("click", function () {
+        carregar(v);
+        if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else { v.pause(); }
+      });
+    });
+    if (reduzir || !("IntersectionObserver" in window)) return;
+
+    var obs = new IntersectionObserver(function (itens) {
+      itens.forEach(function (it) {
+        var v = it.target;
+        if (it.isIntersecting) {
+          carregar(v);
+          var p = v.play(); if (p && p.catch) p.catch(function () {});
+        } else {
+          v.pause();
+        }
+      });
+    }, { threshold: 0.4 });
+    videos.forEach(function (v) { obs.observe(v); });
   })();
 
   // ===== CHECKOUT =====
