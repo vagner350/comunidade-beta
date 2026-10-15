@@ -122,11 +122,19 @@ function exigirAdmin(): string {
 
 function enviarLink(string $para, string $link): bool {
     global $CFG;
-    $assunto = '=?UTF-8?B?' . base64_encode('Seu link de acesso - Amazolé') . '?=';
+    $assunto = 'Seu link de acesso - Amazolé';
     $corpo = "Olá!\r\n\r\nClique no link abaixo para entrar no painel. Ele vale por 15 minutos e só funciona uma vez:\r\n\r\n$link\r\n\r\nSe não foi você, ignore este e-mail.\r\n";
+
+    // Preferência: SMTP com a caixa de e-mail do domínio (chega na caixa de entrada)
+    if (isset($CFG['smtp']) && is_array($CFG['smtp'])) {
+        require_once __DIR__ . '/smtp.php';
+        if (smtp_enviar($CFG['smtp'], $para, $assunto, $corpo, $CFG['responder_para'] ?? null)) return true;
+        error_log('[comunidade-api] SMTP falhou, tentando mail()');
+    }
+
     $de = $CFG['remetente'];
     $h = "From: Amazolé <$de>\r\nReply-To: $de\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n";
-    return @mail($para, $assunto, $corpo, $h, '-f' . $de);
+    return @mail($para, '=?UTF-8?B?' . base64_encode($assunto) . '?=', $corpo, $h, '-f' . $de);
 }
 
 function curso_linha(array $c): array {
