@@ -1277,7 +1277,7 @@
       else if (r.status === 403 && er === "bloqueado") msg($("msg-login"), "Este acesso está bloqueado. Fale com o suporte.", "err");
       else if (er === "envio_falhou") msg($("msg-login"), "Não foi possível enviar o link agora. Tente de novo em alguns minutos.", "err");
       else if (er === "email_invalido") msg($("msg-login"), "Confira o e-mail e tente de novo.", "err");
-      else msg($("msg-login"), "Não foi possível entrar agora. Tente de novo.", "err");
+      else msg($("msg-login"), "Não foi possível entrar agora. Tente de novo. (código: " + (r.status || "sem conexão") + (er ? " · " + er : "") + ")", "err");
       btn.disabled = false;
       return;
     }
