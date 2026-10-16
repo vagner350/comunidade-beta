@@ -182,6 +182,12 @@ function garantirEsquema(PDO $pdo): void {
     if ($feito) return;
     $feito = true;
     $n = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ('config','conteudo','webhook_log')")->fetchColumn();
+    // coluna nova: vários links de afiliação por item (Produtos)
+    try {
+        $tem = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'conteudo' AND column_name = 'links'")->fetchColumn();
+        $existe = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'conteudo'")->fetchColumn();
+        if ($existe && !$tem) $pdo->exec('ALTER TABLE conteudo ADD COLUMN links TEXT NULL');
+    } catch (Throwable $e) { /* sem permissão para alterar: segue sem a coluna */ }
     if ($n === 3) return;
     $sqls = [
         "CREATE TABLE IF NOT EXISTS config (
@@ -196,6 +202,7 @@ function garantirEsquema(PDO $pdo): void {
             texto TEXT NULL,
             link VARCHAR(500) NULL,
             imagem_url VARCHAR(500) NULL,
+            links TEXT NULL,
             ordem INT NOT NULL DEFAULT 0,
             publicado TINYINT(1) NOT NULL DEFAULT 1,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -242,8 +249,27 @@ function conteudo_linha(array $c): array {
     return [
         'id' => $c['id'], 'secao' => $c['secao'], 'titulo' => $c['titulo'], 'texto' => $c['texto'],
         'link' => $c['link'], 'imagem_url' => $c['imagem_url'], 'ordem' => (int) $c['ordem'],
-        'publicado' => (bool) $c['publicado'],
+        'publicado' => (bool) $c['publicado'], 'links' => links_ler($c['links'] ?? null),
     ];
+}
+
+// Vários links de afiliação por item: lista de {rotulo, url}
+function links_ler($raw): array {
+    $a = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
+    return is_array($a) ? array_values($a) : [];
+}
+
+function links_ok($v): ?string {
+    if ($v === null) return null;
+    if (!is_array($v) || count($v) > 20) resp(400, ['erro' => 'links_invalidos']);
+    $out = [];
+    foreach ($v as $l) {
+        if (!is_array($l)) resp(400, ['erro' => 'links_invalidos']);
+        $url = url_https($l['url'] ?? null);
+        if ($url === null) continue;
+        $out[] = ['rotulo' => texto($l['rotulo'] ?? null, 80) ?? '', 'url' => $url];
+    }
+    return $out ? json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
 }
 
 function video_id_ok($v): ?string {
@@ -606,14 +632,18 @@ try {
                 url_https($j['link'] ?? null), url_https($j['imagem_url'] ?? null),
                 (int) ($j['ordem'] ?? 0), array_key_exists('publicado', $j) && !$j['publicado'] ? 0 : 1,
             ];
+            $temLinks = array_key_exists('links', $j);
+            $links = $temLinks ? links_ok($j['links']) : null;
             if (!empty($j['id'])) {
                 $id = id_ok($j['id']);
                 $antes = q('SELECT imagem_url FROM conteudo WHERE id = ?', [$id])->fetch();
                 q('UPDATE conteudo SET secao = ?, titulo = ?, texto = ?, link = ?, imagem_url = ?, ordem = ?, publicado = ? WHERE id = ?', array_merge($d, [$id]));
+                if ($temLinks) q('UPDATE conteudo SET links = ? WHERE id = ?', [$links, $id]);
                 if ($antes && $antes['imagem_url'] !== $d[4]) limpar_upload($antes['imagem_url']);
             } else {
                 $id = uuid();
                 q('INSERT INTO conteudo (secao, titulo, texto, link, imagem_url, ordem, publicado, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array_merge($d, [$id]));
+                if ($temLinks && $links !== null) q('UPDATE conteudo SET links = ? WHERE id = ?', [$links, $id]);
             }
             resp(200, ['ok' => true, 'id' => $id]);
         }

@@ -66,3 +66,12 @@ dialog.dlg-adm small.dica[hidden]{display:none}
 .ft-mini img{object-fit:contain;display:block}
 .ad-thumb{background:#fff}
 .ad-thumb img{object-fit:contain!important}
+
+/* vários links de afiliação */
+.lk-box{margin-top:14px;padding:12px;border:1px dashed var(--line);border-radius:12px;background:var(--bg)}
+.lk-box[hidden]{display:none}
+.lk-tit{font-weight:700;margin-bottom:2px}
+.lk-lista{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.lk-linha{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto;gap:8px;align-items:center}
+.lk-linha input{min-width:0;width:100%}
+@media(max-width:560px){.lk-linha{grid-template-columns:1fr auto}.lk-linha input:nth-child(2){grid-column:1/-1;order:3}}

@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261016b";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261016c";
     document.head.appendChild(l);
   })();
 
@@ -367,7 +367,42 @@
     });
   }
 
+  // Vários links de afiliação (Produtos): cada um com um nome e o endereço
+  function montarLinks(iniciais) {
+    var caixa = el("div", "lk-box");
+    caixa.appendChild(el("div", "lk-tit", "Links para se afiliar a este produto"));
+    caixa.appendChild(el("small", "dica", "Adicione quantos precisar (ex.: “Hotmart”, “Kiwify”, “Página oficial”). Cada um vira um botão para o afiliado."));
+    var lista = el("div", "lk-lista");
+    caixa.appendChild(lista);
+    function linha(rot, url) {
+      var r = el("div", "lk-linha");
+      var i1 = el("input"); i1.type = "text"; i1.maxLength = 80; i1.placeholder = "Nome (ex.: Hotmart)"; i1.value = rot || "";
+      var i2 = el("input"); i2.type = "url"; i2.maxLength = 500; i2.placeholder = "https://..."; i2.value = url || "";
+      var x = btn("✕", "lnk del", function () { r.remove(); });
+      x.title = "Remover link"; x.setAttribute("aria-label", "Remover link");
+      r.appendChild(i1); r.appendChild(i2); r.appendChild(x);
+      lista.appendChild(r);
+      return r;
+    }
+    (iniciais || []).forEach(function (l) { linha(l.rotulo, l.url); });
+    var mais = btn("+ Adicionar link", "abtn ghost peq", function () { linha("", "").querySelector("input").focus(); });
+    caixa.appendChild(mais);
+    return {
+      caixa: caixa,
+      valor: function () {
+        var out = [];
+        lista.querySelectorAll(".lk-linha").forEach(function (r) {
+          var ins = r.querySelectorAll("input");
+          var u = ins[1].value.trim();
+          if (u) out.push({ rotulo: ins[0].value.trim(), url: u });
+        });
+        return out;
+      }
+    };
+  }
+
   function form(it) {
+    var blocoLinks = null;
     var secs = menuCompleto().filter(function (s) { return s.id !== "cursos"; });
     var m0 = modo(it ? it.secao : cont.secao);
     formulario({
@@ -394,9 +429,15 @@
         f.campos.secao.addEventListener("change", aplicar);
         aplicar();
         f.campos.imagem_url.after(seletorFoto(f.campos.imagem_url));
+        blocoLinks = montarLinks(it && it.links ? it.links : []);
+        f.campos.texto.after(blocoLinks.caixa);
+        function mostrarLinks() { blocoLinks.caixa.hidden = f.campos.secao.value !== "produtos"; }
+        f.campos.secao.addEventListener("change", mostrarLinks);
+        mostrarLinks();
       },
       salvar: async function (v) {
         var d = { secao: v.secao, titulo: v.titulo, texto: v.texto, link: v.link, imagem_url: v.imagem_url, ordem: parseInt(v.ordem, 10) || 0, publicado: v.publicado };
+        if (blocoLinks) d.links = v.secao === "produtos" ? blocoLinks.valor() : [];
         if (it) d.id = it.id;
         var r = await api("conteudo_salvar", d);
         if (r.ok) { cont.secao = v.secao; return { ok: true }; }
