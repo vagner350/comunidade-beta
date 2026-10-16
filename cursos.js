@@ -152,15 +152,7 @@
       var row = el("section", "nf-row");
       var cab = el("div", "nf-row-cab");
       cab.appendChild(el("h3", "", nome));
-      var setas = el("div", "nf-setas");
       var tr = el("div", "nf-track");
-      [["‹", -1, "Anterior"], ["›", 1, "Próximo"]].forEach(function (x) {
-        var sb = el("button", "nf-seta", x[0]);
-        sb.type = "button"; sb.setAttribute("aria-label", x[2]);
-        sb.addEventListener("click", function () { tr.scrollBy({ left: x[1] * tr.clientWidth * 0.85, behavior: "smooth" }); });
-        setas.appendChild(sb);
-      });
-      cab.appendChild(setas);
       row.appendChild(cab);
       itens.forEach(function (c) { tr.appendChild(cartao(c)); });
       row.appendChild(tr);
