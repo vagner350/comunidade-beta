@@ -485,6 +485,15 @@
     $("cu-pub").checked = c ? !!c.publicado : true;
     msg($("msg-cu"), "");
     $("dlg-curso").showModal();
+    // Envio da imagem da capa (carrega o painel admin sob demanda)
+    carregarAdminJs().then(function () {
+      var campo = $("cu-capa");
+      if (window.AdminFoto && !campo.dataset.ft) {
+        campo.dataset.ft = "1";
+        campo.after(window.AdminFoto(campo, { capa: true }));
+      }
+      campo.dispatchEvent(new Event("input"));
+    });
   }
 
   $("form-curso").addEventListener("submit", async function (e) {

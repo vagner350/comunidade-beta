@@ -398,6 +398,7 @@ function limpar_upload(?string $url): void {
     $n = nome_upload_da_url($url);
     if ($n === null) return;
     if (q('SELECT 1 FROM conteudo WHERE imagem_url = ? LIMIT 1', [$url])->fetch()) return;
+    if (q('SELECT 1 FROM cursos WHERE capa_url = ? LIMIT 1', [$url])->fetch()) return;
     $f = pasta_uploads() . '/' . $n;
     if (is_file($f)) @unlink($f);
 }
@@ -554,7 +555,9 @@ try {
             ];
             if (!empty($j['id'])) {
                 $id = id_ok($j['id']);
+                $antes = q('SELECT capa_url FROM cursos WHERE id = ?', [$id])->fetch();
                 q('UPDATE cursos SET titulo = ?, descricao = ?, capa_url = ?, categoria = ?, destaque = ?, ordem = ?, publicado = ? WHERE id = ?', array_merge($d, [$id]));
+                if ($antes && $antes['capa_url'] !== $d[2]) limpar_upload($antes['capa_url']);
             } else {
                 $id = uuid();
                 q('INSERT INTO cursos (titulo, descricao, capa_url, categoria, destaque, ordem, publicado, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array_merge($d, [$id]));
@@ -566,7 +569,10 @@ try {
             exigirPost();
             $j = entrada();
             exigirAdmin();
-            q('DELETE FROM cursos WHERE id = ?', [id_ok($j['id'] ?? null)]);
+            $idc = id_ok($j['id'] ?? null);
+            $antes = q('SELECT capa_url FROM cursos WHERE id = ?', [$idc])->fetch();
+            q('DELETE FROM cursos WHERE id = ?', [$idc]);
+            if ($antes) limpar_upload($antes['capa_url']);
             resp(200, ['ok' => true]);
         }
 

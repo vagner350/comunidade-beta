@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261016c";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261016d";
     document.head.appendChild(l);
   })();
 
@@ -219,12 +219,12 @@
   ];
 
   // Reduz a foto no próprio aparelho (máx. 1000 px) antes de enviar: rápido e leve
-  function reduzir(arquivo) {
+  function reduzir(arquivo, maximo) {
     return new Promise(function (ok, erro) {
       var url = URL.createObjectURL(arquivo), img = new Image();
       img.onload = function () {
         URL.revokeObjectURL(url);
-        var k = Math.min(1, 1000 / Math.max(img.width, img.height));
+        var k = Math.min(1, (maximo || 1000) / Math.max(img.width, img.height));
         var c = document.createElement("canvas");
         c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
         var g = c.getContext("2d");
@@ -247,13 +247,14 @@
     } catch (e) { return { ok: false, data: {} }; }
   }
 
-  function seletorFoto(campo) {
-    var caixa = el("div", "ft-box");
+  function seletorFoto(campo, opc) {
+    opc = opc || {};
+    var caixa = el("div", "ft-box" + (opc.capa ? " ft-capa" : ""));
     var previa = el("div", "ft-previa");
     var linha = el("div", "ft-linha");
     var arq = el("input"); arq.type = "file"; arq.accept = "image/jpeg,image/png,image/webp"; arq.hidden = true;
-    var enviar = btn("📷 Enviar foto do produto", "abtn peq", function () { arq.click(); });
-    var tirar = btn("Remover foto", "abtn peq ghost", function () { campo.value = ""; atualizar(); });
+    var enviar = btn(opc.capa ? "📷 Enviar imagem da capa" : "📷 Enviar foto do produto", "abtn peq", function () { arq.click(); });
+    var tirar = btn(opc.capa ? "Remover capa" : "Remover foto", "abtn peq ghost", function () { campo.value = ""; atualizar(); });
     var estado = el("span", "ft-estado");
     linha.appendChild(enviar); linha.appendChild(tirar); linha.appendChild(estado); linha.appendChild(arq);
     var atalhos = el("div", "ft-atalhos");
@@ -268,7 +269,7 @@
       fila.appendChild(b);
     });
     atalhos.appendChild(fila);
-    caixa.appendChild(previa); caixa.appendChild(linha); caixa.appendChild(atalhos);
+    caixa.appendChild(previa); caixa.appendChild(linha); if (!opc.capa) caixa.appendChild(atalhos);
 
     function atualizar() {
       previa.textContent = "";
@@ -288,7 +289,7 @@
       estado.textContent = "Enviando...";
       enviar.disabled = true;
       try {
-        var blob = await reduzir(a);
+        var blob = await reduzir(a, opc.capa ? 1000 : 1000);
         var r = await enviarFoto(blob);
         if (r.ok && r.data.url) { campo.value = r.data.url; estado.textContent = "Foto enviada."; }
         else estado.textContent = r.data && r.data.erro === "formato_invalido" ? "Use JPG, PNG ou WEBP." : "Não foi possível enviar a foto.";
@@ -299,6 +300,8 @@
     atualizar();
     return caixa;
   }
+
+  window.AdminFoto = function (campo, opc) { return seletorFoto(campo, opc); };
 
   // Em Criativos e Produtos cada item é um produto com a pasta do Google Drive
   function modo(secao) {
