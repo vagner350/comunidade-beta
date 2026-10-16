@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261016";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261016b";
     document.head.appendChild(l);
   })();
 
@@ -66,7 +66,7 @@
       if (c.obrig) f.required = true;
       f.value = c.valor != null ? c.valor : "";
       form.appendChild(f); campos[c.id] = f;
-      if (c.dica) { var dk = el("small", "dica", c.dica); form.appendChild(dk); dicas[c.id] = dk; }
+      if (c.dica != null) { var dk = el("small", "dica", c.dica); dk.hidden = !c.dica; form.appendChild(dk); dicas[c.id] = dk; }
     });
     var linha = el("div", "row");
     var cancelar = el("button", "btn ghost", "Cancelar"); cancelar.type = "button";
