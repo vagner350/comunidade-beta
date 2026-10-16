@@ -89,11 +89,17 @@
     var h = el("section", "nf-hero");
     h.appendChild(capa(c, "nf-hero-img"));
     var txt = el("div", "nf-hero-txt");
-    txt.appendChild(el("span", "nf-tag", "EM DESTAQUE"));
+    txt.appendChild(el("span", "nf-tag", "★ EM DESTAQUE"));
     txt.appendChild(el("h2", "", c.titulo));
+    var na = (c.aulas || []).length, pg = progresso(c);
+    var meta = el("div", "nf-chips");
+    if (c.categoria) meta.appendChild(el("span", "nf-chip", c.categoria));
+    meta.appendChild(el("span", "nf-chip", na + (na === 1 ? " aula" : " aulas")));
+    if (pg.feitas > 0) meta.appendChild(el("span", "nf-chip ok", pg.pct + "% concluído"));
+    txt.appendChild(meta);
     if (c.descricao) txt.appendChild(el("p", "", c.descricao));
     var b = el("div", "nf-btns");
-    var play = el("button", "nf-play", "▶ Assistir");
+    var play = el("button", "nf-play", pg.feitas > 0 && pg.feitas < pg.total ? "▶ Continuar" : "▶ Assistir");
     play.type = "button";
     play.addEventListener("click", function () { abrirCurso(c, proximaAula(c)); });
     var info = el("button", "nf-info", "Ver aulas");
@@ -108,13 +114,17 @@
   function cartao(c) {
     var b = el("button", "nf-card");
     b.type = "button";
-    b.appendChild(capa(c, "nf-card-img"));
+    var p = progresso(c);
+    var im = capa(c, "nf-card-img");
+    var n = (c.aulas || []).length;
+    im.appendChild(el("span", "nf-badge", n + (n === 1 ? " aula" : " aulas")));
+    if (p.total && p.feitas === p.total) im.appendChild(el("span", "nf-badge ok", "✓ Concluído"));
+    im.appendChild(el("span", "nf-playico", "▶"));
+    b.appendChild(im);
     var t = el("div", "nf-card-t");
     t.appendChild(el("strong", "", c.titulo));
-    var n = (c.aulas || []).length;
-    t.appendChild(el("span", "", n + (n === 1 ? " aula" : " aulas")));
+    t.appendChild(el("span", "", p.feitas > 0 ? p.feitas + " de " + p.total + " assistidas" : (c.categoria || "Curso")));
     b.appendChild(t);
-    var p = progresso(c);
     if (p.feitas > 0) {
       var bar = el("div", "nf-prog"), fill = el("span");
       fill.style.width = p.pct + "%";
@@ -138,14 +148,27 @@
       if (!grupos.has(k)) grupos.set(k, []);
       grupos.get(k).push(c);
     });
-    grupos.forEach(function (itens, nome) {
+    function linha(nome, itens) {
       var row = el("section", "nf-row");
-      row.appendChild(el("h3", "", nome));
+      var cab = el("div", "nf-row-cab");
+      cab.appendChild(el("h3", "", nome));
+      var setas = el("div", "nf-setas");
       var tr = el("div", "nf-track");
+      [["‹", -1, "Anterior"], ["›", 1, "Próximo"]].forEach(function (x) {
+        var sb = el("button", "nf-seta", x[0]);
+        sb.type = "button"; sb.setAttribute("aria-label", x[2]);
+        sb.addEventListener("click", function () { tr.scrollBy({ left: x[1] * tr.clientWidth * 0.85, behavior: "smooth" }); });
+        setas.appendChild(sb);
+      });
+      cab.appendChild(setas);
+      row.appendChild(cab);
       itens.forEach(function (c) { tr.appendChild(cartao(c)); });
       row.appendChild(tr);
       corpo.appendChild(row);
-    });
+    }
+    var andamento = cs.filter(function (c) { var p = progresso(c); return p.feitas > 0 && p.feitas < p.total; });
+    if (andamento.length) linha("Continue assistindo", andamento);
+    grupos.forEach(function (itens, nome) { linha(nome, itens); });
   }
 
   function player(a) {
