@@ -33,6 +33,13 @@
   }
 
   // Converte o link do vídeo em algo que a página sabe tocar. Só monta o endereço a partir do ID.
+  // Miniatura da aula: do YouTube quando o link é de lá; senão a capa do curso
+  function miniaturaAula(a, c) {
+    var m = (a.video_url || "").match(/^https:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/i);
+    if (m) return "https://i.ytimg.com/vi/" + m[1] + "/mqdefault.jpg";
+    return ehHttps(c.capa_url) ? c.capa_url : "";
+  }
+
   function incorporar(url) {
     var m;
     if ((m = url.match(/^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?(?:[^#]*&)?v=([\w-]{11})/i)) ||
@@ -252,16 +259,31 @@
       side.appendChild(el("div", "nf-meta", p.feitas + " de " + p.total + " assistidas"));
       var ul = el("div", "nf-aulas");
       aulas.forEach(function (a, i) {
-        var b = el("button", "nf-aula" + (atual && a.id === atual.id ? " on" : ""));
+        var tocando = atual && a.id === atual.id;
+        var b = el("button", "nf-aula" + (tocando ? " on" : "") + (vistas[a.id] ? " vista" : ""));
         b.type = "button";
-        b.appendChild(el("span", "nf-n", vistas[a.id] ? "✓" : String(i + 1)));
+        var th = el("span", "nf-th");
+        var src = miniaturaAula(a, c);
+        if (src) {
+          var im = el("img");
+          im.src = src; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+          im.addEventListener("error", function () { im.remove(); th.classList.add("sem-capa"); });
+          th.appendChild(im);
+        } else { th.classList.add("sem-capa"); }
+        th.appendChild(el("span", "nf-th-n", String(i + 1)));
+        if (a.duracao) th.appendChild(el("span", "nf-dur", a.duracao));
+        if (vistas[a.id]) th.appendChild(el("span", "nf-ok", "✓"));
+        b.appendChild(th);
         var tx = el("span", "nf-at");
         tx.appendChild(el("strong", "", a.titulo));
-        if (a.duracao) tx.appendChild(el("small", "", a.duracao));
+        tx.appendChild(el("small", "", tocando ? "▶ Reproduzindo agora" : (vistas[a.id] ? "Assistida" : "Aula " + (i + 1))));
         b.appendChild(tx);
-        b.addEventListener("click", function () { atual = a; desenhar(); });
+        b.addEventListener("click", function () { atual = a; desenhar(); window.scrollTo({ top: 0, behavior: "smooth" }); });
         ul.appendChild(b);
       });
+      var barra = el("div", "nf-prog big"), pf = el("span");
+      pf.style.width = p.pct + "%"; barra.appendChild(pf);
+      side.appendChild(barra);
       side.appendChild(ul);
     }
     desenhar();
