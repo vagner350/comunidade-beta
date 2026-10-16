@@ -6,12 +6,23 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 
-if (!is_file(__DIR__ . '/config.php')) {
-    http_response_code(503);
-    echo json_encode(['erro' => 'nao_instalado']);
-    exit;
+// Outros endereços do mesmo site (mesmo banco): usam a configuração do site principal,
+// trocando só o endereço (para os links de login e as fotos apontarem para o próprio domínio).
+const CONFIG_PRINCIPAL = '/home/u616319980/domains/amazole.me/public_html/comunidade/api/config.php';
+const DOMINIOS_ESPELHO = ['amazoleafiliados.com.br'];
+
+if (is_file(__DIR__ . '/config.php')) {
+    $CFG = require __DIR__ . '/config.php';
+} else {
+    $host = preg_replace('/^www\./', '', strtolower((string) ($_SERVER['HTTP_HOST'] ?? '')));
+    if (!in_array($host, DOMINIOS_ESPELHO, true) || !is_file(CONFIG_PRINCIPAL)) {
+        http_response_code(503);
+        echo json_encode(['erro' => 'nao_instalado']);
+        exit;
+    }
+    $CFG = require CONFIG_PRINCIPAL;
+    $CFG['site'] = 'https://' . $host;
 }
-$CFG = require __DIR__ . '/config.php';
 
 function resp(int $code, array $data = []): void {
     http_response_code($code);
