@@ -352,8 +352,8 @@
   .impl-hero .btn,.impl-preco .btn,.impl-fim .btn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;font-weight:800;box-shadow:0 8px 28px rgba(34,197,94,.35)}
   @media(max-width:760px){.impl-hero{padding:22px}.impl-preco,.impl-fim{padding:22px 16px}.impl-hero .btn,.impl-preco .btn,.impl-fim .btn{display:block;box-sizing:border-box;width:100%;text-align:center}.impl-vals{flex-direction:column;gap:8px}.impl-ou{line-height:1}.impl-grade{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="cursos.css?v=20261016d" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="cursos.css?v=20261016d"></noscript>
+<link rel="stylesheet" href="cursos.css?v=20261023" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="cursos.css?v=20261023"></noscript>
 </head>
 <body>
 <div id="landing">
@@ -912,7 +912,7 @@
     return new Promise(function (res) {
       if (window.Admin) return res();
       var sc = document.createElement("script");
-      sc.src = "admin.js?v=20261016d"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      sc.src = "admin.js?v=20261023"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
       document.head.appendChild(sc);
     });
   }
@@ -1100,7 +1100,14 @@
       b.type = "button"; b.dataset.id = sec.id;
       b.appendChild(criar("span", "ic", sec.icone));
       b.appendChild(criar("span", "", sec.nome));
-      b.addEventListener("click", function () { abrirSecao(sec.id); window.scrollTo(0, 0); });
+      b.addEventListener("click", function () {
+        // Grupo WhatsApp: vai direto para o link do grupo (cadastrado em Gerenciar Conteúdo)
+        if (sec.id === "grupo" && (liberado || ehAdmin)) {
+          var alvo = (CONTEUDO.grupo || []).filter(function (it) { return linkSeguro(it.link); })[0];
+          if (alvo) { window.open(alvo.link, "_blank", "noopener"); return; }
+        }
+        abrirSecao(sec.id); window.scrollTo(0, 0);
+      });
       nav.appendChild(b);
     });
   }
@@ -1385,6 +1392,6 @@
   })();
   iniciar();
 </script>
-<script src="cursos.js?v=20261016d" defer></script>
+<script src="cursos.js?v=20261023" defer></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261016d";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261023";
     document.head.appendChild(l);
   })();
 
@@ -307,6 +307,7 @@
   function modo(secao) {
     if (secao === "criativos") return { item: "Produto", titulo: "Produto", link: "Link da pasta do Google Drive", ph: "https://drive.google.com/drive/folders/...", texto: "Descrição (opcional)", dica: "No Drive: botão direito na pasta → Compartilhar → “Qualquer pessoa com o link” → Leitor. Senão o afiliado não consegue abrir." };
     if (secao === "funil") return { item: "Funil", titulo: "Título do funil", link: "Link do funil", ph: "https://...", texto: "Descrição (opcional) — de qual produto é o funil", dica: "" };
+    if (secao === "grupo") return { item: "Grupo", titulo: "Nome do grupo", link: "Link do grupo do WhatsApp", ph: "https://chat.whatsapp.com/...", texto: "Descrição (opcional)", dica: "Ao clicar em “Grupo Whatsapp” no menu, o afiliado vai direto para este link. Se houver mais de um, vale o primeiro da lista (ordem 1)." };
     if (secao === "produtos") return { item: "Produto", titulo: "Nome do produto", link: "Link (página do produto ou Drive)", ph: "https://...", texto: "Descrição", dica: "" };
     return { item: "Item", titulo: "Título", link: "Link do botão “Abrir” (https, opcional)", ph: "https://...", texto: "Texto", dica: "" };
   }
