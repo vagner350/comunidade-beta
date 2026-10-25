@@ -342,20 +342,23 @@ function coletar($d, string $caminho, array &$out, int $prof = 0): void {
 function webhook_analisar(array $dados): array {
     $pares = [];
     coletar($dados, '', $pares);
-    $email = null; $emailPref = null; $nome = null; $status = [];
+    $email = null; $emailPref = null; $emailSolto = null; $nome = null; $status = [];
     foreach ($pares as [$cam, $val]) {
         $chave = substr($cam, (int) strrpos($cam, '/') + 1);
-        if (preg_match('/mail/', $chave)) {
-            $e = email_ok($val);
-            if ($e !== null) {
+        $e = email_ok($val);
+        if ($e !== null) {
+            if (preg_match('/mail/', $chave)) {
                 if ($emailPref === null && preg_match('#customer|buyer|cliente|comprador|payer|lead|client|subscriber#', $cam)) $emailPref = $e;
                 if ($email === null) $email = $e;
+            } elseif ($emailSolto === null) {
+                $emailSolto = $e; // e-mail em campo com outro nome (ex.: contato)
             }
         }
         if ($nome === null && preg_match('/^(name|nome|full_name|customer_name|buyer_name|nome_completo)$/', $chave) && mb_strlen($val) >= 2 && mb_strlen($val) <= 120) $nome = $val;
-        if (preg_match('/^(status|situacao|event|evento|type|tipo|payment_status|transaction_status|order_status|payment_state|webhook_event_type)$/', $chave)) $status[] = sem_acento($val);
+        if (preg_match('/^(status|situacao|event|evento|type|tipo|payment_status|transaction_status|order_status|payment_state|webhook_event_type)$/', $chave)
+            || (preg_match('/(status|situacao|evento|event)/', $chave) && mb_strlen($val) <= 40)) $status[] = sem_acento($val);
     }
-    return ['email' => $emailPref ?? $email, 'nome' => $nome, 'status' => $status];
+    return ['email' => $emailPref ?? $email ?? $emailSolto, 'nome' => $nome, 'status' => $status];
 }
 
 function webhook_decidir(array $status): string {
@@ -844,6 +847,10 @@ try {
                 $st = q("UPDATE afiliados SET status = 'pendente', observacao = 'Pagamento reembolsado ou cancelado' WHERE email = ? AND status = 'aprovado'", [$email]);
                 $acao_log = $st->rowCount() ? 'revogado' : 'ignorado';
             } else {
+                // Chegou um e-mail, mas o status não é de pagamento aprovado: deixa na lista como pendente
+                // (sem mexer em quem já é aprovado ou bloqueado), para o admin ver e decidir.
+                q("INSERT INTO afiliados (email, nome, status, observacao) VALUES (?, ?, 'pendente', ?)
+                   ON DUPLICATE KEY UPDATE nome = COALESCE(nome, VALUES(nome))", [$email, $an['nome'], mb_substr('Aviso do gateway sem pagamento aprovado: ' . implode(',', array_unique($an['status'])), 0, 480)]);
                 $acao_log = 'ignorado';
             }
             q('INSERT INTO webhook_log (email, status_pagto, acao, corpo) VALUES (?, ?, ?, ?)', [
