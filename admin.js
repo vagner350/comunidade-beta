@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261023";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261024";
     document.head.appendChild(l);
   })();
 
@@ -611,7 +611,7 @@
       ["Quando", "E-mail", "Status recebido", "O que foi feito", "Dados"].forEach(function (x) { th.appendChild(el("th", "", x)); });
       var thead = el("thead"); thead.appendChild(th); tab.appendChild(thead);
       var tb = el("tbody");
-      var nomes = { aprovado: "Aprovado", revogado: "Voltou para pendente", ignorado: "Ignorado", sem_email: "Sem e-mail no aviso", bloqueado_mantido: "Bloqueado (mantido)" };
+      var nomes = { aprovado: "Aprovado", revogado: "Voltou para pendente", ignorado: "Ignorado", sem_email: "Sem e-mail no aviso", bloqueado_mantido: "Bloqueado (mantido)", chave_invalida: "Chegou com a chave errada" };
       d.eventos.forEach(function (e) {
         var tr = el("tr");
         tr.appendChild(el("td", "", fmtData(e.recebido_em)));

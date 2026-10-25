@@ -811,6 +811,13 @@ try {
             $segredo = cfg_get('webhook_secret', '') ?? '';
             if (!is_string($k) || $segredo === '' || !hash_equals($segredo, $k)) {
                 limitar('whk-falha:' . ip(), 20, 600);
+                // Registra a tentativa (sem a chave) para o admin ver que o aviso chegou, mas com a chave errada
+                try {
+                    $rawf = (string) file_get_contents('php://input', false, null, 0, 1500);
+                    q('INSERT INTO webhook_log (email, status_pagto, acao, corpo) VALUES (NULL, ?, ?, ?)', [
+                        mb_substr(($_SERVER['REQUEST_METHOD'] ?? '?') . ' ' . ($_SERVER['CONTENT_TYPE'] ?? ''), 0, 80), 'chave_invalida', mb_substr($rawf, 0, 1500),
+                    ]);
+                } catch (Throwable $e) { /* ignora */ }
                 resp(403, ['erro' => 'nao_autorizado']);
             }
             limitar('whk:' . ip(), 300, 600);
