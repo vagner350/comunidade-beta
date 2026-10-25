@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — Afiliados Amazolé</title>
+<meta name="description" content="Acesso da área do afiliado Amazolé.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1e40af">
+<style>
+  :root{--azul:#2563eb;--rosa:#db2777;--texto:#1c2038;--muted:#5c6385;--linha:#d5d8ec;--verde:#22c55e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;min-height:100dvh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--texto);line-height:1.5;
+    background:radial-gradient(900px 500px at 15% -10%,rgba(37,99,235,.22),transparent 60%),radial-gradient(800px 500px at 100% 0%,rgba(219,39,119,.18),transparent 55%),#f3f4fb;
+    display:grid;place-items:center;padding:20px}
+  .card{width:min(440px,100%);background:#fff;border:1px solid #e4e6f3;border-radius:26px;padding:34px 30px;box-shadow:0 30px 70px rgba(30,64,175,.14)}
+  .brand{font-weight:800;font-size:1.35rem;letter-spacing:.2px;margin-bottom:22px}
+  .brand span{color:var(--azul)}
+  h1{font-size:1.6rem;line-height:1.2;margin-bottom:6px}
+  .sub{color:var(--muted);margin-bottom:22px}
+  label{display:block;font-size:.85rem;font-weight:700;color:#4b5173;margin-bottom:6px}
+  input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--linha);background:#f7f9ff;font:inherit;font-size:1rem;color:var(--texto)}
+  input:focus{outline:2px solid var(--azul);outline-offset:1px;background:#fff}
+  button.ent,a.go{display:block;width:100%;margin-top:16px;padding:15px 20px;border:0;border-radius:999px;font:inherit;font-weight:800;font-size:1rem;cursor:pointer;text-align:center;text-decoration:none;
+    background:linear-gradient(135deg,var(--azul),#1d4ed8);color:#fff;box-shadow:0 10px 28px rgba(37,99,235,.35);transition:transform .15s}
+  button.ent:hover,a.go:hover{transform:translateY(-2px)}
+  button.ent:disabled{opacity:.6;cursor:default;transform:none}
+  a.go.verde{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;box-shadow:0 10px 28px rgba(34,197,94,.35)}
+  a.go.claro{background:#fff;color:var(--texto);border:1px solid var(--linha);box-shadow:none}
+  .msg{margin-top:14px;font-size:.92rem;min-height:1.2em}
+  .msg.err{color:#dc2626}.msg.ok{color:#15803d}
+  .novo{display:none;margin-top:12px}
+  .novo.on{display:block}
+  .novo p{color:var(--muted);font-size:.92rem;text-align:center;margin-bottom:2px}
+  .rodape{margin-top:22px;padding-top:18px;border-top:1px solid #eef0f8;text-align:center;font-size:.9rem;color:var(--muted)}
+  .rodape a{color:var(--azul);font-weight:700}
+  .continuar{display:none;margin-bottom:6px;padding:14px;border-radius:16px;background:#eef3ff;border:1px solid #d6e2f6;text-align:center}
+  .continuar.on{display:block}
+  .continuar small{display:block;color:var(--muted)}
+  .continuar a.go{margin-top:10px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand">Amazolé <span>Afiliados</span></div>
+  <h1>Entrar na área do afiliado</h1>
+  <p class="sub">Use o e-mail do seu cadastro para acessar.</p>
+
+  <div class="continuar" id="continuar">
+    <small>Você já entrou como</small>
+    <strong id="quem"></strong>
+    <a class="go verde" href="/">Continuar para a área do afiliado</a>
+  </div>
+
+  <form id="f" autocomplete="on" novalidate>
+    <label for="email">Seu e-mail</label>
+    <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="voce@email.com" required autofocus>
+    <button class="ent" id="btn" type="submit">Entrar</button>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  </form>
+
+  <div class="novo" id="novo">
+    <p>Esse e-mail ainda não está cadastrado.</p>
+    <a class="go verde" href="/">Quero ser afiliado</a>
+  </div>
+
+  <div class="rodape">Ainda não é afiliado? <a href="/">Conheça o programa</a></div>
+</main>
+
+<script>
+(function () {
+  var CHAVE = "amazole_afiliado_email";
+  var f = document.getElementById("f"), campo = document.getElementById("email"),
+      btn = document.getElementById("btn"), msg = document.getElementById("msg"),
+      novo = document.getElementById("novo");
+
+  function ler() { try { return localStorage.getItem(CHAVE) || ""; } catch (e) { return ""; } }
+  function gravar(v) { try { localStorage.setItem(CHAVE, v); } catch (e) {} }
+  function aviso(t, tipo) { msg.textContent = t || ""; msg.className = "msg" + (tipo ? " " + tipo : ""); }
+
+  var salvo = ler();
+  if (salvo) {
+    document.getElementById("quem").textContent = salvo;
+    document.getElementById("continuar").classList.add("on");
+    campo.value = salvo;
+  }
+
+  f.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var valor = campo.value.trim().toLowerCase();
+    novo.classList.remove("on");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) { aviso("Confira o e-mail e tente de novo.", "err"); campo.focus(); return; }
+    btn.disabled = true; aviso("Entrando...");
+    var r, j = {};
+    try {
+      r = await fetch("/api/?a=entrar", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+        body: JSON.stringify({ email: valor, somente_existente: true })
+      });
+      try { j = await r.json(); } catch (x) {}
+    } catch (x) { btn.disabled = false; aviso("Sem conexão. Verifique a internet e tente de novo.", "err"); return; }
+    btn.disabled = false;
+    if (r.ok && j.admin) { aviso("Enviamos um link de confirmação para o seu e-mail. Clique nele para entrar.", "ok"); return; }
+    if (r.ok) { gravar(valor); aviso("Pronto! Abrindo a sua área...", "ok"); location.href = "/"; return; }
+    if (r.status === 404 && j.erro === "nao_cadastrado") { aviso(""); novo.classList.add("on"); return; }
+    if (r.status === 403 && j.erro === "bloqueado") { aviso("Este acesso está bloqueado. Fale com o suporte.", "err"); return; }
+    if (r.status === 429) { aviso("Muitas tentativas. Aguarde alguns minutos e tente de novo.", "err"); return; }
+    if (j.erro === "envio_falhou") { aviso("Não foi possível enviar o link agora. Tente de novo em alguns minutos.", "err"); return; }
+    aviso("Não foi possível entrar agora. Tente de novo. (código: " + (r.status || "?") + (j.erro ? " · " + j.erro : "") + ")", "err");
+  });
+})();
+</script>
+</body>
+</html>

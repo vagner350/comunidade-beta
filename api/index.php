@@ -431,6 +431,8 @@ try {
             }
 
             $r = q('SELECT status FROM afiliados WHERE email = ?', [$email])->fetch();
+            // Página só de login (entrar.html): não cria cadastro novo, só entra quem já é afiliado
+            if (!$r && !empty($j['somente_existente'])) resp(404, ['erro' => 'nao_cadastrado']);
             if ($r && $r['status'] === 'bloqueado') resp(403, ['erro' => 'bloqueado']);
             q('INSERT INTO afiliados (email) VALUES (?) ON DUPLICATE KEY UPDATE last_login_at = UTC_TIMESTAMP()', [$email]);
             $s = q('SELECT status FROM afiliados WHERE email = ?', [$email])->fetch();
