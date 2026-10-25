@@ -38,6 +38,18 @@
   .continuar.on{display:block}
   .continuar small{display:block;color:var(--muted)}
   .continuar a.go{margin-top:10px}
+  @media(max-width:480px){
+    body{place-items:start center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));padding-top:max(5vh,14px)}
+    .card{padding:26px 20px;border-radius:22px;box-shadow:0 18px 44px rgba(30,64,175,.14)}
+    .brand{margin-bottom:18px}
+    h1{font-size:1.4rem}
+    .sub{margin-bottom:18px}
+    input{padding:15px 16px;font-size:16px}
+    button.ent,a.go{padding:16px 20px;min-height:52px}
+    .rodape{margin-top:18px;padding-top:14px}
+  }
+  @media(max-height:560px){body{place-items:start center}}
+  @media(max-width:340px){.card{padding:22px 16px}h1{font-size:1.25rem}}
 </style>
 </head>
 <body>
