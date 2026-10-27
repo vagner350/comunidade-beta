@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261027";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261027b";
     document.head.appendChild(l);
   })();
 
@@ -630,5 +630,152 @@
     corpo.appendChild(s2);
   }
 
-  window.Admin = { resumo: resumo, conteudo: conteudo, menu: menu, config: config };
+  // ===================================================================
+  // ENGAJAMENTO E AVISOS POR E-MAIL
+  // ===================================================================
+  function uuidNovo() {
+    var b = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(b);
+    b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+    var h = Array.prototype.map.call(b, function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+    return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
+  }
+
+  async function engajamento(corpo) {
+    var t = corpo.dataset.t;
+    corpo.textContent = "";
+    corpo.appendChild(el("div", "vazio", "Carregando..."));
+    var r = await api("engajamento");
+    if (!vivo(corpo, t)) return;
+    corpo.textContent = "";
+    if (!r.ok) { corpo.appendChild(el("div", "vazio", "Não foi possível carregar o engajamento.")); return; }
+    var d = r.data;
+
+    var barra = el("div", "adm-bar");
+    barra.appendChild(btn("↻ Atualizar", "abtn ghost", function () { engajamento(corpo); }));
+    corpo.appendChild(barra);
+
+    var tiles = el("div", "ad-tiles");
+    [
+      ["Aprovados", d.aprovados, ""],
+      ["Entraram hoje", d.hoje, "ok"],
+      ["Ativos em 7 dias", d.ativos_7d, "ok"],
+      ["Ativos em 30 dias", d.ativos_30d, ""],
+      ["Sem entrar há " + d.dias_inativo + "+ dias", d.inativos, "pend"],
+      ["Começaram a trilha", d.comecaram_trilha, ""],
+      ["Concluíram a trilha", d.concluiram_trilha, "ok"]
+    ].forEach(function (x) {
+      var c = el("div", "ad-tile " + x[2]);
+      c.appendChild(el("div", "n", String(x[1])));
+      c.appendChild(el("div", "l", x[0]));
+      tiles.appendChild(c);
+    });
+    corpo.appendChild(tiles);
+    corpo.appendChild(el("p", "dica", "A contagem de acessos começa a partir de agora: quem já estava na lista aparece como \"sem entrar\" até abrir a comunidade pela primeira vez."));
+
+    var graf = el("div", "ad-graf");
+    graf.appendChild(el("h3", "", "Afiliados que entraram por dia (últimos 14 dias)"));
+    var max = Math.max.apply(null, d.por_dia.map(function (x) { return x.ativos; }).concat([1]));
+    var barras = el("div", "ad-barras");
+    d.por_dia.forEach(function (x) {
+      var b = el("div", "ad-bar-col"), i = el("div", "ad-bar-i");
+      i.style.height = Math.max(x.ativos ? 6 : 2, Math.round((x.ativos / max) * 100)) + "%";
+      if (!x.ativos) i.classList.add("zero");
+      b.title = x.dia.split("-").reverse().join("/") + ": " + x.ativos + " ativos";
+      b.appendChild(i); barras.appendChild(b);
+    });
+    graf.appendChild(barras);
+    corpo.appendChild(graf);
+
+    function tabela(titulo, cols, linhas, vazio) {
+      var s = el("div", "ad-graf");
+      s.appendChild(el("h3", "", titulo));
+      if (!linhas.length) { s.appendChild(el("p", "dica", vazio)); corpo.appendChild(s); return; }
+      var tab = el("table", "adm-tab"), th = el("thead"), tr = el("tr");
+      cols.forEach(function (c) { tr.appendChild(el("th", "", c)); });
+      th.appendChild(tr); tab.appendChild(th);
+      var tb = el("tbody");
+      linhas.forEach(function (l) {
+        var row = el("tr");
+        l.forEach(function (v) { row.appendChild(el("td", "", v)); });
+        tb.appendChild(row);
+      });
+      tab.appendChild(tb);
+      var w = el("div", "adm-wrap"); w.appendChild(tab); s.appendChild(w);
+      corpo.appendChild(s);
+    }
+    tabela("Mais ativos (30 dias)", ["Afiliado", "E-mail", "Dias que entrou", "Último acesso"],
+      d.top.map(function (x) { return [x.nome || "—", x.email, String(x.dias), x.ultimo.split("-").reverse().join("/")]; }),
+      "Ainda não há acessos registrados.");
+    tabela("Esfriando (aprovados sem entrar há " + d.dias_inativo + "+ dias)", ["Afiliado", "E-mail", "Último acesso"],
+      d.esfriando.slice(0, 30).map(function (x) { return [x.nome || "—", x.email, fmtData(x.last_login_at)]; }),
+      "Ninguém esfriou. 🎉");
+
+    // ---- aviso por e-mail ----
+    var box = el("div", "ad-graf");
+    box.appendChild(el("h3", "", "Enviar aviso por e-mail"));
+    box.appendChild(el("p", "dica", "Vai só para afiliados aprovados. O envio é em lotes de 20; o limite é de 400 e-mails por dia e, se parar, é só clicar de novo que continua de onde parou, sem repetir."));
+    var f = el("form", "av-form");
+    function campo(rot, node) { var l = el("label", "", rot); f.appendChild(l); f.appendChild(node); return node; }
+    var inpAssunto = el("input"); inpAssunto.maxLength = 150; inpAssunto.placeholder = "Ex.: Produto novo na comunidade!";
+    var inpMsg = el("textarea"); inpMsg.rows = 6; inpMsg.maxLength = 4000; inpMsg.placeholder = "Escreva a mensagem...";
+    var inpLink = el("input"); inpLink.type = "url"; inpLink.placeholder = "https:// (opcional)";
+    var selPub = el("select");
+    [["aprovados", "Todos os aprovados (" + d.aprovados + ")"], ["inativos", "Só quem não entra há " + d.dias_inativo + "+ dias (" + d.inativos + ")"]].forEach(function (o) {
+      var op = el("option", "", o[1]); op.value = o[0]; selPub.appendChild(op);
+    });
+    campo("Assunto", inpAssunto); campo("Mensagem", inpMsg); campo("Link (opcional)", inpLink); campo("Para quem", selPub);
+    var lbm = el("label", "chk"), cbMural = el("input"); cbMural.type = "checkbox";
+    lbm.appendChild(cbMural); lbm.appendChild(document.createTextNode(" Publicar também no Mural de novidades"));
+    f.appendChild(lbm);
+    var linha = el("div", "row");
+    var bTeste = btn("Enviar teste para mim", "abtn ghost"); bTeste.type = "button";
+    var bEnv = btn("Enviar aviso", "abtn"); bEnv.type = "submit";
+    linha.appendChild(bTeste); linha.appendChild(bEnv);
+    f.appendChild(linha);
+    var aviso = el("div", "msg"); f.appendChild(aviso);
+    box.appendChild(f); corpo.appendChild(box);
+
+    var campanha = uuidNovo(), assinatura = "";
+    function dados(pub) {
+      var ass = inpAssunto.value.trim(), m = inpMsg.value.trim();
+      if (!ass || !m) { msg(aviso, "Preencha o assunto e a mensagem.", "err"); return null; }
+      var lk = inpLink.value.trim();
+      if (lk && !/^https:\/\//i.test(lk)) { msg(aviso, "O link precisa começar com https://", "err"); return null; }
+      return { campanha: campanha, assunto: ass, mensagem: m, link: lk || null, publico: pub, dias: d.dias_inativo };
+    }
+    bTeste.addEventListener("click", async function () {
+      var x = dados("teste"); if (!x) return;
+      bTeste.disabled = true; msg(aviso, "Enviando teste...");
+      var r2 = await api("aviso_enviar", x);
+      bTeste.disabled = false;
+      msg(aviso, r2.ok ? "Teste enviado para o seu e-mail." : "Não foi possível enviar o teste. Confira o e-mail em Configurações.", r2.ok ? "ok" : "err");
+    });
+    f.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var x = dados(selPub.value); if (!x) return;
+      var sig = JSON.stringify([x.assunto, x.mensagem, x.link, x.publico]);
+      if (sig !== assinatura) { campanha = uuidNovo(); x.campanha = campanha; assinatura = sig; } // texto mudou = nova campanha
+      var qtd = selPub.value === "inativos" ? d.inativos : d.aprovados;
+      if (!window.confirm("Enviar este aviso para até " + qtd + " afiliados?")) return;
+      bEnv.disabled = true; bTeste.disabled = true;
+      if (cbMural.checked) {
+        cbMural.checked = false;
+        await api("conteudo_salvar", { secao: "novidades", titulo: x.assunto, texto: x.mensagem, link: x.link, ordem: -Math.floor(Date.now() / 1000) });
+        atualizarApp();
+      }
+      var total = 0, falhou = false;
+      while (true) {
+        msg(aviso, "Enviando... " + total + " enviados até agora.");
+        var r2 = await api("aviso_enviar", x);
+        if (!r2.ok) { falhou = true; msg(aviso, "O envio parou depois de " + total + " e-mails (o servidor de e-mail recusou). Clique em Enviar de novo mais tarde para continuar.", "err"); break; }
+        total += r2.data.enviados;
+        if (r2.data.limite_diario) { msg(aviso, "Chegou ao limite diário de envios (" + total + " enviados agora). Clique em Enviar amanhã para continuar de onde parou.", "ok"); falhou = true; break; }
+        if (r2.data.restantes <= 0 || r2.data.enviados === 0) break;
+      }
+      if (!falhou) msg(aviso, "Pronto! Aviso enviado para " + total + " afiliados.", "ok");
+      bEnv.disabled = false; bTeste.disabled = false;
+    });
+  }
+
+  window.Admin = { resumo: resumo, engajamento: engajamento, conteudo: conteudo, menu: menu, config: config };
 })();

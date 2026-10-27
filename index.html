@@ -87,6 +87,23 @@
   .imp-conf{background:#eef3ff;border:1px solid #d6e2f6;border-radius:14px;padding:14px 16px;color:#1c2038;margin-bottom:8px}
   .imp-conf p{color:#5c6385;margin:4px 0 10px;font-size:.92rem}
   .imp-btns{display:flex;flex-wrap:wrap;gap:8px}
+  .trilha{max-width:760px}
+  .tr-topo{background:#fff;border:1px solid #e3e8f4;border-radius:16px;padding:16px 18px;margin-bottom:14px}
+  .tr-prog-t{font-weight:800;color:#1c2038;margin-bottom:10px}
+  .tr-barra{height:10px;background:#e8edf8;border-radius:99px;overflow:hidden}
+  .tr-fill{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#db2777);border-radius:99px;transition:width .3s}
+  .tr-lista{display:flex;flex-direction:column;gap:10px}
+  .tr-passo{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid #e3e8f4;border-radius:16px;padding:14px 16px}
+  .tr-passo.atual{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  .tr-passo.feito{background:#f4faf6;border-color:#c9ead3}
+  .tr-passo.feito h3{color:#5c6385;text-decoration:line-through}
+  .tr-check{flex:none;width:38px;height:38px;border-radius:50%;border:2px solid #cfd4ea;background:#fff;color:#5c6385;font:inherit;font-weight:800;cursor:pointer}
+  .tr-passo.feito .tr-check{background:#22c55e;border-color:#22c55e;color:#052e16}
+  .tr-txt{flex:1;min-width:0}
+  .tr-txt h3{font-size:1.02rem;margin:2px 0 4px;color:#1c2038}
+  .tr-txt p{color:#5c6385;margin:0 0 8px;font-size:.93rem}
+  .tr-txt .item-btns{margin-top:6px}
+  .tr-txt .go{display:inline-block;padding:8px 16px;border-radius:999px;background:#3b6cf6;color:#fff;font:inherit;font-weight:700;font-size:.88rem;border:0;cursor:pointer;text-decoration:none}
   .item-btns{display:flex;flex-wrap:wrap;gap:8px}
   .item .go.afil{background:linear-gradient(135deg,#2563eb,#db2777)}
   .item .go{display:inline-block;margin-top:14px;padding:9px 18px;border-radius:999px;background:#3b6cf6;color:#fff;font-weight:700;font-size:.9rem}
@@ -355,8 +372,8 @@
   .impl-hero .btn,.impl-preco .btn,.impl-fim .btn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;font-weight:800;box-shadow:0 8px 28px rgba(34,197,94,.35)}
   @media(max-width:760px){.impl-hero{padding:22px}.impl-preco,.impl-fim{padding:22px 16px}.impl-hero .btn,.impl-preco .btn,.impl-fim .btn{display:block;box-sizing:border-box;width:100%;text-align:center}.impl-vals{flex-direction:column;gap:8px}.impl-ou{line-height:1}.impl-grade{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="cursos.css?v=20261027" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="cursos.css?v=20261027"></noscript>
+<link rel="stylesheet" href="cursos.css?v=20261027b" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="cursos.css?v=20261027b"></noscript>
 </head>
 <body>
 <div id="landing">
@@ -835,6 +852,8 @@
   };
 
   var SECOES = [
+    { id: "novidades", nome: "Mural de novidades", icone: "📢", sub: "Avisos, produto da semana, criativos novos e lives" },
+    { id: "trilha", nome: "Primeira venda", icone: "🏁", sub: "Passo a passo para fazer sua primeira venda" },
     { id: "implementacao", nome: "Implementação Amazolé", icone: "🚀", sub: "Consultoria completa: nossa equipe executa a sua operação de vendas no WhatsApp de ponta a ponta" },
     { id: "forum", nome: "Fórum", icone: "💬", sub: "Troque ideias, tire dúvidas e compartilhe resultados", posts: true },
     { id: "cursos", nome: "Cursos", icone: "📚", sub: "Aprenda no seu ritmo" },
@@ -864,6 +883,7 @@
   var ADMIN_CURSOS = { id: "admin_cursos", nome: "Gerenciar Cursos", icone: "🎬", sub: "Cadastre cursos, aulas, capas e a sequência" };
   var ADMIN_ITENS = [
     { id: "admin_resumo", nome: "Resumo", icone: "📊", sub: "Os números da comunidade" },
+    { id: "admin_engajamento", nome: "Engajamento e avisos", icone: "📈", sub: "Quem está ativo, quem esfriou e avisos por e-mail" },
     ADMIN_SECAO,
     ADMIN_CURSOS,
     { id: "admin_conteudo", nome: "Gerenciar Conteúdo", icone: "🗂️", sub: "Posts, criativos, produtos e links de cada seção" },
@@ -871,7 +891,7 @@
     { id: "admin_config", nome: "Configurações", icone: "⚙️", sub: "Link de pagamento, vídeo, depoimentos e aprovação automática" }
   ];
   var navCont = 0;
-  var menuSalvo = null, liberado = true;
+  var menuSalvo = null, liberado = true, PROGRESSO = {};
 
   // Junta o menu padrão com o que o admin salvou (ordem, nomes, ocultas e seções novas)
   function menuCompleto() {
@@ -901,6 +921,7 @@
     var r = await api("app_ler", { email: ehAdmin ? "" : email });
     if (r.ok) {
       menuSalvo = r.data.menu || null; CONTEUDO = r.data.conteudo || {}; liberado = true;
+      PROGRESSO = {}; (r.data.progresso || []).forEach(function (k) { PROGRESSO[k] = 1; });
     } else {
       menuSalvo = null; CONTEUDO = {}; liberado = r.status === 0 || r.status >= 500;
     }
@@ -915,7 +936,7 @@
     return new Promise(function (res) {
       if (window.Admin) return res();
       var sc = document.createElement("script");
-      sc.src = "admin.js?v=20261027"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      sc.src = "admin.js?v=20261027b"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
       document.head.appendChild(sc);
     });
   }
@@ -998,6 +1019,66 @@
     corpo.appendChild(fim);
   }
 
+  // ===== TRILHA "PRIMEIRA VENDA" =====
+  var TRILHA_PADRAO = [
+    { id: "p1", titulo: "Assista às aulas de boas-vindas", texto: "Entenda como funciona a comunidade e como vender como afiliado.", ir: "cursos", btn: "Ver cursos" },
+    { id: "p2", titulo: "Escolha o produto que você vai divulgar", texto: "Veja os produtos disponíveis e escolha um para começar.", ir: "produtos", btn: "Ver produtos" },
+    { id: "p3", titulo: "Pegue o seu link de afiliado", texto: "Faça a afiliação no produto escolhido e guarde o seu link.", ir: "produtos", btn: "Pegar link" },
+    { id: "p4", titulo: "Escolha os criativos", texto: "Baixe imagens e vídeos prontos para divulgar.", ir: "criativos", btn: "Ver criativos" },
+    { id: "p5", titulo: "Faça sua primeira divulgação", texto: "Publique no Instagram, status do WhatsApp, grupos ou anúncios, sempre com o seu link." },
+    { id: "p6", titulo: "Entre no grupo do WhatsApp", texto: "Tire dúvidas e acompanhe as novidades com a comunidade.", ir: "grupo", btn: "Entrar no grupo" },
+    { id: "p7", titulo: "Registre sua primeira venda", texto: "Fez a primeira venda? Marque este passo e conte para a comunidade no fórum!", ir: "forum", btn: "Contar no fórum" }
+  ];
+  function renderTrilha(corpo) {
+    var custom = (CONTEUDO.trilha || []);
+    var passos = custom.length ? custom.map(function (it) {
+      return { id: "c" + String(it.id).replace(/[^a-zA-Z0-9]/g, "").slice(0, 30), titulo: it.titulo, texto: it.texto, link: it.link, imagem: it.imagem_url };
+    }) : TRILHA_PADRAO;
+    var topo = criar("div", "tr-topo");
+    var titulo = criar("div", "tr-prog-t");
+    var barra = criar("div", "tr-barra"), fill = criar("div", "tr-fill");
+    barra.appendChild(fill);
+    topo.appendChild(titulo); topo.appendChild(barra);
+    corpo.appendChild(topo);
+    var lista = criar("div", "tr-lista");
+    corpo.appendChild(lista);
+    function atualizar() {
+      var n = passos.filter(function (p) { return PROGRESSO[p.id]; }).length;
+      titulo.textContent = n === passos.length ? "🎉 Parabéns! Você concluiu a trilha." : n + " de " + passos.length + " passos concluídos";
+      fill.style.width = Math.round(n / passos.length * 100) + "%";
+    }
+    var prox = passos.filter(function (p) { return !PROGRESSO[p.id]; })[0];
+    passos.forEach(function (p, i) {
+      var c = criar("div", "tr-passo" + (PROGRESSO[p.id] ? " feito" : "") + (prox && prox.id === p.id ? " atual" : ""));
+      var cb = criar("button", "tr-check"); cb.type = "button"; cb.setAttribute("aria-label", "Marcar como concluído");
+      cb.textContent = PROGRESSO[p.id] ? "✓" : String(i + 1);
+      var cx = criar("div", "tr-txt");
+      cx.appendChild(criar("h3", "", p.titulo));
+      if (p.texto) cx.appendChild(criar("p", "", p.texto));
+      var acoes = criar("div", "item-btns");
+      if (p.ir) {
+        var b = criar("button", "go", p.btn || "Abrir"); b.type = "button";
+        b.addEventListener("click", function () { var btnMenu = document.querySelector('#side-nav button[data-id="' + p.ir + '"]'); if (btnMenu) btnMenu.click(); else abrirSecao(p.ir); });
+        acoes.appendChild(b);
+      }
+      if (linkSeguro(p.link)) {
+        var a = criar("a", "go", rotuloLink(p.link)); a.href = p.link; a.target = "_blank"; a.rel = "noopener noreferrer";
+        acoes.appendChild(a);
+      }
+      if (acoes.children.length) cx.appendChild(acoes);
+      c.appendChild(cb); c.appendChild(cx);
+      cb.addEventListener("click", function () {
+        var feito = !PROGRESSO[p.id];
+        if (feito) PROGRESSO[p.id] = 1; else delete PROGRESSO[p.id];
+        c.classList.toggle("feito", feito); cb.textContent = feito ? "✓" : String(i + 1);
+        atualizar();
+        if (!ehAdmin) api("progresso_marcar", { email: email, item: p.id, feito: feito });
+      });
+      lista.appendChild(c);
+    });
+    atualizar();
+  }
+
   function abrirSecao(id) {
     var todas = secoes();
     var sec = todas.filter(function (x) { return x.id === id; })[0] || todas[0];
@@ -1022,7 +1103,7 @@
       renderAdmin(corpo);
       return;
     }
-    var rotaAdmin = { admin_resumo: "resumo", admin_conteudo: "conteudo", admin_menu: "menu", admin_config: "config" }[sec.id];
+    var rotaAdmin = { admin_resumo: "resumo", admin_engajamento: "engajamento", admin_conteudo: "conteudo", admin_menu: "menu", admin_config: "config" }[sec.id];
     if (rotaAdmin) {
       corpo.className = "main-body admin";
       corpo.appendChild(criar("div", "vazio", "Carregando..."));
@@ -1056,6 +1137,7 @@
       renderImplementacao(corpo);
       return;
     }
+    if (sec.id === "trilha") { corpo.className = "main-body trilha"; renderTrilha(corpo); return; }
     corpo.className = "main-body" + (sec.posts ? "" : " cards");
     var itens = CONTEUDO[sec.id] || [];
     if (!itens.length) {
@@ -1123,7 +1205,7 @@
     window.scrollTo(0, 0);
     await carregarApp();
     montarMenu();
-    abrirSecao(inicial || (ehAdmin ? "admin_resumo" : "forum"));
+    abrirSecao(inicial || (ehAdmin ? "admin_resumo" : "novidades"));
   }
 
   // ===== PAINEL ADMIN =====
@@ -1480,6 +1562,6 @@
   })();
   iniciar();
 </script>
-<script src="cursos.js?v=20261027" defer></script>
+<script src="cursos.js?v=20261027b" defer></script>
 </body>
 </html>

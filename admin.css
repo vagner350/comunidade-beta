@@ -79,3 +79,8 @@ dialog.dlg-adm small.dica[hidden]{display:none}
 /* capa do curso (vertical 3:4) */
 .ft-capa .ft-previa{max-width:180px;aspect-ratio:3/4}
 .ft-capa .ft-previa img{object-fit:cover}
+
+.av-form label{display:block;font-weight:700;margin:10px 0 4px;color:#1c2038}
+.av-form input:not([type=checkbox]),.av-form textarea,.av-form select{width:100%;box-sizing:border-box;border:1px solid #cfd4ea;border-radius:10px;padding:10px 12px;font:inherit}
+.av-form .chk{font-weight:600;margin-top:12px}
+.av-form .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}

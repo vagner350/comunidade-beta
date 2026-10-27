@@ -149,6 +149,19 @@ function enviarLink(string $para, string $link): bool {
     return @mail($para, '=?UTF-8?B?' . base64_encode($assunto) . '?=', $corpo, $h, '-f' . $de);
 }
 
+// Envia um e-mail de texto simples (SMTP da caixa do domínio; cai para mail() se o SMTP falhar)
+function enviarEmail(string $para, string $assunto, string $corpo): bool {
+    global $CFG;
+    if (isset($CFG['smtp']) && is_array($CFG['smtp'])) {
+        require_once __DIR__ . '/smtp.php';
+        if (smtp_enviar($CFG['smtp'], $para, $assunto, $corpo, $CFG['responder_para'] ?? null)) return true;
+    }
+    $de = $CFG['remetente'] ?? '';
+    if ($de === '') return false;
+    $h = "From: Amazolé <$de>\r\nReply-To: $de\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n";
+    return @mail($para, '=?UTF-8?B?' . base64_encode($assunto) . '?=', $corpo, $h, '-f' . $de);
+}
+
 function curso_linha(array $c): array {
     return [
         'id' => $c['id'], 'titulo' => $c['titulo'], 'descricao' => $c['descricao'],
@@ -199,6 +212,24 @@ function garantirEsquema(PDO $pdo): void {
         $existe = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'conteudo'")->fetchColumn();
         if ($existe && !$tem) $pdo->exec('ALTER TABLE conteudo ADD COLUMN links TEXT NULL');
     } catch (Throwable $e) { /* sem permissão para alterar: segue sem a coluna */ }
+    // tabelas novas: progresso da trilha, acessos por dia e controle de envio de avisos
+    try {
+        $t = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ('progresso','acessos','envios')")->fetchColumn();
+        if ($t < 3) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS progresso (
+                email VARCHAR(254) NOT NULL, item VARCHAR(60) NOT NULL,
+                feito_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (email, item)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+            $pdo->exec("CREATE TABLE IF NOT EXISTS acessos (
+                email VARCHAR(254) NOT NULL, dia DATE NOT NULL, n INT NOT NULL DEFAULT 1,
+                PRIMARY KEY (email, dia), KEY idx_dia (dia)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+            $pdo->exec("CREATE TABLE IF NOT EXISTS envios (
+                campanha CHAR(36) NOT NULL, email VARCHAR(254) NOT NULL,
+                enviado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (campanha, email), KEY idx_data (enviado_em)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        }
+    } catch (Throwable $e) { error_log('[comunidade-api] tabelas novas: ' . $e->getMessage()); }
     if ($n === 3) return;
     $sqls = [
         "CREATE TABLE IF NOT EXISTS config (
@@ -670,7 +701,107 @@ try {
             foreach (q('SELECT * FROM conteudo WHERE publicado = 1 ORDER BY secao, ordem, created_at')->fetchAll() as $c) {
                 $itens[$c['secao']][] = conteudo_linha($c);
             }
-            resp(200, ['menu' => is_array($menu) ? $menu : null, 'conteudo' => (object) $itens]);
+            $prog = [];
+            if (adminAtual() === null) {
+                $em = email_ok($j['email'] ?? null);
+                if ($em !== null) {
+                    q('INSERT INTO acessos (email, dia) VALUES (?, UTC_DATE()) ON DUPLICATE KEY UPDATE n = n + 1', [$em]);
+                    q('UPDATE afiliados SET last_login_at = UTC_TIMESTAMP() WHERE email = ?', [$em]);
+                    foreach (q('SELECT item FROM progresso WHERE email = ?', [$em])->fetchAll() as $r) $prog[] = $r['item'];
+                }
+            }
+            resp(200, ['menu' => is_array($menu) ? $menu : null, 'conteudo' => (object) $itens, 'progresso' => $prog]);
+        }
+
+        // ===== Trilha "Primeira venda": marcar/desmarcar um passo =====
+        case 'progresso_marcar': {
+            exigirPost();
+            $j = entrada();
+            exigirAfiliado($j);
+            $em = email_ok($j['email'] ?? null);
+            $item = $j['item'] ?? null;
+            if ($em === null || !is_string($item) || !preg_match('/^[a-zA-Z0-9_-]{1,60}$/', $item)) resp(400, ['erro' => 'dados_invalidos']);
+            if (!empty($j['feito'])) q('INSERT IGNORE INTO progresso (email, item) VALUES (?, ?)', [$em, $item]);
+            else q('DELETE FROM progresso WHERE email = ? AND item = ?', [$em, $item]);
+            resp(200, ['ok' => true]);
+        }
+
+        // ===== Admin: engajamento (quem está ativo, quem esfriou) =====
+        case 'engajamento': {
+            exigirAdmin();
+            $dias = max(1, min(90, (int) ($_GET['inativo'] ?? 15)));
+            $um = fn($sql, $p = []) => (int) q($sql, $p)->fetchColumn();
+            $aprov = $um("SELECT COUNT(*) FROM afiliados WHERE status = 'aprovado'");
+            $serie = [];
+            for ($i = 13; $i >= 0; $i--) $serie[gmdate('Y-m-d', time() - $i * 86400)] = 0;
+            foreach (q('SELECT dia, COUNT(*) c FROM acessos WHERE dia >= DATE_SUB(UTC_DATE(), INTERVAL 13 DAY) GROUP BY dia')->fetchAll() as $r) {
+                if (isset($serie[$r['dia']])) $serie[$r['dia']] = (int) $r['c'];
+            }
+            $porDia = [];
+            foreach ($serie as $d => $c) $porDia[] = ['dia' => $d, 'ativos' => $c];
+            $top = q("SELECT a.email, af.nome, COUNT(*) dias, MAX(a.dia) ultimo FROM acessos a JOIN afiliados af ON af.email = a.email
+                      WHERE a.dia >= DATE_SUB(UTC_DATE(), INTERVAL 30 DAY) GROUP BY a.email, af.nome ORDER BY dias DESC, ultimo DESC LIMIT 15")->fetchAll();
+            $esfriando = q("SELECT email, nome, last_login_at FROM afiliados WHERE status = 'aprovado' AND last_login_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL $dias DAY)
+                            ORDER BY last_login_at DESC LIMIT 100")->fetchAll();
+            foreach ($esfriando as &$e) $e['last_login_at'] = iso($e['last_login_at']);
+            $passos = [];
+            foreach (q('SELECT item, COUNT(*) c FROM progresso GROUP BY item')->fetchAll() as $r) $passos[$r['item']] = (int) $r['c'];
+            resp(200, [
+                'aprovados' => $aprov,
+                'hoje' => $um('SELECT COUNT(*) FROM acessos WHERE dia = UTC_DATE()'),
+                'ativos_7d' => $um('SELECT COUNT(DISTINCT email) FROM acessos WHERE dia >= DATE_SUB(UTC_DATE(), INTERVAL 6 DAY)'),
+                'ativos_30d' => $um('SELECT COUNT(DISTINCT email) FROM acessos WHERE dia >= DATE_SUB(UTC_DATE(), INTERVAL 29 DAY)'),
+                'inativos' => $um("SELECT COUNT(*) FROM afiliados WHERE status = 'aprovado' AND last_login_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL $dias DAY)"),
+                'dias_inativo' => $dias,
+                'concluiram_trilha' => $um('SELECT COUNT(*) FROM (SELECT email FROM progresso GROUP BY email HAVING COUNT(*) >= 7) t'),
+                'comecaram_trilha' => $um('SELECT COUNT(DISTINCT email) FROM progresso'),
+                'por_dia' => $porDia, 'top' => $top, 'esfriando' => $esfriando, 'passos' => (object) $passos,
+                'enviados_hoje' => $um('SELECT COUNT(*) FROM envios WHERE enviado_em >= UTC_DATE()'),
+            ]);
+        }
+
+        // ===== Admin: aviso por e-mail em lotes (retoma de onde parou; não repete e-mail na mesma campanha) =====
+        case 'aviso_enviar': {
+            exigirPost();
+            $j = entrada();
+            exigirAdmin();
+            $camp = id_ok($j['campanha'] ?? null);
+            $assunto = texto($j['assunto'] ?? null, 150);
+            $msgTxt = texto($j['mensagem'] ?? null, 4000);
+            if ($assunto === null || $msgTxt === null) resp(400, ['erro' => 'titulo_obrigatorio']);
+            if (preg_match('/[\r\n]/', $assunto)) resp(400, ['erro' => 'campo_invalido']);
+            $link = url_https($j['link'] ?? null);
+            $pub = $j['publico'] ?? 'aprovados';
+            if (!in_array($pub, ['aprovados', 'inativos', 'teste'], true)) resp(400, ['erro' => 'publico_invalido']);
+            $dias = max(1, min(90, (int) ($j['dias'] ?? 15)));
+            $site = rtrim($CFG['site'], '/');
+            $corpo = $msgTxt . "\r\n\r\n" . ($link ? "Acesse: $link\r\n\r\n" : '') . "Entre na comunidade: $site/entrar.html\r\n\r\n--\r\nVocê recebe este aviso por ser afiliado da Comunidade Amazolé.\r\n";
+            $corpo = str_replace(["\r\n", "\n"], ["\n", "\r\n"], $corpo);
+            $limiteDia = max(10, (int) (cfg_get('envio_dia_max', '400') ?? 400));
+            if ($pub === 'teste') {
+                $para = adminAtual();
+                $ok = $para && enviarEmail($para, '[Teste] ' . $assunto, $corpo);
+                resp($ok ? 200 : 502, $ok ? ['ok' => true, 'enviados' => 1, 'restantes' => 0] : ['erro' => 'envio_falhou']);
+            }
+            $jaHoje = (int) q('SELECT COUNT(*) FROM envios WHERE enviado_em >= UTC_DATE()')->fetchColumn();
+            $lote = min(20, max(0, $limiteDia - $jaHoje));
+            $filtro = $pub === 'inativos' ? "AND last_login_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL $dias DAY)" : '';
+            $base = "FROM afiliados WHERE status = 'aprovado' $filtro AND email NOT IN (SELECT email FROM envios WHERE campanha = ?)";
+            $total = (int) q("SELECT COUNT(*) $base", [$camp])->fetchColumn();
+            if ($lote === 0 && $total > 0) resp(200, ['ok' => true, 'enviados' => 0, 'restantes' => $total, 'limite_diario' => true]);
+            @set_time_limit(120);
+            $env = $falhas = 0;
+            foreach (q("SELECT email $base ORDER BY email LIMIT $lote", [$camp])->fetchAll() as $r) {
+                if (enviarEmail($r['email'], $assunto, $corpo)) {
+                    q('INSERT IGNORE INTO envios (campanha, email) VALUES (?, ?)', [$camp, $r['email']]);
+                    $env++;
+                } else {
+                    $falhas++;
+                    if ($falhas >= 3 && $env === 0) break;
+                }
+            }
+            if ($env === 0 && $falhas > 0) resp(502, ['erro' => 'envio_falhou']);
+            resp(200, ['ok' => true, 'enviados' => $env, 'falhas' => $falhas, 'restantes' => max(0, $total - $env)]);
         }
 
         // ===== Admin: conteúdo das seções =====
@@ -881,6 +1012,11 @@ try {
                     q("INSERT INTO afiliados (email, nome, status, observacao) VALUES (?, ?, 'aprovado', 'Aprovado automaticamente pelo pagamento')
                        ON DUPLICATE KEY UPDATE status = 'aprovado', nome = COALESCE(nome, VALUES(nome))", [$email, $an['nome']]);
                     $acao_log = 'aprovado';
+                    if (!$antes || $antes['status'] !== 'aprovado') {
+                        try {
+                            enviarEmail($email, 'Bem-vindo à Comunidade Amazolé!', "Olá" . ($an['nome'] ? ', ' . $an['nome'] : '') . "!\r\n\r\nSeu acesso à Comunidade Amazolé está liberado.\r\n\r\nPara entrar, use este e-mail em:\r\n" . rtrim($CFG['site'], '/') . "/entrar.html\r\n\r\nComece pela trilha \"Primeira venda\", no menu da comunidade. Boas vendas!\r\n");
+                        } catch (Throwable $e) { /* e-mail de boas-vindas é opcional */ }
+                    }
                 }
             } elseif ($decisao === 'revogar') {
                 $st = q("UPDATE afiliados SET status = 'pendente', observacao = 'Pagamento reembolsado ou cancelado' WHERE email = ? AND status = 'aprovado'", [$email]);
