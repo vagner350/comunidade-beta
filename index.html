@@ -84,6 +84,9 @@
   .post .d{font-size:.8rem;color:#6b7194;margin-bottom:6px}
   .post h3,.item h3{font-size:1.1rem;margin-bottom:8px}
   .post p,.item p{white-space:pre-wrap;color:#363c5e;font-size:.95rem}
+  .imp-conf{background:#eef3ff;border:1px solid #d6e2f6;border-radius:14px;padding:14px 16px;color:#1c2038;margin-bottom:8px}
+  .imp-conf p{color:#5c6385;margin:4px 0 10px;font-size:.92rem}
+  .imp-btns{display:flex;flex-wrap:wrap;gap:8px}
   .item-btns{display:flex;flex-wrap:wrap;gap:8px}
   .item .go.afil{background:linear-gradient(135deg,#2563eb,#db2777)}
   .item .go{display:inline-block;margin-top:14px;padding:9px 18px;border-radius:999px;background:#3b6cf6;color:#fff;font-weight:700;font-size:.9rem}
@@ -352,8 +355,8 @@
   .impl-hero .btn,.impl-preco .btn,.impl-fim .btn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;font-weight:800;box-shadow:0 8px 28px rgba(34,197,94,.35)}
   @media(max-width:760px){.impl-hero{padding:22px}.impl-preco,.impl-fim{padding:22px 16px}.impl-hero .btn,.impl-preco .btn,.impl-fim .btn{display:block;box-sizing:border-box;width:100%;text-align:center}.impl-vals{flex-direction:column;gap:8px}.impl-ou{line-height:1}.impl-grade{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="cursos.css?v=20261024" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="cursos.css?v=20261024"></noscript>
+<link rel="stylesheet" href="cursos.css?v=20261027" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="cursos.css?v=20261027"></noscript>
 </head>
 <body>
 <div id="landing">
@@ -912,7 +915,7 @@
     return new Promise(function (res) {
       if (window.Admin) return res();
       var sc = document.createElement("script");
-      sc.src = "admin.js?v=20261024"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      sc.src = "admin.js?v=20261027"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
       document.head.appendChild(sc);
     });
   }
@@ -1146,12 +1149,97 @@
     var novo = criar("button", "abtn", "+ Adicionar afiliado");
     novo.type = "button";
     novo.addEventListener("click", function () { abrirForm(null); });
+    var imp = criar("button", "abtn ghost", "⬆ Importar CSV");
+    imp.type = "button";
+    var arqImp = criar("input"); arqImp.type = "file"; arqImp.accept = ".csv,.txt,text/csv,text/plain"; arqImp.hidden = true;
+    imp.addEventListener("click", function () { arqImp.click(); });
+    arqImp.addEventListener("change", function () {
+      var a = arqImp.files && arqImp.files[0]; arqImp.value = "";
+      if (a) lerCsvAfiliados(a);
+    });
     contagemEl = criar("span", "adm-count");
-    bar.appendChild(busca); bar.appendChild(sel); bar.appendChild(novo); bar.appendChild(contagemEl);
+    bar.appendChild(busca); bar.appendChild(sel); bar.appendChild(novo); bar.appendChild(imp); bar.appendChild(arqImp); bar.appendChild(contagemEl);
     admMsgEl = criar("div", "msg");
     tabelaEl = criar("div", "adm-wrap");
     corpo.appendChild(bar); corpo.appendChild(admMsgEl); corpo.appendChild(tabelaEl);
     carregarAfiliados();
+  }
+
+  // ----- Importar afiliados de um CSV (e-mail, nome, whatsapp) -----
+  function csvLinhas(txt) {
+    txt = txt.replace(/^\uFEFF/, "");
+    var sep = ";", cab = txt.split(/\r?\n/, 1)[0] || "";
+    var cont = { ";": (cab.match(/;/g) || []).length, ",": (cab.match(/,/g) || []).length, "\t": (cab.match(/\t/g) || []).length };
+    sep = cont[","] > cont[";"] ? "," : ";"; if (cont["\t"] > cont[sep]) sep = "\t";
+    var out = [], lin = [], cel = "", asp = false;
+    for (var i = 0; i < txt.length; i++) {
+      var c = txt[i];
+      if (asp) {
+        if (c === '"') { if (txt[i + 1] === '"') { cel += '"'; i++; } else asp = false; } else cel += c;
+      } else if (c === '"') asp = true;
+      else if (c === sep) { lin.push(cel); cel = ""; }
+      else if (c === "\n" || c === "\r") {
+        if (c === "\r" && txt[i + 1] === "\n") i++;
+        lin.push(cel); cel = ""; if (lin.some(function (x) { return x.trim() !== ""; })) out.push(lin); lin = [];
+      } else cel += c;
+    }
+    lin.push(cel); if (lin.some(function (x) { return x.trim() !== ""; })) out.push(lin);
+    return out;
+  }
+
+  function lerCsvAfiliados(arquivo) {
+    var rd = new FileReader();
+    rd.onerror = function () { msg(admMsgEl, "Não foi possível ler o arquivo.", "err"); };
+    rd.onload = function () {
+      var linhas = csvLinhas(String(rd.result || ""));
+      if (!linhas.length) { msg(admMsgEl, "O arquivo está vazio.", "err"); return; }
+      var norm = function (s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); };
+      var ie = -1, inome = -1, iw = -1, comCab = false;
+      linhas[0].forEach(function (c, i) {
+        var n = norm(c);
+        if (ie < 0 && /^(e-?mail|email|mail|e_mail)/.test(n)) { ie = i; comCab = true; }
+        else if (inome < 0 && /^(nome|name|full.?name|nome completo)/.test(n)) { inome = i; comCab = true; }
+        else if (iw < 0 && /(whats|telefone|celular|phone|fone|tel)/.test(n)) { iw = i; comCab = true; }
+      });
+      if (ie < 0) { // sem cabeçalho: usa a primeira coluna que parece e-mail
+        var base = linhas[comCab ? 1 : 0] || [];
+        base.forEach(function (c, i) { if (ie < 0 && /@/.test(c)) ie = i; });
+      }
+      if (ie < 0) { msg(admMsgEl, "Não encontrei uma coluna de e-mail no arquivo.", "err"); return; }
+      var itens = [], invalidos = 0, re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      linhas.slice(comCab ? 1 : 0).forEach(function (l) {
+        var e = (l[ie] || "").trim().toLowerCase();
+        if (!re.test(e)) { invalidos++; return; }
+        itens.push({ email: e, nome: inome >= 0 ? (l[inome] || "").trim() : "", whatsapp: iw >= 0 ? (l[iw] || "").trim() : "" });
+      });
+      if (!itens.length) { msg(admMsgEl, "Nenhum e-mail válido encontrado.", "err"); return; }
+      confirmarImportacao(itens, invalidos);
+    };
+    rd.readAsText(arquivo, "UTF-8");
+  }
+
+  function confirmarImportacao(itens, invalidos) {
+    admMsgEl.textContent = ""; admMsgEl.className = "msg";
+    var caixa = criar("div", "imp-conf");
+    caixa.appendChild(criar("strong", "", "Encontrei " + itens.length + " afiliado" + (itens.length === 1 ? "" : "s") + " para importar" + (invalidos ? " (" + invalidos + " linha" + (invalidos === 1 ? "" : "s") + " sem e-mail válido ignorada" + (invalidos === 1 ? "" : "s") + ")" : "") + "."));
+    caixa.appendChild(criar("p", "", "Quem já está na lista não é duplicado, e quem está bloqueado continua bloqueado."));
+    var linha = criar("div", "imp-btns");
+    function ir(status) {
+      linha.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+      msg(admMsgEl, "Importando...");
+      api("afiliados_importar", { itens: itens, status: status }).then(function (r) {
+        if (!r.ok) { msg(admMsgEl, "Não foi possível importar" + (r.data && r.data.erro ? " (" + r.data.erro + ")" : "") + ".", "err"); return; }
+        var d = r.data;
+        msg(admMsgEl, "Importação concluída: " + d.novos + " novos, " + d.atualizados + " já existiam" + (d.bloqueados_mantidos ? ", " + d.bloqueados_mantidos + " bloqueados mantidos" : "") + (d.invalidos ? ", " + d.invalidos + " ignorados" : "") + ".", "ok");
+        carregarAfiliados();
+      });
+    }
+    var b1 = criar("button", "abtn", "Importar como Aprovados"); b1.type = "button"; b1.addEventListener("click", function () { ir("aprovado"); });
+    var b2 = criar("button", "abtn ghost", "Importar como Pendentes"); b2.type = "button"; b2.addEventListener("click", function () { ir("pendente"); });
+    var b3 = criar("button", "abtn ghost", "Cancelar"); b3.type = "button"; b3.addEventListener("click", function () { admMsgEl.textContent = ""; });
+    linha.appendChild(b1); linha.appendChild(b2); linha.appendChild(b3);
+    caixa.appendChild(linha);
+    admMsgEl.appendChild(caixa);
   }
 
   async function carregarAfiliados() {
@@ -1392,6 +1480,6 @@
   })();
   iniciar();
 </script>
-<script src="cursos.js?v=20261024" defer></script>
+<script src="cursos.js?v=20261027" defer></script>
 </body>
 </html>

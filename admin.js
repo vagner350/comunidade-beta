@@ -5,7 +5,7 @@
 
   (function () {
     var l = document.createElement("link");
-    l.rel = "stylesheet"; l.href = "admin.css?v=20261024";
+    l.rel = "stylesheet"; l.href = "admin.css?v=20261027";
     document.head.appendChild(l);
   })();
 

@@ -56,13 +56,13 @@ function q(string $sql, array $p = []): PDOStatement {
     return $st;
 }
 
-function entrada(): array {
+function entrada(int $max = 20000): array {
     $m = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     if ($m !== 'POST') return [];
     // Protege contra CSRF: exige cabeçalho personalizado (navegadores bloqueiam isso entre sites).
     if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== 'fetch') resp(400, ['erro' => 'requisicao_invalida']);
-    $raw = file_get_contents('php://input', false, null, 0, 20001);
-    if ($raw === false || strlen($raw) > 20000) resp(413, ['erro' => 'muito_grande']);
+    $raw = file_get_contents('php://input', false, null, 0, $max + 1);
+    if ($raw === false || strlen($raw) > $max) resp(413, ['erro' => 'muito_grande']);
     $j = json_decode($raw === '' ? '{}' : $raw, true);
     if (!is_array($j)) resp(400, ['erro' => 'json_invalido']);
     return $j;
@@ -507,6 +507,43 @@ try {
                 throw $e;
             }
             resp(200, ['ok' => true]);
+        }
+
+        // Importa uma lista (CSV lido no navegador): não cria duplicados, não desbloqueia ninguém e não rebaixa quem já é aprovado
+        case 'afiliados_importar': {
+            exigirPost();
+            $j = entrada(900000);
+            exigirAdmin();
+            $status = status_ok($j['status'] ?? 'aprovado');
+            $itens = $j['itens'] ?? null;
+            if (!is_array($itens) || count($itens) > 5000) resp(400, ['erro' => 'lista_invalida']);
+            $novos = $atualizados = $invalidos = $mantidos = 0;
+            $vistos = [];
+            $obs = $status === 'aprovado' ? 'Importado do amazole.me' : 'Importado (aguardando aprovação)';
+            db()->beginTransaction();
+            try {
+                foreach ($itens as $it) {
+                    if (!is_array($it)) { $invalidos++; continue; }
+                    $email = email_ok($it['email'] ?? null);
+                    if ($email === null || isset($vistos[$email])) { $invalidos++; continue; }
+                    $vistos[$email] = 1;
+                    $nome = isset($it['nome']) && is_string($it['nome']) ? (mb_substr(trim($it['nome']), 0, 120) ?: null) : null;
+                    $whats = isset($it['whatsapp']) && is_string($it['whatsapp']) ? (mb_substr(trim($it['whatsapp']), 0, 30) ?: null) : null;
+                    $ex = q('SELECT status FROM afiliados WHERE email = ?', [$email])->fetch();
+                    if (!$ex) {
+                        q('INSERT INTO afiliados (email, nome, whatsapp, status, observacao) VALUES (?, ?, ?, ?, ?)', [$email, $nome, $whats, $status, $obs]);
+                        $novos++;
+                    } elseif ($ex['status'] === 'bloqueado') {
+                        $mantidos++;
+                    } else {
+                        $novoStatus = ($ex['status'] === 'aprovado' || $status === 'aprovado') ? 'aprovado' : 'pendente';
+                        q('UPDATE afiliados SET nome = COALESCE(nome, ?), whatsapp = COALESCE(whatsapp, ?), status = ? WHERE email = ?', [$nome, $whats, $novoStatus, $email]);
+                        $atualizados++;
+                    }
+                }
+                db()->commit();
+            } catch (Throwable $e) { db()->rollBack(); throw $e; }
+            resp(200, ['ok' => true, 'novos' => $novos, 'atualizados' => $atualizados, 'invalidos' => $invalidos, 'bloqueados_mantidos' => $mantidos]);
         }
 
         case 'afiliado_status': {
