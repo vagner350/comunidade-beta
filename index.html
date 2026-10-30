@@ -372,8 +372,21 @@
   .impl-hero .btn,.impl-preco .btn,.impl-fim .btn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;font-weight:800;box-shadow:0 8px 28px rgba(34,197,94,.35)}
   @media(max-width:760px){.impl-hero{padding:22px}.impl-preco,.impl-fim{padding:22px 16px}.impl-hero .btn,.impl-preco .btn,.impl-fim .btn{display:block;box-sizing:border-box;width:100%;text-align:center}.impl-vals{flex-direction:column;gap:8px}.impl-ou{line-height:1}.impl-grade{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="cursos.css?v=20261027c" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="cursos.css?v=20261027c"></noscript>
+<link rel="stylesheet" href="cursos.css?v=20261029" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="cursos.css?v=20261029"></noscript>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1002875375909644');
+fbq('track','PageView');
+fbq('track','ViewContent',{content_name:'Comunidade Amazolé',content_category:'Pagina de vendas',currency:'BRL',value:27.00});
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('[data-checkout]');
+  if(a)fbq('track','InitiateCheckout',{content_name:'Comunidade Amazolé',currency:'BRL',value:27.00,num_items:1});
+},true);
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1002875375909644&ev=PageView&noscript=1" alt=""></noscript>
+<!-- End Meta Pixel -->
 </head>
 <body>
 <div id="landing">
@@ -936,7 +949,7 @@
     return new Promise(function (res) {
       if (window.Admin) return res();
       var sc = document.createElement("script");
-      sc.src = "admin.js?v=20261027c"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      sc.src = "admin.js?v=20261029"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
       document.head.appendChild(sc);
     });
   }
@@ -1562,6 +1575,6 @@
   })();
   iniciar();
 </script>
-<script src="cursos.js?v=20261027c" defer></script>
+<script src="cursos.js?v=20261029" defer></script>
 </body>
 </html>
