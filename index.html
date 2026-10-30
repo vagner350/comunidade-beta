@@ -372,8 +372,8 @@
   .impl-hero .btn,.impl-preco .btn,.impl-fim .btn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;font-weight:800;box-shadow:0 8px 28px rgba(34,197,94,.35)}
   @media(max-width:760px){.impl-hero{padding:22px}.impl-preco,.impl-fim{padding:22px 16px}.impl-hero .btn,.impl-preco .btn,.impl-fim .btn{display:block;box-sizing:border-box;width:100%;text-align:center}.impl-vals{flex-direction:column;gap:8px}.impl-ou{line-height:1}.impl-grade{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="cursos.css?v=20261029" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="cursos.css?v=20261029"></noscript>
+<link rel="stylesheet" href="cursos.css?v=20261029b" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="cursos.css?v=20261029b"></noscript>
 <!-- Meta Pixel -->
 <script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
@@ -796,7 +796,7 @@ document.addEventListener('click',function(e){
   // ===== CHECKOUT =====
   // Cole aqui o link completo do checkout (pagamento de R$ 27,00).
   // Exemplo: var CHECKOUT_URL = "https://pay.exemplo.com/abc123";
-  var CHECKOUT_URL = "https://dignopay.com.br/checkout/202m449h5f";
+  var CHECKOUT_URL = "https://pagamentos.amazoleafiliados.com.br/";
 
   function aplicarCheckout() {
     var ok = /^https:\/\//i.test(CHECKOUT_URL);
@@ -949,7 +949,7 @@ document.addEventListener('click',function(e){
     return new Promise(function (res) {
       if (window.Admin) return res();
       var sc = document.createElement("script");
-      sc.src = "admin.js?v=20261029"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      sc.src = "admin.js?v=20261029b"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
       document.head.appendChild(sc);
     });
   }
@@ -1575,6 +1575,6 @@ document.addEventListener('click',function(e){
   })();
   iniciar();
 </script>
-<script src="cursos.js?v=20261029" defer></script>
+<script src="cursos.js?v=20261029b" defer></script>
 </body>
 </html>
