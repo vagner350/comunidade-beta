@@ -480,6 +480,8 @@ document.addEventListener('click',function(e){
       texto = "Você está começando, e isso é ótimo: vai aprender do jeito certo desde o início. Com a <strong>implementação guiada</strong> e tudo pronto para usar, a primeira venda fica muito mais perto.";
     }
     $("r-nome").textContent = nome;
+    PERFIL = exp >= 2 && tempo >= 1 ? "acelerado" : exp === 1 ? "virar-jogo" : "iniciante";
+    aplicarCheckout();
     $("r-texto").innerHTML = texto;
 
     var resumo = [
@@ -525,9 +527,20 @@ document.addEventListener('click',function(e){
     try { if (window.fbq) fbq("track", "Lead", { content_name: "Quiz Comunidade Amazolé", currency: "BRL", value: 27.00 }); } catch (e) {}
   }
 
+  // Repassa as UTMs do anúncio e marca src=quiz + sck=perfil: no checkout cada venda fica marcada com a origem
+  var PERFIL = "";
+  function linkCheckout(base, extra) {
+    try {
+      var u = new URL(base), q = new URLSearchParams(location.search);
+      ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid"].forEach(function (k) { var v = q.get(k); if (v && !u.searchParams.has(k)) u.searchParams.set(k, v); });
+      Object.keys(extra || {}).forEach(function (k) { if (extra[k]) u.searchParams.set(k, extra[k]); });
+      return u.toString();
+    } catch (e) { return base; }
+  }
   function aplicarCheckout() {
     if (!/^https:\/\//i.test(CHECKOUT_URL)) return;
-    document.querySelectorAll("[data-checkout]").forEach(function (a) { a.href = CHECKOUT_URL; a.rel = "noopener"; });
+    var url = linkCheckout(CHECKOUT_URL, { src: "quiz", sck: PERFIL });
+    document.querySelectorAll("[data-checkout]").forEach(function (a) { a.href = url; a.rel = "noopener"; });
   }
 
   document.querySelectorAll("[data-comecar]").forEach(function (b) { b.addEventListener("click", function () { atual = 0; px("QuizInicio"); montarPergunta(); }); });

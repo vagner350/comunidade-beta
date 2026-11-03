@@ -811,10 +811,19 @@ document.addEventListener('click',function(e){
   // Exemplo: var CHECKOUT_URL = "https://pay.exemplo.com/abc123";
   var CHECKOUT_URL = "https://pagamentos.amazoleafiliados.com.br/";
 
+  // Repassa as UTMs do anúncio e marca a origem (src=pagina) para saber de onde veio cada venda
+  function linkCheckout(base, extra) {
+    try {
+      var u = new URL(base), q = new URLSearchParams(location.search);
+      ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid"].forEach(function (k) { var v = q.get(k); if (v && !u.searchParams.has(k)) u.searchParams.set(k, v); });
+      Object.keys(extra || {}).forEach(function (k) { if (extra[k]) u.searchParams.set(k, extra[k]); });
+      return u.toString();
+    } catch (e) { return base; }
+  }
   function aplicarCheckout() {
     var ok = /^https:\/\//i.test(CHECKOUT_URL);
     document.querySelectorAll("[data-checkout]").forEach(function (a) {
-      if (ok) { a.href = CHECKOUT_URL; a.rel = "noopener"; a.onclick = null; }
+      if (ok) { a.href = linkCheckout(CHECKOUT_URL, { src: "pagina" }); a.rel = "noopener"; a.onclick = null; }
       else {
         a.onclick = function (e) {
           e.preventDefault();
