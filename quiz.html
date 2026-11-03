@@ -40,10 +40,28 @@
   .lead{color:var(--muted);font-size:1.05rem;margin-bottom:22px}
   .dica{color:var(--muted);font-size:.95rem;margin-bottom:20px}
 
-  .intro-foto{display:flex;align-items:center;gap:14px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff;margin-bottom:22px}
-  .intro-foto img{width:64px;height:80px;object-fit:cover;border-radius:12px;flex:none}
-  .intro-foto p{font-size:.92rem;color:var(--muted)}
-  .intro-foto strong{color:var(--text)}
+  .historia{margin:30px 0 26px;padding:18px;border-radius:22px;background:#fff;border:1px solid var(--line);box-shadow:0 14px 44px rgba(37,99,235,.08)}
+  .hist-foto{position:relative;margin:0 0 18px}
+  .hist-foto img{display:block;width:100%;height:auto;aspect-ratio:4/5;max-height:440px;object-fit:cover;object-position:50% 20%;border-radius:16px}
+  .hist-foto figcaption{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid var(--line);line-height:1.3}
+  .hist-foto figcaption span{font-size:.8rem;color:var(--muted)}
+  .historia h2,.marca h2{margin-bottom:16px}
+  .linha{list-style:none;display:grid;gap:0;padding:0}
+  .linha li{position:relative;padding:0 0 16px 26px}
+  .linha li::before{content:"";position:absolute;left:5px;top:7px;width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+  .linha li::after{content:"";position:absolute;left:10px;top:22px;bottom:2px;width:2px;background:var(--line)}
+  .linha li:last-child{padding-bottom:0}
+  .linha li:last-child::after{display:none}
+  .linha b{display:block;font-size:1rem;margin-bottom:2px}
+  .linha p{color:var(--muted);font-size:.97rem}
+  .linha strong,.marca p strong{color:var(--text)}
+  .marca{margin:0 0 28px}
+  .marca p{color:var(--muted);margin-bottom:16px}
+  .marca .nums{margin-bottom:14px}
+  .prods{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  .prods::-webkit-scrollbar{display:none}
+  .prods img{flex:none;width:88px;height:88px;object-fit:contain;border-radius:14px;background:#fff;border:1px solid var(--line)}
+  .pre-cta{margin-bottom:14px}
   .pontos{list-style:none;display:grid;gap:8px;margin-bottom:24px}
   .pontos li{font-size:.95rem;color:var(--muted)}
   .pontos li::before{content:"✔";color:var(--cta2);font-weight:800;margin-right:8px}
@@ -145,17 +163,64 @@ document.addEventListener('click',function(e){
     <span class="tag">Quiz gratuito · 1 minuto</span>
     <h1>Descubra em <em>7 passos</em> se você tem perfil para vender com 50% de comissão</h1>
     <p class="lead">Responda rapidinho e veja o seu plano para começar como afiliado da Amazolé, a marca com <strong>+12 milhões em vendas pelo WhatsApp</strong>.</p>
-    <div class="intro-foto">
-      <img src="img/vagner-480.webp" alt="Vagner, fundador da Amazolé" width="64" height="80">
-      <p><strong>Vagner, fundador da Amazolé.</strong> Saí do CLT há 4 anos com essa marca. Montei este quiz para te mostrar o caminho mais rápido até a sua primeira venda.</p>
-    </div>
+    <button class="btn" type="button" data-comecar>Começar o quiz</button>
+    <span class="mini">Leva 1 minuto · Não pedimos seus dados</span>
+
+    <article class="historia" aria-labelledby="hist-titulo">
+      <figure class="hist-foto">
+        <img src="img/vagner.webp" srcset="img/vagner-480.webp 480w, img/vagner.webp 680w" sizes="(max-width: 620px) 100vw, 588px" alt="Vagner, fundador da Amazolé, segurando a placa de premiação 1M" width="680" height="850">
+        <figcaption><strong>Vagner</strong><span>Fundador da Amazolé</span></figcaption>
+      </figure>
+
+      <span class="tag">Minha história</span>
+      <h2 id="hist-titulo">Eu saí do CLT e construí a Amazolé. Agora quero te levar junto.</h2>
+
+      <ol class="linha">
+        <li>
+          <b>O começo</b>
+          <p>Sou o <strong>Vagner</strong>. Há 4 anos criei a Amazolé com um objetivo bem claro: <strong>sair do CLT</strong>.</p>
+        </li>
+        <li>
+          <b>Os desafios</b>
+          <p>Foram muitos altos e baixos. Eu aprendi vendendo, errando e ajustando, até encontrar o que realmente funciona.</p>
+        </li>
+        <li>
+          <b>Hoje</b>
+          <p>A marca tem toda a estrutura <strong>validada</strong>: vendas, estoque e branding. Já passamos de <strong>12 milhões em vendas pelo WhatsApp</strong>.</p>
+        </li>
+        <li>
+          <b>Agora, você</b>
+          <p>Não estou atrás só de afiliados. Estou atrás de <strong>verdadeiros consultores da marca</strong>. Vou pegar tudo o que funcionou para mim e <strong>replicar para você</strong>.</p>
+        </li>
+      </ol>
+    </article>
+
+    <section class="marca" aria-labelledby="marca-titulo">
+      <span class="tag">A marca Amazolé</span>
+      <h2 id="marca-titulo">Uma marca de skincare que já provou que vende</h2>
+      <p>A Amazolé cria cuidados para a pele que resolvem problemas reais, como as manchas: <strong>clareadores, cremes, esfoliantes, séruns e sabonetes</strong>. Os produtos têm <strong>estoque nacional</strong> e são enviados do Brasil. Por isso, você só precisa divulgar.</p>
+      <ul class="nums" aria-label="Números da Amazolé">
+        <li><strong>4 anos</strong><span>de marca</span></li>
+        <li><strong>+12 mi</strong><span>em vendas pelo WhatsApp</span></li>
+        <li><strong>50%</strong><span>de comissão para você</span></li>
+      </ul>
+      <div class="prods" aria-label="Alguns produtos da Amazolé">
+        <img src="img/produtos/esfoliante-clareador.webp" alt="Esfoliante Clareador" width="88" height="88" loading="lazy">
+        <img src="img/produtos/sabonete-clareador.webp" alt="Sabonete Clareador" width="88" height="88" loading="lazy">
+        <img src="img/produtos/serum-olhos.webp" alt="Sérum para os Olhos" width="88" height="88" loading="lazy">
+        <img src="img/produtos/formula-avancada.webp" alt="Fórmula Avançada" width="88" height="88" loading="lazy">
+        <img src="img/produtos/pink-amazonico.webp" alt="Pink Amazônico" width="88" height="88" loading="lazy">
+      </div>
+    </section>
+
+    <h2 class="pre-cta">Será que você tem perfil para ser um consultor Amazolé?</h2>
     <ul class="pontos">
       <li>Sem precisar de estoque ou loja</li>
       <li>Funil de vendas já validado</li>
       <li>Resultado personalizado no final</li>
     </ul>
-    <button class="btn" type="button" id="btn-comecar">Começar o quiz</button>
-    <span class="mini">Não pedimos seus dados para fazer o quiz.</span>
+    <button class="btn" type="button" data-comecar>Quero fazer o quiz</button>
+    <span class="mini">Resultado na hora, no final do quiz.</span>
   </section>
 
   <!-- PERGUNTAS (montadas pelo script) -->
@@ -465,7 +530,7 @@ document.addEventListener('click',function(e){
     document.querySelectorAll("[data-checkout]").forEach(function (a) { a.href = CHECKOUT_URL; a.rel = "noopener"; });
   }
 
-  $("btn-comecar").addEventListener("click", function () { atual = 0; px("QuizInicio"); montarPergunta(); });
+  document.querySelectorAll("[data-comecar]").forEach(function (b) { b.addEventListener("click", function () { atual = 0; px("QuizInicio"); montarPergunta(); }); });
   $("btn-proximo").addEventListener("click", proximo);
   $("btn-voltar").addEventListener("click", voltar);
   $("btn-refazer").addEventListener("click", function () { resp = new Array(PERGUNTAS.length); atual = 0; progresso(0, "Quiz de 7 passos"); mostrar("t-inicio"); });
