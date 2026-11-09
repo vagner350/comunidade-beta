@@ -259,10 +259,9 @@
 </style>
 <!-- Meta Pixel -->
 <script>
-// PREÇO PELO LINK: quiz.html mostra R$ 27; quiz.html?preco=57 mostra R$ 57 (sem sorteio)
-window.QUIZ_PRECO=(function(){try{return new URLSearchParams(location.search).get('preco')==='57'?57:27;}catch(e){return 27;}})();
-// PIXEL DE CADA PREÇO: cole o ID do Pixel novo no 57. Vazio = usa o Pixel atual.
-window.QUIZ_PIXEL=({27:'1002875375909644',57:''})[window.QUIZ_PRECO]||'1002875375909644';
+// PREÇO MOSTRADO NO QUIZ (o mesmo do checkout do botão final)
+window.QUIZ_PRECO=27;
+window.QUIZ_PIXEL='1002875375909644';
 
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init',window.QUIZ_PIXEL);
@@ -463,8 +462,8 @@ document.addEventListener('click',function(e){
     comissaoPorVenda: 0,
     // Dias de garantia (o mesmo do checkout). 0 esconde o selo.
     garantiaDias: 7,
-    // Checkout de cada preço do teste. O de R$ 57 é o checkout novo: cole o link aqui.
-    checkoutPorPreco: { 27: "", 57: "" }
+    // LINK DO BOTÃO FINAL DO QUIZ. Preenchido, ele é usado sempre (o link do painel admin é ignorado no quiz).
+    checkoutQuiz: ""
   };
 
   // ===== AS 7 PERGUNTAS =====
@@ -522,7 +521,7 @@ document.addEventListener('click',function(e){
 
   var resp = new Array(PERGUNTAS.length), atual = 0, avancoTimer = null;
   var LEAD_ID = "", PERFIL = "", NOME = "";
-  var PRECO = window.QUIZ_PRECO === 57 ? 57 : 27;
+  var PRECO = window.QUIZ_PRECO;
   document.querySelectorAll("[data-preco]").forEach(function (e) { e.textContent = "R$ " + PRECO; });
   var $ = function (id) { return document.getElementById(id); };
   var ls = {
@@ -535,12 +534,12 @@ document.addEventListener('click',function(e){
   // ===== LINKS DO CHECKOUT (UTMs + origem + contato) =====
   function linkCheckout() {
     try {
-      var u = new URL(CONFIG.checkoutPorPreco[PRECO] || CONFIG.checkout), q = new URLSearchParams(location.search);
+      var u = new URL(CONFIG.checkoutQuiz || CONFIG.checkout), q = new URLSearchParams(location.search);
       ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid"].forEach(function (k) {
         var v = q.get(k); if (v && !u.searchParams.has(k)) u.searchParams.set(k, v);
       });
       u.searchParams.set("src", "quiz");
-      u.searchParams.set("sck", "p" + PRECO + (PERFIL ? "_" + PERFIL : ""));
+      if (PERFIL) u.searchParams.set("sck", PERFIL);
       if (LEAD_ID) u.searchParams.set("lead", LEAD_ID); // abre o checkout já com nome e WhatsApp
       return u.toString();
     } catch (e) { return CONFIG.checkout; }
@@ -553,7 +552,7 @@ document.addEventListener('click',function(e){
   function utmObj() {
     var o = {}, q = new URLSearchParams(location.search);
     ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid"].forEach(function (k) { var v = q.get(k); if (v) o[k] = v.slice(0, 200); });
-    o.src = "quiz"; o.sck = "p" + PRECO + (PERFIL ? "_" + PERFIL : "");
+    o.src = "quiz"; if (PERFIL) o.sck = PERFIL;
     return o;
   }
 
@@ -847,7 +846,7 @@ document.addEventListener('click',function(e){
     .then(function (j) {
       var d = j && (j.data || j);
       if (!d) return;
-      if (/^https:\/\//i.test(d.checkout_url || "")) { CONFIG.checkout = d.checkout_url; aplicarCheckout(); }
+      if (!CONFIG.checkoutQuiz && /^https:\/\//i.test(d.checkout_url || "")) { CONFIG.checkout = d.checkout_url; aplicarCheckout(); }
       montarProva(d);
     })
     .catch(function () {});
