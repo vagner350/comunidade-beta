@@ -142,6 +142,34 @@
   .linkbtn{border:0;background:transparent;color:var(--accent2);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline}
   /* ===== CARROSSEL DE PRODUTOS ===== */
   .produtos{padding-bottom:24px}
+  /* ---------- Premiação para afiliados ---------- */
+  .premios{background:#120a1c;color:#f4eefe;position:relative;overflow:hidden}
+  .premios::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 0,rgba(147,51,234,.28),transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(34,197,94,.18),transparent 50%);pointer-events:none}
+  .premios .wrap{position:relative}
+  .premios h2{color:#fff}
+  .premios .sub{color:#cbbfe0}
+  .marcos{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:36px 0 0;padding:0;counter-reset:m}
+  .marco{counter-increment:m;display:flex;flex-direction:column;border-radius:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);overflow:hidden}
+  .marco figure{margin:0;height:360px;display:flex;align-items:flex-end;justify-content:center;padding:26px 18px 0;background:radial-gradient(circle at 50% 60%,var(--brilho),transparent 65%)}
+  .marco img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:6px;filter:drop-shadow(0 18px 30px rgba(0,0,0,.6))}
+  .marco .info{padding:18px 20px 22px}
+  .marco .passo{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:#cbbfe0;margin-bottom:8px}
+  .marco .passo::before{content:counter(m);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--cor);color:#fff;font-weight:800;font-size:.8rem}
+  .marco h3{font-size:1.6rem;line-height:1.1;color:#fff;margin:0 0 4px}
+  .marco h3 small{display:block;font-size:.95rem;font-weight:600;color:var(--cor-txt);margin-top:4px}
+  .marco p{color:#cbbfe0;font-size:.95rem;margin:10px 0 0}
+  .marco.m1{--cor:#9333ea;--cor-txt:#d8b4fe;--brilho:rgba(147,51,234,.35)}
+  .marco.m2{--cor:#7c3aed;--cor-txt:#c4b5fd;--brilho:rgba(124,58,237,.35)}
+  .marco.m3{--cor:#16a34a;--cor-txt:#86efac;--brilho:rgba(34,197,94,.32)}
+  .premios .mid-cta{margin-top:34px}
+  .premios .nota-premio{text-align:center;color:#9d8fb8;font-size:.85rem;margin-top:14px}
+  @media (max-width:820px){
+    .marcos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:28px -16px 0;padding:0 16px 8px;scrollbar-width:none}
+    .marcos::-webkit-scrollbar{display:none}
+    .marco{flex:0 0 78%;scroll-snap-align:center}
+    .marco h3{font-size:1.4rem}
+    .marco figure{height:300px;padding-top:22px}
+  }
   .marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
   .track{display:flex;width:max-content;animation:rolar 45s linear infinite}
   .marquee:hover .track,.marquee:focus-within .track{animation-play-state:paused}
@@ -520,6 +548,40 @@ document.addEventListener('click',function(e){
         <div class="card"><h3>Venda e 50% para você</h3><p>A venda acontece e metade vira comissão sua.</p></div>
       </div>
       <p class="mid-cta"><a class="btn" href="#" data-checkout>Quero usar o funil · R$ 27,00</a></p>
+    </div>
+  </section>
+
+  <section class="premios" id="premiacao">
+    <div class="wrap">
+      <h2>Premiação para afiliados</h2>
+      <p class="sub">Cada marco de comissões sacadas é comemorado. Você vende, saca as suas comissões e ganha a sua placa da Amazolé.</p>
+      <ol class="marcos">
+        <li class="marco m1">
+          <figure><img src="img/premios/placa-10k.webp" alt="Placa roxa da Amazolé: Parabéns, 10K em comissões" width="404" height="600" loading="lazy" decoding="async"></figure>
+          <div class="info">
+            <span class="passo">Primeiro marco</span>
+            <h3>Placa 10K<small>R$ 10 mil em comissões sacadas</small></h3>
+            <p>A primeira grande conquista. Só o começo da sua história.</p>
+          </div>
+        </li>
+        <li class="marco m2">
+          <figure><img src="img/premios/quadro-50k.webp" alt="Quadro roxo da Amazolé: 50.000 em comissões sacadas" width="444" height="600" loading="lazy" decoding="async"></figure>
+          <div class="info">
+            <span class="passo">Segundo marco</span>
+            <h3>Quadro 50K<small>R$ 50 mil em comissões sacadas</small></h3>
+            <p>Para quem já transformou a divulgação em um negócio de verdade.</p>
+          </div>
+        </li>
+        <li class="marco m3">
+          <figure><img src="img/premios/quadro-100k.webp" alt="Quadro verde da Amazolé: 100K em comissões sacadas" width="454" height="600" loading="lazy" decoding="async"></figure>
+          <div class="info">
+            <span class="passo">Terceiro marco</span>
+            <h3>Quadro 100K<small>R$ 100 mil em comissões sacadas</small></h3>
+            <p>O topo da jornada de um consultor Amazolé.</p>
+          </div>
+        </li>
+      </ol>
+      <p class="mid-cta"><a class="btn" href="#" data-checkout>Quero começar · R$ 27,00</a></p>
     </div>
   </section>
 
