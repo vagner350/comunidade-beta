@@ -468,8 +468,8 @@ document.addEventListener('click',function(e){
     comissaoPorVenda: 0,
     // Dias de garantia (o mesmo do checkout). 0 esconde o selo.
     garantiaDias: 7,
-    // Produto do checkout para cada preço (?p=). Vazio = produto padrão do checkout.
-    produtoPorPreco: { 27: "", 57: "comunidade-57" }
+    // Checkout de cada preço do teste. O de R$ 57 é o checkout novo: cole o link aqui.
+    checkoutPorPreco: { 27: "", 57: "" }
   };
 
   // ===== AS 7 PERGUNTAS =====
@@ -540,13 +540,11 @@ document.addEventListener('click',function(e){
   // ===== LINKS DO CHECKOUT (UTMs + origem + contato) =====
   function linkCheckout() {
     try {
-      var u = new URL(CONFIG.checkout), q = new URLSearchParams(location.search);
+      var u = new URL(CONFIG.checkoutPorPreco[PRECO] || CONFIG.checkout), q = new URLSearchParams(location.search);
       ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid"].forEach(function (k) {
         var v = q.get(k); if (v && !u.searchParams.has(k)) u.searchParams.set(k, v);
       });
       u.searchParams.set("src", "quiz");
-      var prod = CONFIG.produtoPorPreco[PRECO];
-      if (prod) u.searchParams.set("p", prod);
       u.searchParams.set("sck", "p" + PRECO + (PERFIL ? "_" + PERFIL : ""));
       if (LEAD_ID) u.searchParams.set("lead", LEAD_ID); // abre o checkout já com nome e WhatsApp
       return u.toString();
