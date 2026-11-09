@@ -259,26 +259,21 @@
 </style>
 <!-- Meta Pixel -->
 <script>
-// TESTE DE PREÇO R$ 27 x R$ 57: mude para true quando o produto de R$ 57 existir no checkout
-window.QUIZ_TESTE_PRECO = false;
+// PREÇO PELO LINK: quiz.html mostra R$ 27; quiz.html?preco=57 mostra R$ 57 (sem sorteio)
+window.QUIZ_PRECO=(function(){try{return new URLSearchParams(location.search).get('preco')==='57'?57:27;}catch(e){return 27;}})();
+// PIXEL DE CADA PREÇO: cole o ID do Pixel novo no 57. Vazio = usa o Pixel atual.
+window.QUIZ_PIXEL=({27:'1002875375909644',57:''})[window.QUIZ_PRECO]||'1002875375909644';
 
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1002875375909644');
+fbq('init',window.QUIZ_PIXEL);
 fbq('track','PageView');
-// Teste de preço: o sorteio fica no navegador e é lido também pelo script do quiz
-window.QUIZ_PRECO=(function(){var q=null,s=null;try{q=new URLSearchParams(location.search).get('preco');}catch(e){}
-  if(q==='27'||q==='57'){try{localStorage.setItem('quiz_preco',q);}catch(e){}return +q;}
-  try{s=localStorage.getItem('quiz_preco');}catch(e){}
-  if(window.QUIZ_TESTE_PRECO&&(s==='27'||s==='57'))return +s;
-  if(window.QUIZ_TESTE_PRECO){s=Math.random()<.5?'27':'57';try{localStorage.setItem('quiz_preco',s);}catch(e){}return +s;}
-  return 27;})();
 fbq('track','ViewContent',{content_name:'Quiz Comunidade Amazolé',content_category:'Quiz',currency:'BRL',value:window.QUIZ_PRECO});
 document.addEventListener('click',function(e){
   var a=e.target.closest&&e.target.closest('[data-checkout]');
   if(a)fbq('track','InitiateCheckout',{content_name:'Comunidade Amazolé',currency:'BRL',value:window.QUIZ_PRECO,num_items:1});
 },true);
 </script>
-<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1002875375909644&ev=PageView&noscript=1"></noscript>
+
 </head>
 <body>
 <header>
@@ -461,7 +456,7 @@ document.addEventListener('click',function(e){
   var CONFIG = {
     checkout: "https://pagamentos.amazoleafiliados.com.br/",
     leadApi: "https://pagamentos.amazoleafiliados.com.br/api/lead.php",
-    pixel: "1002875375909644",
+    pixel: window.QUIZ_PIXEL,
     whatsapp: "5592985647581",
     // Simulador de ganhos: coloque o valor médio de comissão por venda em reais (ex.: 48.5).
     // Enquanto for 0, o simulador fica escondido.
