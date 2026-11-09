@@ -259,13 +259,23 @@
 </style>
 <!-- Meta Pixel -->
 <script>
+// TESTE DE PREÇO R$ 27 x R$ 57: mude para true quando o produto de R$ 57 existir no checkout
+window.QUIZ_TESTE_PRECO = false;
+
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','1002875375909644');
 fbq('track','PageView');
-fbq('track','ViewContent',{content_name:'Quiz Comunidade Amazolé',content_category:'Quiz',currency:'BRL',value:27.00});
+// Teste de preço: o sorteio fica no navegador e é lido também pelo script do quiz
+window.QUIZ_PRECO=(function(){var q=null,s=null;try{q=new URLSearchParams(location.search).get('preco');}catch(e){}
+  if(q==='27'||q==='57'){try{localStorage.setItem('quiz_preco',q);}catch(e){}return +q;}
+  try{s=localStorage.getItem('quiz_preco');}catch(e){}
+  if(window.QUIZ_TESTE_PRECO&&(s==='27'||s==='57'))return +s;
+  if(window.QUIZ_TESTE_PRECO){s=Math.random()<.5?'27':'57';try{localStorage.setItem('quiz_preco',s);}catch(e){}return +s;}
+  return 27;})();
+fbq('track','ViewContent',{content_name:'Quiz Comunidade Amazolé',content_category:'Quiz',currency:'BRL',value:window.QUIZ_PRECO});
 document.addEventListener('click',function(e){
   var a=e.target.closest&&e.target.closest('[data-checkout]');
-  if(a)fbq('track','InitiateCheckout',{content_name:'Comunidade Amazolé',currency:'BRL',value:27.00,num_items:1});
+  if(a)fbq('track','InitiateCheckout',{content_name:'Comunidade Amazolé',currency:'BRL',value:window.QUIZ_PRECO,num_items:1});
 },true);
 </script>
 <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1002875375909644&ev=PageView&noscript=1"></noscript>
@@ -408,7 +418,7 @@ document.addEventListener('click',function(e){
     <section class="bloco" aria-labelledby="h-oferta">
       <div class="oferta" id="oferta">
         <h2 id="h-oferta">Entre para a Comunidade Amazolé</h2>
-        <div class="preco"><b>R$ 27</b><span>pagamento único,<br>sem mensalidade</span></div>
+        <div class="preco"><b data-preco>R$ 27</b><span>pagamento único,<br>sem mensalidade</span></div>
         <ul class="checks">
           <li>50% de comissão em cada venda</li>
           <li>Funil de vendas validado, pronto para usar</li>
@@ -436,7 +446,7 @@ document.addEventListener('click',function(e){
 
 <div class="barra-compra" id="barra-compra" aria-hidden="true">
   <div class="wrap">
-    <div class="v"><b>R$ 27</b><span>pagamento único</span></div>
+    <div class="v"><b data-preco>R$ 27</b><span>pagamento único</span></div>
     <a class="comprar" href="#" data-checkout tabindex="-1">Quero entrar</a>
   </div>
 </div>
@@ -457,7 +467,9 @@ document.addEventListener('click',function(e){
     // Enquanto for 0, o simulador fica escondido.
     comissaoPorVenda: 0,
     // Dias de garantia (o mesmo do checkout). 0 esconde o selo.
-    garantiaDias: 0
+    garantiaDias: 7,
+    // Produto do checkout para cada preço (?p=). Vazio = produto padrão do checkout.
+    produtoPorPreco: { 27: "", 57: "comunidade-57" }
   };
 
   // ===== AS 7 PERGUNTAS =====
@@ -515,6 +527,8 @@ document.addEventListener('click',function(e){
 
   var resp = new Array(PERGUNTAS.length), atual = 0, avancoTimer = null;
   var LEAD_ID = "", PERFIL = "", NOME = "";
+  var PRECO = window.QUIZ_PRECO === 57 ? 57 : 27;
+  document.querySelectorAll("[data-preco]").forEach(function (e) { e.textContent = "R$ " + PRECO; });
   var $ = function (id) { return document.getElementById(id); };
   var ls = {
     get: function (k) { try { return localStorage.getItem("quiz_" + k); } catch (e) { return null; } },
@@ -531,7 +545,9 @@ document.addEventListener('click',function(e){
         var v = q.get(k); if (v && !u.searchParams.has(k)) u.searchParams.set(k, v);
       });
       u.searchParams.set("src", "quiz");
-      if (PERFIL) u.searchParams.set("sck", PERFIL);
+      var prod = CONFIG.produtoPorPreco[PRECO];
+      if (prod) u.searchParams.set("p", prod);
+      u.searchParams.set("sck", "p" + PRECO + (PERFIL ? "_" + PERFIL : ""));
       if (LEAD_ID) u.searchParams.set("lead", LEAD_ID); // abre o checkout já com nome e WhatsApp
       return u.toString();
     } catch (e) { return CONFIG.checkout; }
@@ -544,7 +560,7 @@ document.addEventListener('click',function(e){
   function utmObj() {
     var o = {}, q = new URLSearchParams(location.search);
     ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid"].forEach(function (k) { var v = q.get(k); if (v) o[k] = v.slice(0, 200); });
-    o.src = "quiz"; if (PERFIL) o.sck = PERFIL;
+    o.src = "quiz"; o.sck = "p" + PRECO + (PERFIL ? "_" + PERFIL : "");
     return o;
   }
 
@@ -671,7 +687,7 @@ document.addEventListener('click',function(e){
     try {
       if (window.fbq) {
         fbq("init", CONFIG.pixel, { ph: "55" + fone, fn: nome.split(/\s+/)[0].toLowerCase(), country: "br" });
-        fbq("track", "Lead", { content_name: "Quiz Comunidade Amazolé", currency: "BRL", value: 27.00 });
+        fbq("track", "Lead", { content_name: "Quiz Comunidade Amazolé", currency: "BRL", value: window.QUIZ_PRECO });
       }
     } catch (e) {}
   }
@@ -739,7 +755,7 @@ document.addEventListener('click',function(e){
     var canal = txt("canal");
     var prod = idx("produto") === 3 ? "o produto que mais combina com o seu público" : txt("produto").toLowerCase();
     var plano = [
-      ["Entre na comunidade", "Pagamento único de R$ 27 e acesso liberado no seu e-mail."],
+      ["Entre na comunidade", "Pagamento único de R$ " + PRECO + " e acesso liberado no seu e-mail."],
       ["Comece por " + prod, "Afilie-se e pegue o seu link de venda, com estoque nacional."],
       ["Divulgue no " + canal, "Use os criativos, vídeos e páginas prontas" + (tempo === 0 ? ", mesmo com menos de 1 hora por dia." : " no tempo que você separou.")],
       ["Receba 50% de comissão", "A automação de WhatsApp atende, a venda acontece e metade é sua."]
@@ -756,7 +772,7 @@ document.addEventListener('click',function(e){
     mostrar("t-resultado", "r-nome");
     iniciarClips();
 
-    var dados = { perfil: PERFIL, capturou: LEAD_ID ? "sim" : "nao" };
+    var dados = { preco: PRECO, perfil: PERFIL, capturou: LEAD_ID ? "sim" : "nao" };
     PERGUNTAS.forEach(function (q, i) { dados[q.id] = q.ops[resp[i]].t; });
     px("QuizConcluido", dados);
   }
@@ -823,7 +839,7 @@ document.addEventListener('click',function(e){
 
   // ===== EVENTOS =====
   document.querySelectorAll("[data-comecar]").forEach(function (b) {
-    b.addEventListener("click", function () { atual = 0; px("QuizInicio", {}); montarPergunta(); });
+    b.addEventListener("click", function () { atual = 0; px("QuizInicio", { preco: PRECO }); montarPergunta(); });
   });
   $("btn-voltar").addEventListener("click", voltar);
   $("btn-refazer").addEventListener("click", function () { resp = new Array(PERGUNTAS.length); atual = 0; PERFIL = ""; inicio(); });
