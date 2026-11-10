@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Quiz Amazolé — Descubra seu perfil de consultor</title>
-<meta name="description" content="Responda 7 perguntas rápidas e receba seu plano para começar a vender como afiliado Amazolé com 50% de comissão.">
+<meta name="description" content="Responda 6 perguntas rápidas e receba seu plano para começar a vender como afiliado Amazolé com 50% de comissão.">
 <meta name="theme-color" content="#0f3d2e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +43,7 @@
   .marca{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.02em;text-decoration:none;color:var(--floresta)}
   .marca i{font-style:normal;color:var(--pink)}
   .contador{font-size:.88rem;font-weight:600;color:var(--suave)}
-  .segs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 0 10px}
+  .segs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:0 0 10px}
   .segs i{height:5px;border-radius:5px;background:var(--linha);transition:background .3s}
   .segs i.ok{background:var(--folha)}
   .segs i.agora{background:var(--floresta)}
@@ -54,7 +54,7 @@
   .tela.on.anima{animation:entra .4s cubic-bezier(.2,.7,.2,1)}
   @keyframes entra{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-  h1,h2,h3{font-family:var(--display);letter-spacing:-.025em;line-height:1.08;color:var(--floresta)}
+  h1,h2,h3{text-wrap:balance;font-family:var(--display);letter-spacing:-.025em;line-height:1.08;color:var(--floresta)}
   h1{font-size:clamp(1.85rem,7.8vw,2.6rem);font-weight:800}
   .capa h1{font-size:clamp(1.8rem,min(7.6vw,4.6svh),2.6rem)}
   h2{font-size:clamp(1.5rem,6.2vw,1.95rem);font-weight:700}
@@ -84,12 +84,13 @@
   .capa .seguir:hover{background:var(--broto)}
   .capa .nota{color:#a9cdb9}
 
-  .fatos{display:grid;grid-template-columns:repeat(3,1fr);margin:12px 0 0;border-radius:var(--r-medio);background:var(--papel);border:1px solid var(--linha);overflow:hidden}
-  .fatos div{padding:12px 8px;text-align:center}
-  .fatos div+div{border-left:1px solid var(--linha)}
-  .fatos b{display:block;font-family:var(--display);font-size:1.35rem;font-weight:800;color:var(--floresta);letter-spacing:-.02em;line-height:1.1}
-  .fatos span{font-size:.78rem;color:var(--suave);line-height:1.3;display:block;margin-top:3px}
-
+  .placas{margin:12px 0 0;padding:14px 14px 12px;border-radius:var(--r-medio);background:#160d22;color:#f2eafe;position:relative;overflow:hidden}
+  .placas::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 120%,rgba(147,51,234,.45),transparent 60%),radial-gradient(ellipse at 90% 120%,rgba(34,197,94,.35),transparent 55%);pointer-events:none}
+  .placas-tit{position:relative;font-family:var(--display);font-weight:700;font-size:1rem;margin-bottom:10px;color:#fff}
+  .placas ul{position:relative;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+  .placas img{height:80px;width:auto;margin:0 auto 6px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
+  .placas b{display:block;font-family:var(--display);font-size:1.15rem;line-height:1}
+  .placas span{display:block;font-size:.75rem;color:#c9bbe0;margin-top:2px}
   .bloco{margin-top:40px}
   .bloco>h2{margin-bottom:16px}
   .foto-historia{border-radius:var(--r-grande);overflow:hidden;margin-bottom:20px;background:var(--broto)}
@@ -237,14 +238,25 @@
     .capa{padding:30px 30px 28px}
     .op{min-height:72px}
   }
-  @media (max-height:640px){
+  @media (max-height:680px){
     .capa{padding:16px 18px 16px}
     .capa-topo{margin-bottom:12px}
     .capa-topo img{width:44px;height:44px}
     .capa .sub{margin:10px 0 16px;font-size:.98rem}
     .capa .seguir{min-height:52px}
     .capa .nota{margin-top:8px}
-    .fatos div{padding:10px 6px}
+    .placas{padding:12px 12px 10px}
+    .placas img{height:56px}
+    .placas-tit{margin-bottom:8px}
+    .capa h1{font-size:1.75rem}
+  }
+  @media (max-height:600px){
+    .capa-topo{margin-bottom:10px}
+    .capa-topo img{width:38px;height:38px}
+    .capa h1{font-size:1.6rem}
+    .capa .sub{font-size:.93rem;margin:8px 0 14px}
+    .placas img{height:46px}
+    .placas span{display:none}
   }
   @media (max-width:360px){
     .ops.duas{grid-template-columns:1fr}
@@ -281,7 +293,7 @@ document.addEventListener('click',function(e){
       <a class="marca" href="./">Amazol<i>é</i></a>
       <span class="contador" id="contador" aria-live="polite"></span>
     </div>
-    <div class="segs" id="segs" aria-hidden="true" hidden><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="segs" id="segs" aria-hidden="true" hidden><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 </header>
 
@@ -293,16 +305,18 @@ document.addEventListener('click',function(e){
         <img src="img/vagner-480.webp" alt="" width="52" height="52">
         <p><b>Vagner, fundador da Amazolé</b><br>Saí do CLT há 4 anos com a marca</p>
       </div>
-      <h1>Descubra se você tem perfil para vender com 50% de comissão</h1>
-      <p class="sub">7 perguntas rápidas e você recebe um plano para a sua primeira venda como afiliado.</p>
-      <button class="seguir" type="button" data-comecar>Começar o quiz</button>
-      <span class="nota">Leva 1 minuto e o resultado sai na hora</span>
+      <h1>+12 milhões em vendas. Agora é a sua vez.</h1>
+      <p class="sub">É o resultado da Amazolé pelo WhatsApp. Venda como afiliado, ganhe 50% de comissão e conquiste as suas placas.</p>
+      <button class="seguir" type="button" data-comecar>Fazer o quiz de 6 perguntas</button>
     </div>
 
-    <div class="fatos" aria-label="Números da Amazolé">
-      <div><b>+12 mi</b><span>em vendas pelo WhatsApp</span></div>
-      <div><b>4 anos</b><span>de marca validada</span></div>
-      <div><b>50%</b><span>de comissão por venda</span></div>
+    <div class="placas" aria-labelledby="h-placas">
+      <p class="placas-tit" id="h-placas">Premiação para afiliados</p>
+      <ul>
+        <li><img src="img/premios/placa-10k.webp" alt="Placa 10K em comissões" width="54" height="80"><b>10K</b><span>em comissões</span></li>
+        <li><img src="img/premios/quadro-50k.webp" alt="Quadro 50K em comissões sacadas" width="59" height="80"><b>50K</b><span>sacados</span></li>
+        <li><img src="img/premios/quadro-100k.webp" alt="Quadro 100K em comissões sacadas" width="61" height="80"><b>100K</b><span>sacados</span></li>
+      </ul>
     </div>
 
   </section>
@@ -502,13 +516,6 @@ document.addEventListener('click',function(e){
         { em: "🎨", t: "Não saber criar conteúdo", fb: "Resolvido: você recebe imagens, vídeos e páginas de venda prontos." },
         { em: "📣", t: "Não saber anunciar", fb: "Resolvido: tem treinamento de anúncios passo a passo." },
         { em: "🤖", t: "Não dar conta de atender", fb: "Resolvido: a automação de WhatsApp atende os clientes para você." }
-      ] },
-    { id: "produto", titulo: "Qual produto combina mais com o seu público?", dica: "Toque no que você venderia primeiro.", duas: true, prod: true,
-      ops: [
-        { img: "img/produtos/esfoliante-clareador.webp", t: "Clareadores de manchas", fb: "É o carro-chefe da marca: um problema que muita gente quer resolver." },
-        { img: "img/produtos/serum-olhos.webp", t: "Cuidados com olhos e rosto", fb: "Sérum e Fórmula Avançada rendem ótimos conteúdos de antes e depois." },
-        { img: "img/produtos/mxd20.webp", t: "Linha masculina e barba", fb: "MXD20 e Barbudom atendem um público fiel e pouco explorado." },
-        { em: "✨", t: "Ainda não sei", fb: "Na comunidade você vê todos os produtos e escolhe com calma." }
       ] },
     { id: "quando", titulo: "Com um funil pronto e 50% de comissão, quando você começaria?", dica: "Responda com sinceridade.",
       ops: [
@@ -740,15 +747,14 @@ document.addEventListener('click',function(e){
     $("r-texto").innerHTML = texto;
 
     var ul = $("r-resumo"); ul.innerHTML = "";
-    [["Objetivo", txt("objetivo")], ["Canal", txt("canal")], ["Trava resolvida", txt("trava")], ["Primeiro produto", txt("produto")]].forEach(function (r) {
+    [["Objetivo", txt("objetivo")], ["Canal", txt("canal")], ["Tempo por dia", txt("tempo")], ["Trava resolvida", txt("trava")]].forEach(function (r) {
       var li = el("li"); li.appendChild(el("span", "", r[0])); li.appendChild(document.createTextNode(r[1])); ul.appendChild(li);
     });
 
     var canal = txt("canal");
-    var prod = idx("produto") === 3 ? "o produto que mais combina com o seu público" : txt("produto").toLowerCase();
     var plano = [
       ["Entre na comunidade", "Pagamento único de R$ " + PRECO + " e acesso liberado no seu e-mail."],
-      ["Comece por " + prod, "Afilie-se e pegue o seu link de venda, com estoque nacional."],
+      ["Escolha o seu primeiro produto", "Veja todos os produtos na comunidade, afilie-se e pegue o seu link de venda, com estoque nacional."],
       ["Divulgue no " + canal, "Use os criativos, vídeos e páginas prontas" + (tempo === 0 ? ", mesmo com menos de 1 hora por dia." : " no tempo que você separou.")],
       ["Receba 50% de comissão", "A automação de WhatsApp atende, a venda acontece e metade é sua."]
     ];
