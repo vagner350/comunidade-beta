@@ -113,7 +113,6 @@
   .checks li{display:flex;gap:10px;align-items:flex-start}
   .checks li::before{content:"";flex:none;width:20px;height:20px;margin-top:2px;border-radius:50%;background:var(--folha) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='m9.5 16.2-4-4 1.4-1.4 2.6 2.6 7-7 1.4 1.4z'/%3E%3C/svg%3E") center/16px no-repeat}
 
-
   /* ---------- Perguntas ---------- */
   .pergunta{padding-top:18px}
   .pergunta h2{margin-bottom:8px}
@@ -349,6 +348,18 @@ document.addEventListener('click',function(e){
       </div>
     </div>
 
+    <section class="bloco" aria-labelledby="h-clips">
+      <h2 id="h-clips">Criativos prontos para os seus anúncios</h2>
+      <p class="sub-bloco">Vídeos reais da marca para atrair clientes até o seu WhatsApp.</p>
+      <div class="clips" id="clips">
+        <video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="150" height="267"></video>
+        <video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="150" height="267"></video>
+        <video data-src="media/conteudo/v4.mp4" poster="media/conteudo/v4.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 3" width="150" height="267"></video>
+        <video data-src="media/conteudo/v5.mp4" poster="media/conteudo/v5.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 4" width="150" height="267"></video>
+        <video data-src="media/conteudo/v6.mp4" poster="media/conteudo/v6.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 5" width="150" height="267"></video>
+      </div>
+    </section>
+
     <section class="bloco" aria-labelledby="h-plano">
       <h2 id="h-plano">Seu plano para a primeira venda</h2>
       <ol class="plano" id="r-plano"></ol>
@@ -387,18 +398,6 @@ document.addEventListener('click',function(e){
     <section class="bloco" id="b-depos" aria-labelledby="h-depos" hidden>
       <h2 id="h-depos">Quem já está vendendo</h2>
       <div class="depos" id="r-depos"></div>
-    </section>
-
-    <section class="bloco" aria-labelledby="h-clips">
-      <h2 id="h-clips">Criativos prontos para os seus anúncios</h2>
-      <p class="sub-bloco">Vídeos reais da marca para atrair clientes até o seu WhatsApp.</p>
-      <div class="clips" id="clips">
-        <video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="150" height="267"></video>
-        <video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="150" height="267"></video>
-        <video data-src="media/conteudo/v4.mp4" poster="media/conteudo/v4.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 3" width="150" height="267"></video>
-        <video data-src="media/conteudo/v5.mp4" poster="media/conteudo/v5.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 4" width="150" height="267"></video>
-        <video data-src="media/conteudo/v6.mp4" poster="media/conteudo/v6.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 5" width="150" height="267"></video>
-      </div>
     </section>
 
     <section class="bloco" id="b-historia" aria-labelledby="h-hist2">
