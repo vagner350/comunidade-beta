@@ -166,6 +166,16 @@
   .bonus-box{margin:-4px 0 18px;padding:14px 16px;border-radius:var(--r-medio);background:#fff8e1;border:1px dashed #e8c45a}
   .bonus-box b{display:block;color:#7a4f00;margin-bottom:2px}
   .bonus-box span{font-size:.93rem;color:#5c4a1c}
+  .chat{border-radius:var(--r-grande);overflow:hidden;border:1px solid var(--linha);background:#efeae2}
+  .chat-topo{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#075e54;color:#fff}
+  .chat-av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#25d366;color:#053d36;font-weight:700}
+  .chat-topo b{display:block;line-height:1.2}
+  .chat-topo small{font-size:.78rem;color:#cfe9e4}
+  .chat-corpo{display:flex;flex-direction:column;gap:8px;padding:14px 12px 16px}
+  .msg{max-width:82%;padding:8px 12px;border-radius:12px;font-size:.95rem;line-height:1.4;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+  .msg.ela{align-self:flex-start;background:#fff;border-top-left-radius:4px}
+  .msg.voce{align-self:flex-end;background:#d9fdd3;border-top-right-radius:4px}
+  .chat-fim{align-self:center;margin-top:4px;padding:6px 12px;border-radius:999px;background:var(--floresta);color:#fff;font-size:.85rem;font-weight:600}
   .faq{margin-top:28px}
   .faq h2{margin-bottom:12px}
   .faq details{border-bottom:1px solid var(--linha)}
@@ -296,7 +306,7 @@ document.addEventListener('click',function(e){
       <div class="capa-txt">
         <p class="quem"><b>Vagner</b>, fundador da Amazolé</p>
         <h1>+12 milhões em vendas. Agora é a sua vez.</h1>
-        <p class="sub">É o resultado da Amazolé pelo WhatsApp. Venda como afiliado, ganhe 50% de comissão e conquiste as suas placas de premiação.</p>
+        <p class="sub">É o que a Amazolé já vendeu atendendo clientes pelo WhatsApp. Agora é você quem atende, vende e ganha 50% de cada venda.</p>
         <button class="seguir" type="button" data-comecar>Fazer o quiz</button>
         <span class="nota">7 perguntas rápidas e o resultado sai na hora</span>
       </div>
@@ -344,6 +354,21 @@ document.addEventListener('click',function(e){
       <ol class="plano" id="r-plano"></ol>
     </section>
 
+    <section class="bloco" aria-labelledby="h-chat">
+      <h2 id="h-chat">Como a venda acontece no WhatsApp</h2>
+      <p class="sub-bloco">O anúncio leva o cliente até você. Você atende, agenda o pedido e ganha a sua comissão.</p>
+      <div class="chat" role="img" aria-label="Exemplo de conversa de venda no WhatsApp">
+        <div class="chat-topo"><span class="chat-av" aria-hidden="true">A</span><div><b>Ana</b><small>Exemplo de atendimento</small></div></div>
+        <div class="chat-corpo">
+          <p class="msg ela">Oi! Vi o anúncio do Esfoliante Clareador. Ainda tem?</p>
+          <p class="msg voce">Oi, Ana! Tem sim, com estoque aqui no Brasil 😊 Quer que eu já agende o seu pedido?</p>
+          <p class="msg ela">Quero! O que você precisa?</p>
+          <p class="msg voce">Só o seu nome completo e o endereço com CEP. Já deixo tudo certinho por aqui.</p>
+          <p class="chat-fim">✅ Pedido agendado. 50% dessa venda é sua.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="bloco" id="b-simulador" aria-labelledby="h-sim" hidden>
       <h2 id="h-sim">Quanto você pode ganhar</h2>
       <div class="simulador">
@@ -365,8 +390,8 @@ document.addEventListener('click',function(e){
     </section>
 
     <section class="bloco" aria-labelledby="h-clips">
-      <h2 id="h-clips">Conteúdo pronto para você postar</h2>
-      <p class="sub-bloco">Vídeos reais da marca que você recebe para divulgar.</p>
+      <h2 id="h-clips">Criativos prontos para os seus anúncios</h2>
+      <p class="sub-bloco">Vídeos reais da marca para atrair clientes até o seu WhatsApp.</p>
       <div class="clips" id="clips">
         <video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="150" height="267"></video>
         <video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="150" height="267"></video>
@@ -397,6 +422,7 @@ document.addEventListener('click',function(e){
           <li>Cursos e treinamentos em vídeo</li>
           <li>Criativos, vídeos e páginas de venda prontos</li>
           <li>Produtos com estoque nacional para se afiliar</li>
+          <li>Passo a passo para configurar o seu WhatsApp com IA</li>
           <li>Automação de WhatsApp e grupo da comunidade</li>
         </ul>
         <div class="bonus-box"><b>Bônus por tempo limitado</b><span>Finalizando o pagamento em até 16 minutos, você leva o Grupo de Criativos Novos no WhatsApp de graça.</span></div>
@@ -410,6 +436,7 @@ document.addEventListener('click',function(e){
       </div>
       <div class="faq" aria-labelledby="h-faq">
         <h2 id="h-faq">Perguntas frequentes</h2>
+        <details><summary>Como eu vendo?</summary><p>Você anuncia com os criativos prontos, o cliente chama no seu WhatsApp e você atende e fecha a venda. Cada venda gera 50% de comissão para você.</p></details>
         <details><summary>Tem mensalidade?</summary><p>Não. Você paga <span data-preco-txt>R$ 27</span> uma vez só.</p></details>
         <details><summary>Como recebo o acesso?</summary><p>Logo após o pagamento, o acesso é liberado no seu e-mail. No Pix, a aprovação é na hora.</p></details>
         <details><summary>Preciso ter estoque ou loja?</summary><p>Não. Os produtos têm estoque nacional e são enviados do Brasil. Você só divulga com o seu link.</p></details>
@@ -463,33 +490,33 @@ document.addEventListener('click',function(e){
         { em: "📈", t: "Somar a um negócio que já tenho", fb: "Você soma os produtos Amazolé ao que já vende, sem precisar de estoque." },
         { em: "🌱", t: "Começar do zero na internet", fb: "A comunidade tem implementação guiada para quem está começando." }
       ] },
-    { id: "experiencia", titulo: "Você já vendeu alguma coisa pela internet?", dica: "Não existe resposta errada.",
+    { id: "experiencia", titulo: "Você já vendeu alguma coisa pelo WhatsApp?", dica: "Não existe resposta errada.",
       ops: [
         { em: "🙋", t: "Nunca vendi nada", fb: "Você não precisa de experiência: os cursos começam do primeiro passo." },
-        { em: "🤔", t: "Já tentei, mas não deu certo", fb: "Normalmente falta um funil testado. Na comunidade você usa o que já foi validado." },
+        { em: "🤔", t: "Já tentei, mas não deu certo", fb: "Normalmente falta um funil testado. Na comunidade você usa o que já vendeu +12 milhões pelo WhatsApp." },
         { em: "🙂", t: "Vendo de vez em quando", fb: "Com criativos prontos você ganha frequência e vende mais." },
         { em: "🚀", t: "Já vendo com frequência", fb: "Você escala mais rápido com produtos que já têm prova de venda." }
       ] },
-    { id: "canal", titulo: "Onde você tem mais facilidade para divulgar?", dica: "Depois você pode usar mais de um.", duas: true,
+    { id: "whats", titulo: "Como você usa o WhatsApp hoje?", dica: "É por ele que os seus clientes vão chegar e comprar.",
       ops: [
-        { em: "📸", t: "Instagram", fb: "Os vídeos e criativos prontos são perfeitos para Reels e Stories." },
-        { em: "💬", t: "WhatsApp", fb: "A marca já fez +12 milhões em vendas pelo WhatsApp. É o canal que mais converte." },
-        { em: "🎵", t: "TikTok", fb: "Os vídeos de conteúdo real funcionam muito bem no TikTok." },
-        { em: "🎯", t: "Anúncios pagos", fb: "Os treinamentos mostram como anunciar e melhorar seus resultados." }
+        { em: "💬", t: "Já vendo pelo WhatsApp", fb: "Ótimo. Com os anúncios levando clientes até você e produtos validados, é atender e fechar." },
+        { em: "💼", t: "Tenho WhatsApp Business", fb: "Perfeito: etiquetas e respostas rápidas ajudam a atender mais gente e vender mais." },
+        { em: "🙂", t: "Uso só para conversar", fb: "Dá para começar com o seu próprio número. Na comunidade você aprende a atender e vender." },
+        { em: "🤖", t: "Quero atender no automático", fb: "Você aprende a configurar o seu WhatsApp com IA para responder e conduzir o cliente até o pedido." }
       ] },
     { id: "tempo", titulo: "Quanto tempo por dia você pode dedicar?", dica: "Seja realista: isso entra no seu plano.",
       ops: [
-        { em: "⏱️", t: "Menos de 1 hora", fb: "Dá para começar. Com tudo pronto, você só copia, posta e atende." },
-        { em: "🕐", t: "De 1 a 2 horas", fb: "Tempo ótimo para postar todo dia e responder os clientes." },
+        { em: "⏱️", t: "Menos de 1 hora", fb: "Dá para começar. Com tudo pronto, você só anuncia e atende no WhatsApp." },
+        { em: "🕐", t: "De 1 a 2 horas", fb: "Tempo ótimo para atender os clientes no WhatsApp com calma e fechar vendas." },
         { em: "🕑", t: "De 2 a 4 horas", fb: "Com esse tempo você já consegue testar anúncios e escalar." },
         { em: "🔥", t: "Mais de 4 horas", fb: "Você tem tempo para tratar isso como um negócio de verdade." }
       ] },
     { id: "trava", titulo: "O que mais te impediu de vender até hoje?", dica: "Isso vai ser resolvido no seu plano.",
       ops: [
         { em: "📦", t: "Não ter produto ou estoque", fb: "Resolvido: os produtos têm estoque nacional e são enviados do Brasil." },
-        { em: "🎨", t: "Não saber criar conteúdo", fb: "Resolvido: você recebe imagens, vídeos e páginas de venda prontos." },
-        { em: "📣", t: "Não saber anunciar", fb: "Resolvido: tem treinamento de anúncios passo a passo." },
-        { em: "🤖", t: "Não dar conta de atender", fb: "Resolvido: a automação de WhatsApp atende os clientes para você." }
+        { em: "💬", t: "Não saber o que responder ao cliente", fb: "Resolvido: nos treinamentos você aprende a atender e conduzir o cliente até a compra no WhatsApp." },
+        { em: "🤝", t: "Não conseguir fechar a venda", fb: "Resolvido: o funil validado leva o cliente do anúncio até o pedido no seu WhatsApp." },
+        { em: "🤖", t: "Não dar conta de atender todo mundo", fb: "Resolvido: a automação de WhatsApp com IA atende os clientes para você." }
       ] },
     { id: "premio", titulo: "Você sonha em ganhar uma placa de premiação da Amazolé?", dica: "Cada marco de comissões sacadas vira uma placa. Qual você quer conquistar?", duas: true, prod: true, escuro: true,
       ops: [
@@ -670,16 +697,16 @@ document.addEventListener('click',function(e){
     var ip = idx("premio");
     var META = ["Placa 10K", "Quadro 50K", "Quadro 100K", "Primeira venda"][ip];
     var ul = $("r-resumo"); ul.innerHTML = "";
-    [["Objetivo", txt("objetivo")], ["Canal", txt("canal")], ["Trava resolvida", txt("trava")], ["Meta", META]].forEach(function (r) {
+    [["Objetivo", txt("objetivo")], ["Seu WhatsApp", txt("whats")], ["Trava resolvida", txt("trava")], ["Meta", META]].forEach(function (r) {
       var li = el("li"); li.appendChild(el("span", "", r[0])); li.appendChild(document.createTextNode(r[1])); ul.appendChild(li);
     });
 
-    var canal = txt("canal");
     var plano = [
       ["Entre na comunidade", "Pagamento único de R$ " + PRECO + " e acesso liberado no seu e-mail."],
       ["Escolha o seu primeiro produto", "Veja todos os produtos na comunidade, afilie-se e pegue o seu link de venda, com estoque nacional."],
-      ["Divulgue no " + canal, "Use os criativos, vídeos e páginas prontas" + (tempo === 0 ? ", mesmo com menos de 1 hora por dia." : " no tempo que você separou.")],
-      [ip < 3 ? "Receba 50% e conquiste " + ["a placa 10K", "o quadro 50K", "o quadro 100K"][ip] : "Receba 50% de comissão", "A automação de WhatsApp atende, a venda acontece e metade é sua." + (ip < 3 ? " Cada saque te aproxima da sua premiação." : "")]
+      ["Receba clientes no seu WhatsApp", "Use os criativos prontos nos anúncios: quem se interessa chama direto no seu WhatsApp."],
+      ["Atenda e feche a venda", "Siga o passo a passo da comunidade ou deixe a automação com IA atender por você" + (tempo === 0 ? ", mesmo com menos de 1 hora por dia." : ".")],
+      [ip < 3 ? "Receba 50% e conquiste " + ["a placa 10K", "o quadro 50K", "o quadro 100K"][ip] : "Receba 50% de comissão", "Cada venda fechada no seu WhatsApp vira 50% de comissão para você." + (ip < 3 ? " Cada saque te aproxima da sua premiação." : "")]
     ];
     var ol = $("r-plano"); ol.innerHTML = "";
     plano.forEach(function (p) { var li = el("li"), d = el("div"); d.appendChild(el("b", "", p[0])); d.appendChild(el("span", "", p[1])); li.appendChild(d); ol.appendChild(li); });
