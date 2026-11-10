@@ -260,7 +260,7 @@
 <!-- Meta Pixel -->
 <script>
 // PREÇO MOSTRADO NO QUIZ (o mesmo do checkout do botão final)
-window.QUIZ_PRECO=27;
+window.QUIZ_PRECO=57;
 window.QUIZ_PIXEL='1002875375909644';
 
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
@@ -454,7 +454,7 @@ document.addEventListener('click',function(e){
   // ===== CONFIGURAÇÕES =====
   var CONFIG = {
     checkout: "https://pagamentos.amazoleafiliados.com.br/",
-    leadApi: "https://pagamentos.amazoleafiliados.com.br/api/lead.php",
+    leadApi: "https://pagamento57.amazoleafiliados.com.br/api/lead.php",
     pixel: window.QUIZ_PIXEL,
     whatsapp: "5592985647581",
     // Simulador de ganhos: coloque o valor médio de comissão por venda em reais (ex.: 48.5).
@@ -463,7 +463,7 @@ document.addEventListener('click',function(e){
     // Dias de garantia (o mesmo do checkout). 0 esconde o selo.
     garantiaDias: 7,
     // LINK DO BOTÃO FINAL DO QUIZ. Preenchido, ele é usado sempre (o link do painel admin é ignorado no quiz).
-    checkoutQuiz: ""
+    checkoutQuiz: "https://pagamento57.amazoleafiliados.com.br/"
   };
 
   // ===== AS 7 PERGUNTAS =====
