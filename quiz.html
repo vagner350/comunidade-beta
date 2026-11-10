@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Quiz Amazolé — Descubra seu perfil de consultor</title>
-<meta name="description" content="Responda 6 perguntas rápidas e receba seu plano para começar a vender como afiliado Amazolé com 50% de comissão.">
+<meta name="description" content="Responda 7 perguntas rápidas e receba seu plano para começar a vender como afiliado Amazolé com 50% de comissão.">
 <meta name="theme-color" content="#0f3d2e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +43,7 @@
   .marca{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.02em;text-decoration:none;color:var(--floresta)}
   .marca i{font-style:normal;color:var(--pink)}
   .contador{font-size:.88rem;font-weight:600;color:var(--suave)}
-  .segs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:0 0 10px}
+  .segs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 0 10px}
   .segs i{height:5px;border-radius:5px;background:var(--linha);transition:background .3s}
   .segs i.ok{background:var(--folha)}
   .segs i.agora{background:var(--floresta)}
@@ -56,7 +56,7 @@
 
   h1,h2,h3{text-wrap:balance;font-family:var(--display);letter-spacing:-.025em;line-height:1.08;color:var(--floresta)}
   h1{font-size:clamp(1.85rem,7.8vw,2.6rem);font-weight:800}
-  .capa h1{font-size:clamp(1.8rem,min(7.6vw,4.6svh),2.6rem)}
+  .capa h1{font-size:clamp(1.8rem,7.6vw,2.6rem)}
   h2{font-size:clamp(1.5rem,6.2vw,1.95rem);font-weight:700}
   h3{font-size:1.2rem;font-weight:700;line-height:1.2}
   p{max-width:62ch}
@@ -71,26 +71,19 @@
   .nota{display:block;text-align:center;font-size:.86rem;color:var(--suave);margin-top:10px}
 
   /* ---------- Abertura ---------- */
-  .capa{position:relative;overflow:hidden;background:var(--floresta);color:#fff;border-radius:var(--r-grande);padding:20px 20px 18px;margin-top:4px}
-  .capa::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(229,64,122,.35),rgba(229,64,122,0) 70%);pointer-events:none}
-  .capa-topo{display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative;z-index:1}
-  .capa-topo img{width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 18%;border:2px solid rgba(255,255,255,.7)}
-  .capa-topo p{font-size:.92rem;line-height:1.35;color:#cfe8da}
-  .capa-topo b{color:#fff;font-weight:600}
-  .capa h1{color:#fff;position:relative;z-index:1}
-  .capa .sub{color:#cfe8da;font-size:1.02rem;margin:12px 0 20px;position:relative;z-index:1}
-  .capa .comprar,.capa .seguir{position:relative;z-index:1}
+  .capa{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;background:var(--floresta);color:#fff;border-radius:var(--r-grande);margin-top:4px;min-height:calc(100vh - 76px);min-height:min(calc(100svh - 76px),760px)}
+  .capa-foto{position:absolute;left:0;top:0;z-index:0;width:100%;height:72%;object-fit:cover;object-position:50% 18%}
+  .capa::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(15,61,46,0) 28%,rgba(15,61,46,.82) 50%,var(--floresta) 66%);pointer-events:none}
+  .capa-txt{position:relative;z-index:2;padding:0 20px 20px}
+  .capa h1{text-shadow:0 2px 14px rgba(0,0,0,.35)}
+  .quem{display:inline-block;font-size:.88rem;color:#cfe8da;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);margin-bottom:12px}
+  .quem b{color:#fff;font-weight:600}
+  .capa h1{color:#fff}
+  .capa .sub{color:#d6ece0;font-size:1.02rem;margin:10px 0 18px}
   .capa .seguir{background:#fff;color:var(--floresta)}
   .capa .seguir:hover{background:var(--broto)}
   .capa .nota{color:#a9cdb9}
 
-  .placas{margin:12px 0 0;padding:14px 14px 12px;border-radius:var(--r-medio);background:#160d22;color:#f2eafe;position:relative;overflow:hidden}
-  .placas::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 120%,rgba(147,51,234,.45),transparent 60%),radial-gradient(ellipse at 90% 120%,rgba(34,197,94,.35),transparent 55%);pointer-events:none}
-  .placas-tit{position:relative;font-family:var(--display);font-weight:700;font-size:1rem;margin-bottom:10px;color:#fff}
-  .placas ul{position:relative;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-  .placas img{height:80px;width:auto;margin:0 auto 6px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
-  .placas b{display:block;font-family:var(--display);font-size:1.15rem;line-height:1}
-  .placas span{display:block;font-size:.75rem;color:#c9bbe0;margin-top:2px}
   .bloco{margin-top:40px}
   .bloco>h2{margin-bottom:16px}
   .foto-historia{border-radius:var(--r-grande);overflow:hidden;margin-bottom:20px;background:var(--broto)}
@@ -139,6 +132,9 @@
   .op.prod img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:var(--r-pequeno);background:var(--nevoa)}
   .op.prod .em{width:100%;height:auto;aspect-ratio:1;border-radius:var(--r-pequeno);font-size:2.6rem}
   .op.prod.sel .em{background:var(--broto)}
+  .op.premio img{background:#160d22;padding:8px;object-fit:contain}
+  .op.premio .em{background:#160d22}
+  .op.premio.sel .em{background:#2a1740}
   .retorno{display:flex;gap:10px;margin-top:16px;padding:14px 16px;border-radius:var(--r-medio);background:var(--floresta);color:#e4f3ea;font-size:.97rem;line-height:1.45}
   .retorno::before{content:"";flex:none;width:8px;border-radius:8px;background:var(--sol)}
   .retorno.on{animation:entra .3s ease}
@@ -175,7 +171,7 @@
   .perfil h1{color:#fff;font-size:clamp(1.8rem,7.4vw,2.4rem)}
   .perfil>p{color:#d6ece0;margin-top:14px}
   .perfil>p strong{color:#fff}
-  .resumo{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+  .resumo{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
   .resumo li{padding:10px 12px;border-radius:var(--r-pequeno);background:rgba(255,255,255,.08);font-size:.9rem;line-height:1.35;color:#fff}
   .resumo span{display:block;color:#a9cdb9;font-size:.78rem}
 
@@ -235,33 +231,27 @@
   footer a{color:var(--suave)}
 
   @media (min-width:600px){
-    .capa{padding:30px 30px 28px}
+    .capa-txt{padding:0 30px 28px}
     .op{min-height:72px}
   }
   @media (max-height:680px){
-    .capa{padding:16px 18px 16px}
-    .capa-topo{margin-bottom:12px}
-    .capa-topo img{width:44px;height:44px}
-    .capa .sub{margin:10px 0 16px;font-size:.98rem}
+    .capa-txt{padding:0 18px 16px}
+    .capa h1{font-size:1.75rem}
+    .capa .sub{margin:8px 0 14px;font-size:.96rem}
     .capa .seguir{min-height:52px}
     .capa .nota{margin-top:8px}
-    .placas{padding:12px 12px 10px}
-    .placas img{height:56px}
-    .placas-tit{margin-bottom:8px}
-    .capa h1{font-size:1.75rem}
   }
   @media (max-height:600px){
-    .capa-topo{margin-bottom:10px}
-    .capa-topo img{width:38px;height:38px}
-    .capa h1{font-size:1.6rem}
-    .capa .sub{font-size:.93rem;margin:8px 0 14px}
-    .placas img{height:46px}
-    .placas span{display:none}
+    .quem{margin-bottom:8px}
+    .capa h1{font-size:1.55rem}
+    .capa .sub{font-size:.92rem}
+    .capa .nota{display:none}
   }
   @media (max-width:360px){
     .ops.duas{grid-template-columns:1fr}
     .ops.duas .op{flex-direction:row;align-items:center;min-height:68px}
-    .op.prod img,.op.prod .em{width:56px;aspect-ratio:1}
+    .op.prod img,.op.prod .em{width:56px;height:56px;aspect-ratio:1}
+    .op.premio img{padding:4px}
     .op.prod .em{font-size:1.5rem}
     .resumo{grid-template-columns:1fr}
   }
@@ -293,7 +283,7 @@ document.addEventListener('click',function(e){
       <a class="marca" href="./">Amazol<i>é</i></a>
       <span class="contador" id="contador" aria-live="polite"></span>
     </div>
-    <div class="segs" id="segs" aria-hidden="true" hidden><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="segs" id="segs" aria-hidden="true" hidden><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 </header>
 
@@ -301,24 +291,15 @@ document.addEventListener('click',function(e){
   <!-- ===== ABERTURA ===== -->
   <section class="tela on" id="t-inicio">
     <div class="capa">
-      <div class="capa-topo">
-        <img src="img/vagner-480.webp" alt="" width="52" height="52">
-        <p><b>Vagner, fundador da Amazolé</b><br>Saí do CLT há 4 anos com a marca</p>
+      <img class="capa-foto" src="img/vagner.webp" srcset="img/vagner-480.webp 480w, img/vagner.webp 680w" sizes="(max-width: 560px) 100vw, 528px" alt="Vagner, fundador da Amazolé, segurando a placa de premiação 1M" width="680" height="850" fetchpriority="high">
+      <div class="capa-txt">
+        <p class="quem"><b>Vagner</b>, fundador da Amazolé</p>
+        <h1>+12 milhões em vendas. Agora é a sua vez.</h1>
+        <p class="sub">É o resultado da Amazolé pelo WhatsApp. Venda como afiliado, ganhe 50% de comissão e conquiste as suas placas de premiação.</p>
+        <button class="seguir" type="button" data-comecar>Fazer o quiz</button>
+        <span class="nota">7 perguntas rápidas e o resultado sai na hora</span>
       </div>
-      <h1>+12 milhões em vendas. Agora é a sua vez.</h1>
-      <p class="sub">É o resultado da Amazolé pelo WhatsApp. Venda como afiliado, ganhe 50% de comissão e conquiste as suas placas.</p>
-      <button class="seguir" type="button" data-comecar>Fazer o quiz de 6 perguntas</button>
     </div>
-
-    <div class="placas" aria-labelledby="h-placas">
-      <p class="placas-tit" id="h-placas">Premiação para afiliados</p>
-      <ul>
-        <li><img src="img/premios/placa-10k.webp" alt="Placa 10K em comissões" width="54" height="80"><b>10K</b><span>em comissões</span></li>
-        <li><img src="img/premios/quadro-50k.webp" alt="Quadro 50K em comissões sacadas" width="59" height="80"><b>50K</b><span>sacados</span></li>
-        <li><img src="img/premios/quadro-100k.webp" alt="Quadro 100K em comissões sacadas" width="61" height="80"><b>100K</b><span>sacados</span></li>
-      </ul>
-    </div>
-
   </section>
 
   <!-- ===== PERGUNTA (montada pelo script) ===== -->
@@ -369,9 +350,8 @@ document.addEventListener('click',function(e){
   <!-- ===== RESULTADO ===== -->
   <section class="tela" id="t-resultado">
     <div class="perfil">
-      <small id="r-ola">Seu perfil é</small>
-      <h1 id="r-nome" tabindex="-1"></h1>
-      <p id="r-texto"></p>
+      <small id="r-ola" hidden></small>
+      <h1 id="r-nome" tabindex="-1">Seu plano está pronto</h1>
       <ul class="resumo" id="r-resumo"></ul>
     </div>
 
@@ -517,6 +497,13 @@ document.addEventListener('click',function(e){
         { em: "📣", t: "Não saber anunciar", fb: "Resolvido: tem treinamento de anúncios passo a passo." },
         { em: "🤖", t: "Não dar conta de atender", fb: "Resolvido: a automação de WhatsApp atende os clientes para você." }
       ] },
+    { id: "premio", titulo: "Você sonha em ganhar uma placa de premiação da Amazolé?", dica: "Cada marco de comissões sacadas vira uma placa. Qual você quer conquistar?", duas: true, prod: true, escuro: true,
+      ops: [
+        { img: "img/premios/placa-10k.webp", t: "Sim! A placa 10K", fb: "R$ 10 mil em comissões sacadas: o primeiro grande marco de quem leva a sério." },
+        { img: "img/premios/quadro-50k.webp", t: "Quero o quadro 50K", fb: "R$ 50 mil sacados: é aqui que a divulgação vira um negócio de verdade." },
+        { img: "img/premios/quadro-100k.webp", t: "Vou buscar o 100K", fb: "R$ 100 mil sacados: o topo da jornada de um consultor Amazolé." },
+        { em: "🏆", t: "Ainda não penso nisso", fb: "Tudo bem. Comece pela primeira venda: a primeira placa vem com o tempo." }
+      ] },
     { id: "quando", titulo: "Com um funil pronto e 50% de comissão, quando você começaria?", dica: "Responda com sinceridade.",
       ops: [
         { em: "⚡", t: "Hoje mesmo", fb: "Essa é a atitude de quem faz a primeira venda rápido." },
@@ -597,7 +584,7 @@ document.addEventListener('click',function(e){
     q.ops.forEach(function (o, i) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "op" + (q.prod ? " prod" : "") + (resp[atual] === i ? " sel" : "");
+      b.className = "op" + (q.prod ? " prod" : "") + (q.escuro ? " premio" : "") + (resp[atual] === i ? " sel" : "");
       b.setAttribute("role", "radio");
       b.setAttribute("aria-checked", resp[atual] === i ? "true" : "false");
       if (o.img) {
@@ -742,12 +729,13 @@ document.addEventListener('click',function(e){
       PERFIL = "iniciante"; nome = "Iniciante com potencial 🌱";
       texto = "Você está começando, e isso é bom: vai aprender do jeito certo desde o início. Com a <strong>implementação guiada</strong> e tudo pronto para usar, a primeira venda fica muito mais perto.";
     }
-    $("r-ola").textContent = NOME ? NOME.split(" ")[0] + ", seu perfil é" : "Seu perfil é";
-    $("r-nome").textContent = nome;
-    $("r-texto").innerHTML = texto;
+    $("r-ola").textContent = NOME ? NOME.split(" ")[0] + "," : "";
+    $("r-ola").hidden = !NOME;
 
+    var ip = idx("premio");
+    var META = ["Placa 10K", "Quadro 50K", "Quadro 100K", "Primeira venda"][ip];
     var ul = $("r-resumo"); ul.innerHTML = "";
-    [["Objetivo", txt("objetivo")], ["Canal", txt("canal")], ["Tempo por dia", txt("tempo")], ["Trava resolvida", txt("trava")]].forEach(function (r) {
+    [["Objetivo", txt("objetivo")], ["Canal", txt("canal")], ["Trava resolvida", txt("trava")], ["Meta", META]].forEach(function (r) {
       var li = el("li"); li.appendChild(el("span", "", r[0])); li.appendChild(document.createTextNode(r[1])); ul.appendChild(li);
     });
 
@@ -756,7 +744,7 @@ document.addEventListener('click',function(e){
       ["Entre na comunidade", "Pagamento único de R$ " + PRECO + " e acesso liberado no seu e-mail."],
       ["Escolha o seu primeiro produto", "Veja todos os produtos na comunidade, afilie-se e pegue o seu link de venda, com estoque nacional."],
       ["Divulgue no " + canal, "Use os criativos, vídeos e páginas prontas" + (tempo === 0 ? ", mesmo com menos de 1 hora por dia." : " no tempo que você separou.")],
-      ["Receba 50% de comissão", "A automação de WhatsApp atende, a venda acontece e metade é sua."]
+      [ip < 3 ? "Receba 50% e conquiste " + ["a placa 10K", "o quadro 50K", "o quadro 100K"][ip] : "Receba 50% de comissão", "A automação de WhatsApp atende, a venda acontece e metade é sua." + (ip < 3 ? " Cada saque te aproxima da sua premiação." : "")]
     ];
     var ol = $("r-plano"); ol.innerHTML = "";
     plano.forEach(function (p) { var li = el("li"), d = el("div"); d.appendChild(el("b", "", p[0])); d.appendChild(el("span", "", p[1])); li.appendChild(d); ol.appendChild(li); });
