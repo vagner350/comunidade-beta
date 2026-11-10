@@ -140,21 +140,6 @@
   .retorno.on{animation:entra .3s ease}
   .voltar{margin-top:18px;padding:10px 2px;color:var(--suave);font-weight:600;font-size:.95rem}
 
-  /* ---------- Captura ---------- */
-  .captura{padding-top:18px}
-  .selo{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:var(--broto);color:var(--floresta);font-weight:600;font-size:.88rem;margin-bottom:14px}
-  .selo::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--folha) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='m9.5 16.2-4-4 1.4-1.4 2.6 2.6 7-7 1.4 1.4z'/%3E%3C/svg%3E") center/14px no-repeat}
-  .captura h2{margin-bottom:10px}
-  .captura>p{color:var(--suave);margin-bottom:22px}
-  .campo{display:block;margin-bottom:14px}
-  .campo span{display:block;font-weight:600;font-size:.95rem;margin-bottom:6px}
-  .campo input{width:100%;height:56px;padding:0 16px;border-radius:var(--r-medio);border:2px solid var(--linha);background:var(--papel);font:inherit;font-size:1.05rem;color:var(--texto)}
-  .campo input:focus{outline:none;border-color:var(--folha)}
-  .campo.erro input{border-color:#c2410c}
-  .campo small{display:block;color:#c2410c;font-size:.86rem;margin-top:6px;min-height:0}
-  .aviso{font-size:.84rem;color:var(--suave);margin:4px 0 18px}
-  .pular{display:block;margin:14px auto 0;color:var(--suave);font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
-
   /* ---------- Carregando ---------- */
   .carregando{padding:60px 0 20px;text-align:center}
   .anel{width:64px;height:64px;margin:0 auto 22px;border-radius:50%;border:6px solid var(--broto);border-top-color:var(--folha);animation:gira .9s linear infinite}
@@ -309,28 +294,6 @@ document.addEventListener('click',function(e){
     <div class="ops" id="q-ops" role="radiogroup"></div>
     <div class="retorno" id="q-retorno" role="status" hidden></div>
     <button class="voltar" type="button" id="btn-voltar">← Voltar</button>
-  </section>
-
-  <!-- ===== CAPTURA DE CONTATO ===== -->
-  <section class="tela captura" id="t-captura">
-    <span class="selo">Seu plano está pronto</span>
-    <h2 tabindex="-1" id="cap-titulo">Para quem eu envio o seu plano?</h2>
-    <p>Deixe seu nome e WhatsApp para ver o resultado. Assim você também recebe o plano no celular para consultar depois.</p>
-    <form id="form-lead" novalidate>
-      <label class="campo" id="c-nome">
-        <span>Seu nome</span>
-        <input type="text" id="lead-nome" name="nome" autocomplete="given-name" placeholder="Como você se chama?" maxlength="80" required>
-        <small></small>
-      </label>
-      <label class="campo" id="c-whats">
-        <span>Seu WhatsApp</span>
-        <input type="tel" id="lead-whats" name="whatsapp" autocomplete="tel-national" inputmode="numeric" placeholder="(DDD) 9 0000-0000" maxlength="16" required>
-        <small></small>
-      </label>
-      <p class="aviso">Ao continuar, você aceita receber o seu plano e mensagens da Amazolé no WhatsApp. Pode sair quando quiser.</p>
-      <button class="seguir" type="submit">Ver meu resultado</button>
-    </form>
-    <button class="pular" type="button" id="btn-pular">Ver o resultado sem informar</button>
   </section>
 
   <!-- ===== CARREGANDO ===== -->
@@ -624,7 +587,7 @@ document.addEventListener('click',function(e){
     avancoTimer = setTimeout(function () {
       if (atual !== este) return;
       if (atual < PERGUNTAS.length - 1) { atual++; montarPergunta(); }
-      else irCaptura();
+      else carregar();
     }, 1300);
   }
   function voltar() {
@@ -638,65 +601,6 @@ document.addEventListener('click',function(e){
     $("contador").textContent = "";
     mostrar("t-inicio");
   }
-
-  // ===== CAPTURA DE NOME E WHATSAPP =====
-  function irCaptura() {
-    progresso(PERGUNTAS.length);
-    $("contador").textContent = "Último passo";
-    if (NOME) $("lead-nome").value = NOME;
-    mostrar("t-captura", "cap-titulo");
-    px("QuizCaptura", {});
-  }
-  function mascaraWhats(v) {
-    v = digits(v).slice(0, 11);
-    if (v.length <= 2) return v.length ? "(" + v : "";
-    if (v.length <= 6) return "(" + v.slice(0, 2) + ") " + v.slice(2);
-    if (v.length <= 10) return "(" + v.slice(0, 2) + ") " + v.slice(2, 6) + "-" + v.slice(6);
-    return "(" + v.slice(0, 2) + ") " + v.slice(2, 7) + "-" + v.slice(7);
-  }
-  function erro(campo, msg) {
-    var c = $(campo); c.classList.toggle("erro", !!msg);
-    c.querySelector("small").textContent = msg || "";
-  }
-  function idAleatorio() {
-    var a = new Uint8Array(10);
-    try { crypto.getRandomValues(a); } catch (e) { for (var i = 0; i < 10; i++) a[i] = Math.floor(Math.random() * 256); }
-    return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
-  }
-  function enviarLead(nome, fone) {
-    LEAD_ID = LEAD_ID || idAleatorio();
-    var corpo = JSON.stringify({ leadId: LEAD_ID, name: nome, email: "", phone: fone, productId: "", utm: utmObj() });
-    try {
-      // text/plain evita a checagem prévia do navegador entre domínios; o checkout lê o corpo como JSON
-      fetch(CONFIG.leadApi, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain" }, body: corpo }).catch(function () {});
-    } catch (e) {}
-    try {
-      if (window.fbq) {
-        fbq("init", CONFIG.pixel, { ph: "55" + fone, fn: nome.split(/\s+/)[0].toLowerCase(), country: "br" });
-        fbq("track", "Lead", { content_name: "Quiz Comunidade Amazolé", currency: "BRL", value: window.QUIZ_PRECO });
-      }
-    } catch (e) {}
-  }
-  $("lead-whats").addEventListener("input", function (e) {
-    e.target.value = mascaraWhats(e.target.value);
-    if ($("c-whats").classList.contains("erro") && digits(e.target.value).length >= 10) erro("c-whats", "");
-  });
-  $("lead-nome").addEventListener("input", function (e) {
-    if ($("c-nome").classList.contains("erro") && e.target.value.trim().length >= 2) erro("c-nome", "");
-  });
-  $("form-lead").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var nome = $("lead-nome").value.trim().replace(/\s+/g, " ");
-    var fone = digits($("lead-whats").value);
-    var ok = true;
-    if (nome.length < 2) { erro("c-nome", "Digite seu nome."); ok = false; } else erro("c-nome", "");
-    if (fone.length < 10 || fone.length > 11) { erro("c-whats", "Digite o WhatsApp com DDD, só números."); ok = false; } else erro("c-whats", "");
-    if (!ok) { (nome.length < 2 ? $("lead-nome") : $("lead-whats")).focus(); return; }
-    NOME = nome;
-    enviarLead(nome, fone);
-    carregar();
-  });
-  $("btn-pular").addEventListener("click", function () { px("QuizPulouCaptura", {}); carregar(); });
 
   // ===== CARREGANDO =====
   function carregar() {
@@ -758,9 +662,10 @@ document.addEventListener('click',function(e){
     mostrar("t-resultado", "r-nome");
     iniciarClips();
 
-    var dados = { preco: PRECO, perfil: PERFIL, capturou: LEAD_ID ? "sim" : "nao" };
+    var dados = { preco: PRECO, perfil: PERFIL };
     PERGUNTAS.forEach(function (q, i) { dados[q.id] = q.ops[resp[i]].t; });
     px("QuizConcluido", dados);
+    try { if (window.fbq) fbq("track", "Lead", { content_name: "Quiz Comunidade Amazolé", currency: "BRL", value: window.QUIZ_PRECO }); } catch (e) {}
   }
 
   // ===== SIMULADOR =====
