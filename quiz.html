@@ -158,6 +158,22 @@
   .perfil>p strong{color:#fff}
   .resumo{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
   .resumo li{padding:10px 12px;border-radius:var(--r-pequeno);background:rgba(255,255,255,.08);font-size:.9rem;line-height:1.35;color:#fff}
+  .perfil-cta{margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14)}
+  .perfil-preco{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+  .perfil-preco b{flex:none;white-space:nowrap;font-family:var(--display);font-size:2.4rem;font-weight:800;letter-spacing:-.03em;line-height:1;color:#fff}
+  .perfil-preco span{color:#a9cdb9;font-size:.9rem;line-height:1.3}
+  .bonus-linha{margin-top:12px;font-size:.9rem;color:#ffe7a3;line-height:1.4}
+  .bonus-box{margin:-4px 0 18px;padding:14px 16px;border-radius:var(--r-medio);background:#fff8e1;border:1px dashed #e8c45a}
+  .bonus-box b{display:block;color:#7a4f00;margin-bottom:2px}
+  .bonus-box span{font-size:.93rem;color:#5c4a1c}
+  .faq{margin-top:28px}
+  .faq h2{margin-bottom:12px}
+  .faq details{border-bottom:1px solid var(--linha)}
+  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 2px;font-weight:600;font-size:1.02rem}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--broto);color:var(--floresta);font-weight:700;font-size:1.1rem;transition:transform .2s}
+  .faq details[open] summary::after{transform:rotate(45deg)}
+  .faq details p{padding:0 2px 16px;color:var(--suave)}
   .resumo span{display:block;color:#a9cdb9;font-size:.78rem}
 
   .plano{list-style:none;counter-reset:p;display:grid;gap:12px}
@@ -193,7 +209,7 @@
   .oferta{position:relative;padding:26px 20px 22px;border-radius:var(--r-grande);background:var(--papel);border:2px solid var(--floresta)}
   .oferta h2{margin-bottom:4px}
   .preco{display:flex;align-items:baseline;gap:10px;margin:12px 0 4px}
-  .preco b{font-family:var(--display);font-size:3.2rem;font-weight:800;letter-spacing:-.04em;color:var(--floresta);line-height:1}
+  .preco b{flex:none;white-space:nowrap;font-family:var(--display);font-size:3.2rem;font-weight:800;letter-spacing:-.04em;color:var(--floresta);line-height:1}
   .preco span{color:var(--suave);font-size:.95rem}
   .oferta .checks{margin:18px 0 22px}
   .seguro{display:grid;gap:6px;margin-top:16px;font-size:.88rem;color:var(--suave)}
@@ -238,7 +254,7 @@
     .op.prod img,.op.prod .em{width:56px;height:56px;aspect-ratio:1}
     .op.premio img{padding:4px}
     .op.prod .em{font-size:1.5rem}
-    .resumo{grid-template-columns:1fr}
+    .resumo li{font-size:.85rem;padding:9px 10px}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation:none!important;transition:none!important}
@@ -316,6 +332,11 @@ document.addEventListener('click',function(e){
       <small id="r-ola" hidden></small>
       <h1 id="r-nome" tabindex="-1">Seu plano está pronto</h1>
       <ul class="resumo" id="r-resumo"></ul>
+      <div class="perfil-cta">
+        <div class="perfil-preco"><b data-preco>R$ 27</b><span>pagamento único, sem mensalidade</span></div>
+        <a class="comprar" href="#" data-checkout id="r-cta-topo">Finalizar minha inscrição</a>
+        <p class="bonus-linha">🎁 Finalize o pagamento em até 16 minutos e ganhe de bônus o Grupo de Criativos Novos no WhatsApp.</p>
+      </div>
     </div>
 
     <section class="bloco" aria-labelledby="h-plano">
@@ -368,7 +389,7 @@ document.addEventListener('click',function(e){
 
     <section class="bloco" aria-labelledby="h-oferta">
       <div class="oferta" id="oferta">
-        <h2 id="h-oferta">Entre para a Comunidade Amazolé</h2>
+        <h2 id="h-oferta">Tudo o que você recebe hoje</h2>
         <div class="preco"><b data-preco>R$ 27</b><span>pagamento único,<br>sem mensalidade</span></div>
         <ul class="checks">
           <li>50% de comissão em cada venda</li>
@@ -378,13 +399,23 @@ document.addEventListener('click',function(e){
           <li>Produtos com estoque nacional para se afiliar</li>
           <li>Automação de WhatsApp e grupo da comunidade</li>
         </ul>
-        <a class="comprar" href="#" data-checkout id="r-cta">Quero entrar na comunidade</a>
+        <div class="bonus-box"><b>Bônus por tempo limitado</b><span>Finalizando o pagamento em até 16 minutos, você leva o Grupo de Criativos Novos no WhatsApp de graça.</span></div>
+        <a class="comprar" href="#" data-checkout id="r-cta">Finalizar minha inscrição</a>
         <div class="seguro">
           <span>Pix com aprovação na hora</span>
           <span>Acesso liberado por e-mail logo após o pagamento</span>
           <span>Pagamento em ambiente seguro</span>
         </div>
         <div class="garantia" id="r-garantia" hidden><b id="r-gdias"></b><span>dias de garantia: se não gostar, devolvemos o seu dinheiro.</span></div>
+      </div>
+      <div class="faq" aria-labelledby="h-faq">
+        <h2 id="h-faq">Perguntas frequentes</h2>
+        <details><summary>Tem mensalidade?</summary><p>Não. Você paga <span data-preco-txt>R$ 27</span> uma vez só.</p></details>
+        <details><summary>Como recebo o acesso?</summary><p>Logo após o pagamento, o acesso é liberado no seu e-mail. No Pix, a aprovação é na hora.</p></details>
+        <details><summary>Preciso ter estoque ou loja?</summary><p>Não. Os produtos têm estoque nacional e são enviados do Brasil. Você só divulga com o seu link.</p></details>
+        <details><summary>Nunca vendi nada. Serve para mim?</summary><p>Serve. Os cursos começam do primeiro passo e você recebe criativos, vídeos e páginas de venda prontos.</p></details>
+        <details><summary>Quanto eu ganho por venda?</summary><p>50% de comissão em cada venda feita pela sua divulgação.</p></details>
+        <details id="faq-garantia"><summary>E se eu não gostar?</summary><p>Você tem 7 dias de garantia. Se não gostar, devolvemos o seu dinheiro.</p></details>
       </div>
       <a class="duvida" id="r-whats" href="#" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.2.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
@@ -398,7 +429,7 @@ document.addEventListener('click',function(e){
 <div class="barra-compra" id="barra-compra" aria-hidden="true">
   <div class="wrap">
     <div class="v"><b data-preco>R$ 27</b><span>pagamento único</span></div>
-    <a class="comprar" href="#" data-checkout tabindex="-1">Quero entrar</a>
+    <a class="comprar" href="#" data-checkout tabindex="-1">Finalizar inscrição</a>
   </div>
 </div>
 
@@ -479,7 +510,7 @@ document.addEventListener('click',function(e){
   var resp = new Array(PERGUNTAS.length), atual = 0, avancoTimer = null;
   var LEAD_ID = "", PERFIL = "", NOME = "";
   var PRECO = window.QUIZ_PRECO;
-  document.querySelectorAll("[data-preco]").forEach(function (e) { e.textContent = "R$ " + PRECO; });
+  document.querySelectorAll("[data-preco],[data-preco-txt]").forEach(function (e) { e.textContent = "R$ " + PRECO; });
   var $ = function (id) { return document.getElementById(id); };
   var ls = {
     get: function (k) { try { return localStorage.getItem("quiz_" + k); } catch (e) { return null; } },
@@ -653,7 +684,6 @@ document.addEventListener('click',function(e){
     var ol = $("r-plano"); ol.innerHTML = "";
     plano.forEach(function (p) { var li = el("li"), d = el("div"); d.appendChild(el("b", "", p[0])); d.appendChild(el("span", "", p[1])); li.appendChild(d); ol.appendChild(li); });
 
-    $("r-cta").textContent = quando <= 1 ? "Quero começar agora" : "Quero entrar na comunidade";
     $("r-whats").href = "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent("Olá! Fiz o quiz da Amazolé e tenho uma dúvida sobre a comunidade.");
     if (CONFIG.garantiaDias > 0) { $("r-garantia").hidden = false; $("r-gdias").textContent = CONFIG.garantiaDias; }
 
@@ -700,14 +730,18 @@ document.addEventListener('click',function(e){
     vids.forEach(function (v) { obs.observe(v); });
   }
 
-  // ===== BARRA FIXA DE COMPRA (quando o botão da oferta sai da tela) =====
+  // ===== BARRA FIXA DE COMPRA: aparece no resultado sempre que nenhum botão de pagar está na tela =====
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(function (ents) {
-      var e = ents[0], tela = $("t-resultado").classList.contains("on");
-      var on = tela && !e.isIntersecting && e.boundingClientRect.top > window.innerHeight;
+    var visiveis = {};
+    var obsCta = new IntersectionObserver(function (ents) {
+      ents.forEach(function (e) { visiveis[e.target.id] = e.isIntersecting; });
+      var tela = $("t-resultado").classList.contains("on");
+      var algum = Object.keys(visiveis).some(function (k) { return visiveis[k]; });
+      var on = tela && !algum;
       $("barra-compra").classList.toggle("on", on);
       $("barra-compra").setAttribute("aria-hidden", on ? "false" : "true");
-    }).observe($("r-cta"));
+    });
+    obsCta.observe($("r-cta-topo")); obsCta.observe($("r-cta"));
   }
 
   // ===== VÍDEO E DEPOIMENTOS DO PAINEL ADMIN =====
