@@ -202,9 +202,10 @@
   .nav-r .linkbtn{text-decoration:none;color:var(--muted);font-size:.9rem}
   @media(max-width:420px){.nav-r .linkbtn{display:none}}
   .btn.sm{padding:9px 18px;font-size:.9rem}
-  .btn.lg{padding:16px 32px;font-size:1.05rem}
+  .btn.lg{padding:20px 40px;font-size:1.2rem;min-height:64px;letter-spacing:.01em}
   .trust{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;margin-top:26px;color:var(--muted);font-size:.92rem}
-  .mid-cta{text-align:center;margin-top:34px}
+  .mid-cta{text-align:center;margin-top:36px}
+  .mid-cta .btn,.hist-cta .btn{min-width:min(100%,420px)}
   .faq{max-width:760px}
   .faq details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:0 20px}
   .faq summary{cursor:pointer;font-weight:700;padding:16px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
@@ -221,7 +222,7 @@
   .sticky-cta{display:none}
   @media(max-width:700px){
     .hero{padding:64px 0 48px}
-    .btn.lg{width:100%;text-align:center}
+    .btn.lg{width:100%;text-align:center;padding:20px 18px;font-size:1.15rem}
     .sticky-cta{display:block;position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 14px;background:rgba(10,1,24,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
     body:not(.logado){padding-bottom:78px}
     body.logado .sticky-cta{display:none}
@@ -477,7 +478,7 @@ document.addEventListener('click',function(e){
       <p class="sub">Assista ao vídeo e entenda como os afiliados da Amazolé vendem.</p>
       <div class="video" id="video"></div>
       <div class="grid" id="depoimentos"></div>
-      <p class="mid-cta"><a class="btn" href="#" data-checkout>Quero fazer parte · R$ 57,00</a></p>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -500,7 +501,7 @@ document.addEventListener('click',function(e){
             <li><strong>100%</strong><span>estrutura validada</span></li>
           </ul>
           <p>Agora não estamos atrás só de afiliados. Estamos atrás de <strong>verdadeiros consultores da nossa marca</strong>. Vamos pegar tudo o que já funcionou para a gente e <strong>replicar para você</strong>.</p>
-          <p class="hist-cta"><a class="btn lg" href="#" data-checkout>Quero ser consultor · R$ 57,00</a></p>
+          <p class="hist-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
           <p class="cta-note" role="status"></p>
         </div>
       </div>
@@ -517,6 +518,7 @@ document.addEventListener('click',function(e){
         <div class="card"><div class="ic">⏱️</div><h3>Quer economizar tempo</h3><p>Criativos, vídeos e páginas de venda prontos, sem criar tudo do zero.</p></div>
         <div class="card"><div class="ic">💸</div><h3>Quer uma renda extra</h3><p>Fique com 50% de comissão em cada venda gerada pela sua divulgação.</p></div>
       </div>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -534,6 +536,7 @@ document.addEventListener('click',function(e){
         <div class="card"><div class="ic">💬</div><h3>Fórum e grupo</h3><p>Tire dúvidas e troque experiência com outros afiliados.</p></div>
         <div class="card"><div class="ic">🚀</div><h3>Implementação guiada</h3><p>Um caminho claro para fazer sua primeira venda.</p></div>
       </div>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -547,7 +550,7 @@ document.addEventListener('click',function(e){
         <div class="card"><h3>Atendimento no WhatsApp</h3><p>Automação para responder e conduzir o cliente até a compra.</p></div>
         <div class="card"><h3>Venda e 50% para você</h3><p>A venda acontece e metade vira comissão sua.</p></div>
       </div>
-      <p class="mid-cta"><a class="btn" href="#" data-checkout>Quero usar o funil · R$ 57,00</a></p>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -581,7 +584,7 @@ document.addEventListener('click',function(e){
           </div>
         </li>
       </ol>
-      <p class="mid-cta"><a class="btn" href="#" data-checkout>Quero começar · R$ 57,00</a></p>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -600,6 +603,7 @@ document.addEventListener('click',function(e){
         <figure class="prod"><img decoding="async" src="img/produtos/sabonete-clareador.webp" alt="Sabonete em pasta clareador" width="260" height="260"><figcaption>Sabonete Clareador</figcaption></figure>
         <figure class="prod"><img decoding="async" src="img/produtos/mxd20.webp" alt="MXD20 Power Hair em cápsulas e Barbudom tônico capilar" width="260" height="260"><figcaption>MXD20 + Barbudom</figcaption></figure>
       </div>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -629,6 +633,7 @@ document.addEventListener('click',function(e){
           <video data-src="media/conteudo/v6.mp4" poster="media/conteudo/v6.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 6" width="240" height="427"></video>
         </figure>
       </div>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -642,6 +647,7 @@ document.addEventListener('click',function(e){
         <div class="card"><h3>Divulgue</h3><p>Use os criativos, vídeos e páginas prontas nas suas redes e anúncios.</p></div>
         <div class="card"><h3>Receba 50% de comissão</h3><p>Cada venda gerada pela sua divulgação gera 50% de comissão para você.</p></div>
       </div>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 
@@ -659,7 +665,7 @@ document.addEventListener('click',function(e){
           <li>✔ Produtos com estoque nacional para afiliar</li>
           <li>✔ Automação de WhatsApp e grupo da comunidade</li>
         </ul>
-        <a class="btn lg" href="#" data-checkout>Quero entrar agora</a>
+        <a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a>
         <p class="cta-note" role="status"></p>
         <p class="seguro">🔒 Pagamento em ambiente seguro</p>
         <p><button class="linkbtn" type="button" data-open>Já sou afiliado? Entrar</button></p>
@@ -678,11 +684,12 @@ document.addEventListener('click',function(e){
       <details><summary>Como recebo o meu acesso?</summary><p>Depois da confirmação do pagamento, é só entrar com o seu e-mail na página inicial.</p></details>
       <details><summary>Onde posso divulgar?</summary><p>Onde você tiver público: Instagram, WhatsApp, TikTok, anúncios e outros canais.</p></details>
       <details><summary>Tenho dúvidas, com quem falo?</summary><p>Entre em contato pelo e-mail sac@amazole.me.</p></details>
+      <p class="mid-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></p>
     </div>
   </section>
 </main>
 
-<div class="sticky-cta" id="sticky-cta"><a class="btn lg" href="#" data-checkout>Entrar na comunidade · R$ 57,00</a></div>
+<div class="sticky-cta" id="sticky-cta"><a class="btn lg" href="#" data-checkout>Quero entrar · R$ 57,00</a></div>
 <footer>
   <div class="wrap">© 2026 Amazolé · Comunidade de Afiliados</div>
 </footer>
