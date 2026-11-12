@@ -649,6 +649,143 @@
   #dlg-login .btn[type=submit]{background:#0f3d2e;color:#fff}
   #dlg-login .btn.ghost{border:2px solid #d5e3da;color:#0f3d2e;background:#fff}
   .lp-marca{display:inline-flex;align-items:center;min-height:44px}
+
+  /* ================================================================
+     ÁREA DO AFILIADO (2026-11): mesma identidade da página de vendas,
+     menu em painel lateral no celular e botões de link grandes.
+     ================================================================ */
+  #app{--floresta:#0f3d2e;--folha:#1d7a52;--broto:#d7efe1;--nevoa:#eef5f0;--pink:#d63370;--pink-escuro:#b8285e;--texto:#13271f;--suave:#4f6358;--linha:#d5e3da;
+    --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;--ease-out:cubic-bezier(.23,1,.32,1);--ease-drawer:cubic-bezier(.32,.72,0,1);
+    background:var(--nevoa);color:var(--texto);font-family:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+  #app h1,#app h2,#app h3{font-family:var(--display);letter-spacing:-.02em}
+  #app .side{background:var(--floresta);color:#bcd9c9}
+  #app .side-brand{font-family:var(--display);letter-spacing:-.02em}
+  #app .side-brand span{color:#ff8fb6}
+  #app .side-nav button{color:#cfe8da;min-height:46px;transition:background-color 150ms ease,color 150ms ease}
+  #app .side-nav button.on{background:#fff;color:var(--floresta)}
+  #app .side-nav .nav-sep{color:#8fb7a2}
+  #app .side-foot{border-top-color:rgba(255,255,255,.12)}
+  #app .side-out{color:#cfe8da;min-height:44px}
+  @media (hover:hover) and (pointer:fine){
+    #app .side-nav button:not(.on):hover{background:rgba(255,255,255,.1);color:#fff}
+    #app .side-out:hover{color:#fff}
+    #app .go:hover{background:#0a2e22}
+    #app .go.afil:hover{background:var(--pink-escuro)}
+  }
+  #app .main-head{background:#fff;border-bottom:1px solid var(--linha)}
+  #app .main-head h1{color:var(--floresta)}
+  #app .main-head p{color:var(--suave)}
+  #app .main.dark .main-head{background:transparent;border-bottom:0}
+  #app .post,#app .item{border-color:var(--linha);border-radius:18px;color:var(--texto)}
+  #app .post p,#app .item p{color:var(--suave)}
+  #app .vazio{border-color:#b9d3c4;color:var(--suave)}
+
+  /* Botões de link: grandes, largura total, fáceis de tocar */
+  #app .item-btns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:16px}
+  #app .tr-txt .item-btns{margin-top:10px}
+  #app .go,#app .item .go,#app .tr-txt .go{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin:0;padding:12px 16px;
+    border:0;border-radius:12px;background:var(--floresta);color:#fff;font:inherit;font-weight:700;font-size:.98rem;line-height:1.25;text-align:center;
+    text-decoration:none;cursor:pointer;touch-action:manipulation;transition:transform 160ms var(--ease-out),background-color 150ms ease;overflow-wrap:anywhere}
+  #app .go.afil,#app .item .go.afil{background:var(--pink)}
+  #app .go:active{transform:scale(.97)}
+  @media (min-width:901px){
+    #app .post .item-btns,#app .tr-txt .item-btns{display:flex;flex-wrap:wrap}
+    #app .post .go,#app .tr-txt .go{width:auto;min-width:220px}
+  }
+  #app .tr-check{min-width:40px;min-height:40px}
+
+  /* Topo do celular (escondido no computador) */
+  #app .app-top{display:none}
+  #app .app-fundo{display:none}
+
+  @media (max-width:900px){
+    #app{flex-direction:column}
+    #app .app-top{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;height:60px;padding:0 12px calc(0px) 12px;padding-top:env(safe-area-inset-top);
+      background:var(--floresta);color:#fff;box-shadow:0 6px 18px -12px rgba(0,0,0,.5)}
+    #app .app-menu-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px 8px 10px;border:0;border-radius:999px;background:rgba(255,255,255,.12);
+      color:#fff;font:inherit;font-weight:700;cursor:pointer;touch-action:manipulation;transition:transform 160ms var(--ease-out)}
+    #app .app-menu-btn:active{transform:scale(.96)}
+    #app .app-menu-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+    #app .app-top-txt{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+    #app .app-top-txt b{font-family:var(--display);font-size:1.05rem;letter-spacing:-.02em}
+    #app .app-top-txt b i{font-style:normal;color:#ff8fb6}
+    #app .app-top-txt span{font-size:.82rem;color:#bcd9c9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    /* Menu em painel lateral */
+    #app .side{position:fixed;top:0;bottom:0;left:0;z-index:70;width:min(86vw,330px);height:100%;max-height:none;
+      display:flex;flex-direction:column;transform:translateX(-104%);visibility:hidden;
+      transition:transform 300ms var(--ease-drawer),visibility 0s linear 300ms;box-shadow:20px 0 50px -20px rgba(0,0,0,.5);
+      padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);overscroll-behavior:contain}
+    body.menu-aberto #app .side{transform:none;visibility:visible;transition:transform 300ms var(--ease-drawer)}
+    #app .side-nav{flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:6px 12px 12px;gap:4px}
+    #app .side-nav button{white-space:normal;width:100%;min-height:50px;font-size:1rem}
+    #app .side-foot{display:block}
+    #app .side-email{margin:0 0 6px}
+    #app .app-fundo{display:block;position:fixed;inset:0;z-index:65;background:rgba(6,30,22,.5);opacity:0;transition:opacity 250ms ease}
+    #app .app-fundo[hidden]{display:none}
+    body.menu-aberto #app .app-fundo{opacity:1}
+    body.menu-aberto{overflow:hidden}
+
+    #app .main-head{padding:18px 16px 16px}
+    #app .main-head h1{font-size:1.5rem}
+    #app .main-head p{font-size:.95rem}
+    #app .main-body{padding:16px 16px 48px;gap:14px}
+    #app .main-body.cards{grid-template-columns:1fr}
+    #app .post,#app .item{padding:18px}
+    #app .item-img.capa{width:calc(100% + 36px);margin:-18px -18px 14px}
+  }
+  #app .item .d,#app .post .d{font-size:.82rem;color:var(--suave);font-weight:600}
+  #app .tr-fill{background:var(--folha)}
+  #app .tr-barra{background:#dfeae3}
+  #app .tr-passo.atual{border-color:var(--folha);box-shadow:0 0 0 3px rgba(29,122,82,.14)}
+  #app .impl-hero{background:linear-gradient(160deg,#0f3d2e 0%,#17573f 100%)}
+  #app .impl-val strong{color:var(--floresta);font-family:var(--display)}
+  #app .impl-preco,#app .impl-lista li,#app .impl-card{border-color:var(--linha)}
+  #app .impl-fim{background:#fff;border-color:var(--linha)}
+  #app .impl-lista li::before{color:var(--folha)}
+  #app .impl-hero .btn,#app .impl-preco .btn,#app .impl-fim .btn{background:var(--pink);color:#fff;box-shadow:0 12px 28px -12px rgba(214,51,112,.7);min-height:56px;display:flex;align-items:center;justify-content:center;transition:transform 160ms var(--ease-out)}
+  #app .impl-hero .btn:active,#app .impl-preco .btn:active,#app .impl-fim .btn:active{transform:scale(.97)}
+  /* Painel admin no novo visual e no celular */
+  #app .main-body .btn{background:var(--floresta);color:#fff;border-radius:12px;min-height:46px;box-shadow:none;transition:transform 160ms var(--ease-out)}
+  #app .main-body .btn:active{transform:scale(.97)}
+  #app .main-body .btn.ghost,#app .main-body .btn.sec{background:#fff;color:var(--floresta);border:2px solid var(--linha)}
+  #app .main-body .btn[data-checkout]{background:var(--pink)}
+  #app .abtn{background:var(--floresta);color:#fff;border-color:var(--floresta);min-height:46px;border-radius:12px;transition:transform 160ms var(--ease-out)}
+  #app .abtn:active{transform:scale(.97)}
+  #app .abtn.sec,#app .abtn.ghost,#app .abtn.out{background:#fff;color:var(--floresta);border-color:var(--linha)}
+  #app .abtn.del,#app .abtn.danger{background:#fff;color:#c0392b;border-color:#f1c5c0}
+  #app .ad-tile,#app .adm-wrap{border-color:var(--linha)}
+  #app .ad-bar-i{background:var(--folha)}
+  #app .ad-bar-i.zero{background:#dfeae3}
+  #app .adm-tab .lnk{color:var(--folha);min-height:40px}
+  #app .adm-tab .lnk.del{color:#c0392b}
+  @media (max-width:900px){
+    #app .ad-tiles{grid-template-columns:1fr 1fr;gap:10px}
+    #app .ad-tile{padding:14px}
+    #app .adm-bar{display:grid;gap:10px}
+    #app .adm-bar input,#app .adm-bar select,#app .adm-bar .btn{width:100%;min-height:48px;font-size:16px}
+    /* Tabela de afiliados vira cartões */
+    #app .adm-wrap{background:transparent;border:0;overflow:visible}
+    #app .adm-tab thead{display:none}
+    #app .adm-tab,#app .adm-tab tbody,#app .adm-tab tr,#app .adm-tab td{display:block;width:100%}
+    #app .adm-tab tr{background:#fff;border:1px solid var(--linha);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+    #app .adm-tab td{border:0;padding:6px 0;display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;overflow-wrap:anywhere}
+    #app .adm-tab td::before{color:var(--suave);font-size:.82rem;font-weight:600}
+    #app .adm-tab td:nth-child(1)::before{content:"E-mail"}
+    #app .adm-tab td:nth-child(2)::before{content:"Nome"}
+    #app .adm-tab td:nth-child(3)::before{content:"WhatsApp"}
+    #app .adm-tab td:nth-child(4)::before{content:"Status"}
+    #app .adm-tab td:nth-child(5)::before{content:"Cadastro"}
+    #app .adm-tab td:nth-child(6)::before{content:"Último acesso"}
+    #app .adm-tab td:nth-child(7)::before{content:"Ações"}
+    #app .adm-tab td:nth-child(1){font-weight:700}
+    #app .adm-tab td:nth-child(7){grid-template-columns:96px auto auto;justify-content:start}
+    #app .adm-tab select{min-height:44px;font-size:16px;width:100%}
+    #app .adm-tab .lnk{padding:8px 12px;border-radius:10px;background:var(--nevoa);margin-right:6px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #app .side,#app .app-fundo,#app .go,#app .app-menu-btn{transition:none!important}
+  }
 </style>
 <link rel="stylesheet" href="cursos.css?v=20261029b" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="cursos.css?v=20261029b"></noscript>
@@ -994,7 +1131,15 @@ document.addEventListener('click',function(e){
 </div>
 
 <div id="app">
-  <aside class="side">
+  <header class="app-top">
+    <button type="button" class="app-menu-btn" id="btn-menu" aria-controls="side-menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span>Menu</span>
+    </button>
+    <div class="app-top-txt"><b>Amazol<i>é</i></b><span id="top-sec"></span></div>
+  </header>
+  <div class="app-fundo" id="app-fundo" hidden></div>
+  <aside class="side" id="side-menu" aria-label="Menu da comunidade">
     <div class="side-brand">Amazolé <span>Afiliados</span></div>
     <nav class="side-nav" id="side-nav" aria-label="Menu da comunidade"></nav>
     <div class="side-foot">
@@ -1338,7 +1483,7 @@ document.addEventListener('click',function(e){
     return new Promise(function (res) {
       if (window.Admin) return res();
       var sc = document.createElement("script");
-      sc.src = "admin.js?v=20261029b"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
+      sc.src = "admin.js?v=20261112"; sc.onload = function () { res(); }; sc.onerror = function () { res(); };
       document.head.appendChild(sc);
     });
   }
@@ -1489,6 +1634,8 @@ document.addEventListener('click',function(e){
     });
     $("sec-titulo").textContent = sec.nome;
     $("sec-sub").textContent = sec.sub;
+    if ($("top-sec")) $("top-sec").textContent = sec.nome;
+    fecharMenu();
     var corpo = $("sec-corpo");
     corpo.textContent = "";
     corpo.dataset.t = String(++navCont);
@@ -1554,7 +1701,8 @@ document.addEventListener('click',function(e){
         if (!sec.posts) c.classList.add("com-capa");
         im.src = it.imagem_url; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
         im.addEventListener("error", function () { im.remove(); });
-        c.appendChild(im);
+        // Capa sempre no topo do cartão (a data vem depois dela)
+        if (!sec.posts && c.firstChild) c.insertBefore(im, c.firstChild); else c.appendChild(im);
       }
       c.appendChild(criar("h3", "", it.titulo || ""));
       if (it.texto) c.appendChild(criar("p", "", it.texto));
@@ -1574,6 +1722,35 @@ document.addEventListener('click',function(e){
       corpo.appendChild(c);
     });
   }
+
+  // Menu do celular: painel lateral que abre pelo botão "Menu"
+  function abrirMenu() {
+    document.body.classList.add("menu-aberto");
+    $("app-fundo").hidden = false;
+    $("btn-menu").setAttribute("aria-expanded", "true");
+    var on = document.querySelector("#side-nav button.on") || document.querySelector("#side-nav button");
+    if (on) try { on.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function fecharMenu() {
+    if (!document.body.classList.contains("menu-aberto")) return;
+    document.body.classList.remove("menu-aberto");
+    $("btn-menu").setAttribute("aria-expanded", "false");
+    setTimeout(function () { if (!document.body.classList.contains("menu-aberto")) $("app-fundo").hidden = true; }, 280);
+  }
+  $("btn-menu").addEventListener("click", function () { document.body.classList.contains("menu-aberto") ? fecharMenu() : abrirMenu(); });
+  $("app-fundo").addEventListener("click", fecharMenu);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") fecharMenu(); });
+  // Arrastar o painel para a esquerda fecha
+  (function () {
+    var side = $("side-menu"), x0 = null, y0 = 0;
+    side.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+    side.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0, dy = Math.abs(e.changedTouches[0].clientY - y0);
+      if (dx < -60 && dy < 60) fecharMenu();
+      x0 = null;
+    }, { passive: true });
+  })();
 
   function montarMenu() {
     var nav = $("side-nav");
@@ -1874,6 +2051,7 @@ document.addEventListener('click',function(e){
   $("btn-sair").addEventListener("click", async function () {
     email = ""; gravarEmail("");
     if (ehAdmin) { ehAdmin = false; emailAdmin = ""; await api("admin_sair", {}); }
+    fecharMenu();
     document.body.classList.remove("logado");
     window.scrollTo(0, 0);
   });

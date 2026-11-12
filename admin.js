@@ -550,7 +550,7 @@
       pai.appendChild(l);
       return i;
     }
-    var inCheckout = campo(s1, "Link de pagamento (checkout)", d.checkout_url, "https://...", "Todos os botões “Entrar na comunidade” levam para este link. Vazio mantém o link atual do site.");
+    var inCheckout = campo(s1, "Link de pagamento (checkout)", d.checkout_url, "https://...", "Atenção: hoje a página principal e o quiz usam o checkout fixo de R$ 57 (pagamento57.amazoleafiliados.com.br). Este campo não muda esses botões.");
     var inVideo = campo(s1, "Vídeo do YouTube (link ou código)", d.video_id, "https://youtu.be/...", "Aparece na seção “Veja como funciona na prática”. Vazio esconde a seção.");
 
     s1.appendChild(el("h4", "", "Depoimentos"));
