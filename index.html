@@ -557,6 +557,9 @@
   #landing .prod figcaption{color:var(--texto);font-weight:600}
   #landing .clips{padding:0 0 8px;gap:14px;scrollbar-width:none}
   #landing .clips::-webkit-scrollbar{display:none}
+  #landing [data-auto].rolando{scroll-snap-type:none;scroll-behavior:auto}
+  #landing .marcos{scrollbar-width:none}
+  #landing .marcos::-webkit-scrollbar{display:none}
   #landing .clip video{border:0;border-radius:var(--r-m);background:var(--floresta)}
 
   /* Premiação (mantém o fundo escuro das placas) */
@@ -764,7 +767,7 @@ document.addEventListener('click',function(e){
     <div class="wrap">
       <h2 id="h-premios">Premiação para afiliados</h2>
       <p class="sub">Cada marco de comissões sacadas é comemorado. Você vende, saca as suas comissões e ganha a sua placa da Amazolé.</p>
-      <ol class="marcos">
+      <ol class="marcos" data-auto>
         <li class="marco m1">
           <figure><img src="img/premios/placa-10k.webp" alt="Placa roxa da Amazolé: Parabéns, 10K em comissões" width="404" height="600" loading="lazy" decoding="async"></figure>
           <div class="info">
@@ -883,7 +886,7 @@ document.addEventListener('click',function(e){
     <div class="lp-wrap">
       <h2 id="h-clips">Criativos reais para os seus anúncios</h2>
       <p class="lp-sub">Vídeos da marca para atrair clientes até o seu WhatsApp.</p>
-      <div class="clips" id="clips">
+      <div class="clips" id="clips" data-auto>
         <figure class="clip"><video data-src="media/conteudo/v1.mp4" poster="media/conteudo/v1.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 1" width="240" height="427"></video></figure>
         <figure class="clip"><video data-src="media/conteudo/v2.mp4" poster="media/conteudo/v2.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 2" width="240" height="427"></video></figure>
         <figure class="clip"><video data-src="media/conteudo/v3.mp4" poster="media/conteudo/v3.webp" muted loop playsinline preload="none" aria-label="Vídeo de conteúdo 3" width="240" height="427"></video></figure>
@@ -943,6 +946,44 @@ document.addEventListener('click',function(e){
   <div class="lp-wrap">© 2026 Amazolé, Comunidade de Afiliados</div>
 </footer>
 <script>
+  // Criativos e premiação rolam sozinhos, devagar. Pausa no toque e volta depois de 3 s.
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var VEL = 34; // pixels por segundo
+    document.querySelectorAll("[data-auto]").forEach(function (el) {
+      var pos = 0, ultimo = 0, pausado = false, visivel = false, volta = null, espera = 0;
+      function podeRolar() { return el.scrollWidth - el.clientWidth > 4; }
+      function pausar() {
+        pausado = true; el.classList.remove("rolando");
+        clearTimeout(volta);
+        volta = setTimeout(function () { pos = el.scrollLeft; pausado = false; }, 3000);
+      }
+      ["pointerdown", "touchstart", "wheel", "focusin"].forEach(function (ev) { el.addEventListener(ev, pausar, { passive: true }); });
+      el.addEventListener("mouseenter", function () { pausado = true; clearTimeout(volta); el.classList.remove("rolando"); });
+      el.addEventListener("mouseleave", function () { pos = el.scrollLeft; pausado = false; });
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) { visivel = es[0].isIntersecting; if (visivel) pos = el.scrollLeft; }, { threshold: 0.25 }).observe(el);
+      } else { visivel = true; }
+      function quadro(t) {
+        var dt = ultimo ? Math.min((t - ultimo) / 1000, 0.05) : 0; ultimo = t;
+        if (visivel && !pausado && !document.hidden && podeRolar()) {
+          el.classList.add("rolando");
+          if (espera > 0) { espera -= dt; }
+          else {
+            var fim = el.scrollWidth - el.clientWidth;
+            pos += VEL * dt;
+            if (pos >= fim) {
+              pos = fim; el.scrollLeft = fim; espera = 1.6;
+              setTimeout(function () { if (!pausado) { el.scrollTo({ left: 0, behavior: "smooth" }); pos = 0; espera = 1.4; } }, 1500);
+            } else { el.scrollLeft = pos; }
+          }
+        }
+        requestAnimationFrame(quadro);
+      }
+      requestAnimationFrame(quadro);
+    });
+  })();
+
   // O link do quiz leva junto as UTMs do anúncio
   (function () {
     var q = location.search;
